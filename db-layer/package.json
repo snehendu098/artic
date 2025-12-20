@@ -1,0 +1,24 @@
+{
+  "name": "db-layer",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "db:generate": "bun drizzle-kit generate",
+    "db:migrate": "bun drizzle-kit migrate",
+    "db:studio": "bun drizzle-kit studio"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
+    "drizzle-orm": "^0.45.1",
+    "hono": "^4.11.1",
+    "pg": "^8.16.3",
+    "viem": "^2.43.2"
+  },
+  "devDependencies": {
+    "dotenv": "^17.2.3",
+    "drizzle-kit": "^0.31.8",
+    "wrangler": "^4.4.0"
+  }
+}
