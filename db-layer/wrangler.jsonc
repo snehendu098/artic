@@ -8,10 +8,10 @@
 			"binding": "ARTIC",
 			"id": "67d36f839ca04174b166b86461a26d87"
 		}
-	]
-	// "compatibility_flags": [
-	//   "nodejs_compat"
-	// ],
+	],
+	"compatibility_flags": [
+	  "nodejs_compat"
+	],
 	// "vars": {
 	//   "MY_VAR": "my-variable"
 	// },

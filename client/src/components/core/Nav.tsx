@@ -8,9 +8,7 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu";
 import Image from "next/image";
-import { ConnectButton } from "thirdweb/react";
-import { client } from "@/lib/thirdweb-client";
-import { defineChain } from "thirdweb";
+import ConnectButton from "./ConnectButton";
 
 const nav = [
   { title: "Home", link: "/" },
@@ -20,29 +18,23 @@ const nav = [
 
 function Nav() {
   return (
-    <div className="w-full p-4 flex px-8 justify-between items-center">
+    <div className="w-full p-4 flex px-8 justify-between border-b items-center">
       <div className="flex items-center space-x-4">
         <Image
           src={"/logo.png"}
           alt="logo"
-          width={40}
-          height={40}
+          width={30}
+          height={30}
           className="aspect-square"
         />
-        <p className="text-2xl font-semibold">ARTIC</p>
+        <p className="text-2xl">ARTIC</p>
       </div>
       {/* Nav Items */}
       <NavigationMenuDemo />
       {/* Connect Button */}
+
       <div>
-        <ConnectButton
-          client={client}
-          chains={[defineChain(5003), defineChain(5000)]}
-          connectButton={{
-            className:
-              "!bg-primary !rounded-2xl !hover:bg-primary/40 !text-white",
-          }}
-        />
+        <ConnectButton />
       </div>
     </div>
   );

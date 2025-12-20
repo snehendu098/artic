@@ -1,4 +1,11 @@
-import { pgTable, text, uuid, foreignKey, boolean } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  uuid,
+  foreignKey,
+  boolean,
+  date,
+} from "drizzle-orm/pg-core";
 
 export const userTable = pgTable("users", {
   id: uuid().primaryKey(),
@@ -11,6 +18,7 @@ export const delegationWallets = pgTable(
     id: uuid().primaryKey(),
     user: text().notNull(),
     delegationWalletPk: text().notNull(),
+    createdAt: date().defaultNow(),
   },
   (table) => [
     foreignKey({
@@ -27,8 +35,8 @@ export const strategySchema = pgTable(
     id: uuid().primaryKey(),
     strategy: text().notNull(),
     creatorWallet: text(),
-    delegationWallet: uuid(),
     isActive: boolean().default(false),
+    createdAt: date().defaultNow(),
   },
   (table) => [
     foreignKey({
@@ -36,10 +44,50 @@ export const strategySchema = pgTable(
       foreignColumns: [userTable.wallet],
       name: "strategy_creator_wallet_fk",
     }),
+  ],
+);
+
+export const strategySubscriptions = pgTable(
+  "strategy_subscriptions",
+  {
+    id: uuid().primaryKey(),
+    strategyId: uuid().notNull(),
+    userWallet: text().notNull(),
+    isActive: boolean().default(false),
+    createdAt: date().defaultNow(),
+  },
+  (table) => [
     foreignKey({
-      columns: [table.delegationWallet],
+      columns: [table.strategyId],
+      foreignColumns: [strategySchema.id],
+      name: "strategy_subscription_strategy_fk",
+    }),
+    foreignKey({
+      columns: [table.userWallet],
+      foreignColumns: [userTable.wallet],
+      name: "strategy_subscription_user_fk",
+    }),
+  ],
+);
+
+export const subscriptionWallets = pgTable(
+  "subscription_wallets",
+  {
+    id: uuid().primaryKey(),
+    subscriptionId: uuid().notNull(),
+    delegationWalletId: uuid().notNull(),
+    createdAt: date().defaultNow(),
+  },
+  (table) => [
+    foreignKey({
+      columns: [table.subscriptionId],
+      foreignColumns: [strategySubscriptions.id],
+      name: "subscription_wallet_subscription_fk",
+    }),
+    foreignKey({
+      columns: [table.delegationWalletId],
       foreignColumns: [delegationWallets.id],
-      name: "strategy_delegation_wallet_fk",
+      name: "subscription_wallet_delegation_fk",
     }),
   ],
 );
@@ -51,6 +99,7 @@ export const walletActions = pgTable(
     action: text(),
     strategy: uuid(),
     stateChange: text(),
+    createdAt: date().defaultNow(),
   },
   (table) => [
     foreignKey({
