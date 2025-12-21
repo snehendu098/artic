@@ -27,6 +27,7 @@ export interface StrategyInfo {
 export interface WalletAction {
   id: string;
   action: string;
+  emoji?: string;
   stateChange: string;
   userWallet: string;
   createdAt: Date | string;
@@ -274,5 +275,58 @@ export async function fetchRecentWalletActions(
   } catch (error) {
     console.error("Error fetching wallet actions:", error);
     return [];
+  }
+}
+
+export interface StrategyDetail {
+  id: string;
+  name: string;
+  strategy: string;
+  creatorWallet: string | null;
+  isActive: boolean;
+  createdAt: string | null;
+  subscriberCount: number;
+}
+
+export interface StrategyPageData {
+  strategy: StrategyDetail;
+  isActiveForUser: boolean;
+  delegationWallet: string | null;
+  walletActions: WalletAction[];
+  subscribers: Array<{ userWallet: string }>;
+}
+
+export async function fetchStrategyDetails(
+  strategyId: string,
+  userWallet?: string
+): Promise<StrategyPageData | null> {
+  try {
+    const url = `${API_BASE_URL}/strategies/${encodeURIComponent(strategyId)}/details`;
+    console.log("Fetching strategy details from:", url);
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        ...(userWallet && { "X-User-Wallet": userWallet }),
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch strategy details: ${response.status}`);
+    }
+
+    const data: ApiResponse<StrategyPageData> = await response.json();
+
+    if (!data.success || !data.data) {
+      throw new Error(data.message || "Failed to fetch strategy details");
+    }
+
+    console.log("Strategy details fetched successfully:", data.data);
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching strategy details:", error);
+    return null;
   }
 }

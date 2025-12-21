@@ -1,7 +1,8 @@
-import { strategySchema, strategySubscriptions, subscriptionWallets } from "../schema";
+import { strategySchema, strategySubscriptions, subscriptionWallets, delegationWallets, walletActions } from "../schema";
 import { eq, count } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { validateDelegationWalletOwnership } from "./delegation.actions";
+import { privateKeyToAccount } from "viem/accounts";
 
 export interface CreateStrategyResult {
   strategyId: string;
@@ -166,4 +167,138 @@ export const getStrategiesForUser = async (
   }
 
   return results;
+};
+
+export interface StrategyDetailResponse {
+  strategy: {
+    id: string;
+    name: string;
+    strategy: string;
+    creatorWallet: string | null;
+    isActive: boolean;
+    createdAt: string | null;
+    subscriberCount: number;
+  };
+  isActiveForUser: boolean;
+  delegationWallet: string | null;
+  walletActions: Array<{
+    id: string;
+    action: string;
+    emoji?: string;
+    stateChange?: string;
+    userWallet: string;
+    createdAt: Date | null;
+  }>;
+  subscribers: Array<{ userWallet: string }>;
+}
+
+export const getStrategyDetailsById = async (
+  database: any,
+  strategyId: string,
+  userWallet?: string
+): Promise<StrategyDetailResponse | null> => {
+  // Query 1: Get strategy details
+  const strategy = await database
+    .select()
+    .from(strategySchema)
+    .where(eq(strategySchema.id, strategyId))
+    .limit(1);
+
+  if (!strategy || strategy.length === 0) {
+    return null;
+  }
+
+  const strategyData = strategy[0];
+
+  // Query 2: Get subscriber count
+  const subscriberCountResult = await database
+    .select({
+      count: count(strategySubscriptions.id),
+    })
+    .from(strategySubscriptions)
+    .where(eq(strategySubscriptions.strategyId, strategyId));
+
+  const subscriberCount = subscriberCountResult[0]?.count || 0;
+
+  // Query 3: Check if user is subscribed
+  let isActiveForUser = false;
+  let delegationWallet: string | null = null;
+
+  if (userWallet) {
+    const subscription = await database
+      .select()
+      .from(strategySubscriptions)
+      .where(
+        eq(strategySubscriptions.strategyId, strategyId)
+      )
+      .where(eq(strategySubscriptions.userWallet, userWallet))
+      .limit(1);
+
+    if (subscription && subscription.length > 0) {
+      isActiveForUser = subscription[0].isActive;
+
+      // Get delegation wallet for this subscription
+      const delegationRecord = await database
+        .select({
+          delegationWalletId: subscriptionWallets.delegationWalletId,
+        })
+        .from(subscriptionWallets)
+        .where(eq(subscriptionWallets.subscriptionId, subscription[0].id))
+        .limit(1);
+
+      if (delegationRecord && delegationRecord.length > 0) {
+        const delegationWalletRecord = await database
+          .select()
+          .from(delegationWallets)
+          .where(eq(delegationWallets.id, delegationRecord[0].delegationWalletId))
+          .limit(1);
+
+        if (delegationWalletRecord && delegationWalletRecord.length > 0) {
+          const account = privateKeyToAccount(
+            delegationWalletRecord[0].delegationWalletPk as `0x${string}`
+          );
+          delegationWallet = account.address;
+        }
+      }
+    }
+  }
+
+  // Query 4: Get wallet actions for this strategy
+  const actions = await database
+    .select()
+    .from(walletActions)
+    .where(eq(walletActions.strategy, strategyId));
+
+  // Query 5: Get all subscribers
+  const subscribers = await database
+    .select({
+      userWallet: strategySubscriptions.userWallet,
+    })
+    .from(strategySubscriptions)
+    .where(eq(strategySubscriptions.strategyId, strategyId));
+
+  return {
+    strategy: {
+      id: strategyData.id,
+      name: strategyData.name,
+      strategy: strategyData.strategy,
+      creatorWallet: strategyData.creatorWallet,
+      isActive: strategyData.isActive,
+      createdAt: strategyData.createdAt,
+      subscriberCount,
+    },
+    isActiveForUser,
+    delegationWallet,
+    walletActions: actions.map((action: any) => ({
+      id: action.id,
+      action: action.action,
+      emoji: action.emoji,
+      stateChange: action.stateChange,
+      userWallet: action.userWallet,
+      createdAt: action.createdAt,
+    })),
+    subscribers: subscribers.map((sub: any) => ({
+      userWallet: sub.userWallet,
+    })),
+  };
 };

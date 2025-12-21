@@ -5,6 +5,7 @@ import { randomUUID } from "crypto";
 export interface WalletActionRecord {
   id: string;
   action: string;
+  emoji?: string;
   strategy: string;
   userWallet: string;
   delegationWalletId: string;
@@ -16,6 +17,7 @@ export interface WalletActionRecord {
 export interface RecentWalletAction {
   id: string;
   action: string;
+  emoji?: string;
   stateChange?: string;
   userWallet: string;
   createdAt: Date;
@@ -58,7 +60,7 @@ export const createWalletActions = async (
   userWallet: string,
   delegationWalletId: string,
   subscriptionId: string,
-  actions: Array<{ action: string; stateChange?: string }>,
+  actions: Array<{ action: string; emoji?: string; stateChange?: string }>,
 ): Promise<WalletActionRecord[]> => {
   const createdActions: WalletActionRecord[] = [];
 
@@ -68,6 +70,7 @@ export const createWalletActions = async (
     await database.insert(walletActions).values({
       id: actionId,
       action: action.action,
+      emoji: action.emoji,
       strategy: strategyId,
       userWallet: userWallet,
       delegationWalletId: delegationWalletId,
@@ -78,6 +81,7 @@ export const createWalletActions = async (
     createdActions.push({
       id: actionId,
       action: action.action,
+      emoji: action.emoji,
       strategy: strategyId,
       userWallet: userWallet,
       delegationWalletId: delegationWalletId,
@@ -98,6 +102,7 @@ export const getRecentWalletActions = async (
     .select({
       id: walletActions.id,
       action: walletActions.action,
+      emoji: walletActions.emoji,
       stateChange: walletActions.stateChange,
       userWallet: walletActions.userWallet,
       createdAt: walletActions.createdAt,

@@ -3,7 +3,7 @@ import { Env } from "./types";
 import { createDelegationWallet } from "./controllers/user.controller";
 import { createStrategyHandler } from "./controllers/strategy.controller";
 import { updateStrategyStateHandler } from "./controllers/strategy-state.controller";
-import { fetchDelegationWallets, fetchStrategies, fetchStrategiesForUser } from "./controllers/fetch.controller";
+import { fetchDelegationWallets, fetchStrategies, fetchStrategiesForUser, fetchStrategyDetailsById } from "./controllers/fetch.controller";
 import { fetchRecentWalletActions } from "./controllers/wallet-action.controller";
 import { requireApiKey } from "./middleware/auth.middleware";
 import { fetchActiveSubscriptionsHandler } from "./controllers/bot.controller";
@@ -23,6 +23,7 @@ app.get("/users/delegations/:wallet", fetchDelegationWallets);
 // Strategy endpoints
 app.post("/strategies/create", createStrategyHandler);
 app.post("/strategies/state-update", updateStrategyStateHandler);
+app.get("/strategies/:strategyId/details", fetchStrategyDetailsById);
 app.get("/strategies/:creatorWallet", fetchStrategies);
 app.get("/user/:userWallet/strategies", fetchStrategiesForUser);
 

@@ -8,8 +8,10 @@ import {
 import {
   getStrategiesByCreator,
   getStrategiesForUser,
+  getStrategyDetailsById,
   Strategy,
   StrategyInfo,
+  StrategyDetailResponse,
 } from "../db/actions/strategy.actions";
 import { privateKeyToAccount } from "viem/accounts";
 
@@ -141,6 +143,64 @@ export const fetchStrategiesForUser = async (c: Context<Env>) => {
         message: "User strategies retrieved successfully",
         data: strategies,
       } as ApiResponse<StrategyInfo[]>,
+      200,
+    );
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Internal server error";
+
+    return c.json(
+      {
+        success: false,
+        message: errorMessage,
+        data: null,
+      } as ApiResponse,
+      500,
+    );
+  }
+};
+
+export const fetchStrategyDetailsById = async (c: Context<Env>) => {
+  try {
+    const strategyId = c.req.param("strategyId");
+    const userWallet = c.req.header("X-User-Wallet");
+
+    // Validate input
+    if (!strategyId || typeof strategyId !== "string") {
+      return c.json(
+        {
+          success: false,
+          message: "strategyId parameter is required and must be a string",
+          data: null,
+        } as ApiResponse,
+        400,
+      );
+    }
+
+    const database = db(c.env.DATABASE_URL);
+    const strategyDetails = await getStrategyDetailsById(
+      database,
+      strategyId,
+      userWallet
+    );
+
+    if (!strategyDetails) {
+      return c.json(
+        {
+          success: false,
+          message: "Strategy not found",
+          data: null,
+        } as ApiResponse,
+        404,
+      );
+    }
+
+    return c.json(
+      {
+        success: true,
+        message: "Strategy details retrieved successfully",
+        data: strategyDetails,
+      } as ApiResponse<StrategyDetailResponse>,
       200,
     );
   } catch (error) {

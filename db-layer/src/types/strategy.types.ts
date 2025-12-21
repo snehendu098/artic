@@ -17,6 +17,7 @@ export interface CreateStrategyData {
 
 export interface StateChangeAction {
   action: string;
+  emoji?: string;
   stateChange?: string;
 }
 
@@ -31,6 +32,7 @@ export interface UpdateStrategyStateRequest {
 export interface WalletActionData {
   id: string;
   action: string;
+  emoji?: string;
   strategy: string;
   subscriptionId: string;
   stateChange?: string;

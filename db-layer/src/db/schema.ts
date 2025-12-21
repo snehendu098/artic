@@ -99,6 +99,7 @@ export const walletActions = pgTable(
   {
     id: uuid().primaryKey(),
     action: text(),
+    emoji: text(),
     strategy: uuid(),
     userWallet: text().notNull(),
     delegationWalletId: uuid().notNull(),

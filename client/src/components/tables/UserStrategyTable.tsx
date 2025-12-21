@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Settings, PlusIcon } from "lucide-react";
+import { Eye, PlusIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   Table,
@@ -86,8 +86,11 @@ const UserStrategyTable = ({
           </TableHeader>
           <TableBody>
             {data.map((strategy, index) => (
-              <TableRow key={strategy.strategyId} className="px-4">
-                <TableCell className="text-sm font-semibold">
+              <TableRow key={strategy.strategyId} className="px-4 cursor-pointer hover:bg-white/5">
+                <TableCell
+                  className="text-sm font-semibold cursor-pointer"
+                  onClick={() => router.push(`/strategy/${strategy.strategyId}`)}
+                >
                   {strategy.name}
                 </TableCell>
                 <TableCell className="text-sm text-center">
@@ -116,9 +119,10 @@ const UserStrategyTable = ({
                     variant="outline"
                     size="sm"
                     className="gap-2"
-                    title="Settings"
+                    title="View Strategy"
+                    onClick={() => router.push(`/strategy/${strategy.strategyId}`)}
                   >
-                    <Settings size={16} />
+                    <Eye size={16} />
                   </Button>
                 </TableCell>
               </TableRow>
