@@ -77,7 +77,21 @@ export function PrivyConnectButton() {
     };
 
     fetchData();
-  }, [address]);
+
+    // Listen for chain change events
+    if (typeof window !== "undefined" && window.ethereum) {
+      const handleChainChanged = (chainIdHex: string) => {
+        const newChainId = parseInt(chainIdHex, 16);
+        setChainId(newChainId);
+      };
+
+      window.ethereum.on("chainChanged", handleChainChanged);
+
+      return () => {
+        window.ethereum.removeListener("chainChanged", handleChainChanged);
+      };
+    }
+  }, [address, chainId]);
 
   const handleCopyAddress = async (addr: string) => {
     await navigator.clipboard.writeText(addr);
@@ -86,7 +100,10 @@ export function PrivyConnectButton() {
   };
 
   const switchNetwork = async (targetChainId: number) => {
-    if (!window.ethereum) return;
+    if (!window.ethereum) {
+      console.error("window.ethereum is not available");
+      return;
+    }
 
     try {
       const chainIdHex = `0x${targetChainId.toString(16)}`;
@@ -94,6 +111,7 @@ export function PrivyConnectButton() {
         method: "wallet_switchEthereumChain",
         params: [{ chainId: chainIdHex }],
       });
+      // Refresh balance after successful network switch
       setChainId(targetChainId);
     } catch (error: any) {
       if (error.code === 4902) {
@@ -112,9 +130,12 @@ export function PrivyConnectButton() {
               },
             ],
           });
+          setChainId(targetChainId);
         } catch (addError) {
           console.error("Error adding chain:", addError);
         }
+      } else {
+        console.error("Error switching network:", error);
       }
     }
   };
