@@ -1,6 +1,7 @@
 "use client";
 
-import { InfoIcon, CheckCircle2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Settings, PlusIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   Table,
@@ -23,36 +24,7 @@ const UserStrategyTable = ({
   loading = false,
   error = null,
 }: UserStrategyTableProps) => {
-  const getStatusBadge = (isActive: boolean) => {
-    if (isActive) {
-      return (
-        <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-green-500/20 text-green-400 text-xs font-medium">
-          <CheckCircle2 size={14} />
-          Active
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-gray-500/20 text-gray-400 text-xs font-medium">
-        Inactive
-      </span>
-    );
-  };
-
-  const getCreatorBadge = (isCreator: boolean) => {
-    if (isCreator) {
-      return (
-        <span className="inline-flex items-center px-2 py-1 rounded bg-purple-500/20 text-purple-400 text-xs font-medium">
-          Creator
-        </span>
-      );
-    }
-    return (
-      <span className="inline-flex items-center px-2 py-1 rounded bg-blue-500/20 text-blue-400 text-xs font-medium">
-        Subscribed
-      </span>
-    );
-  };
+  const router = useRouter();
 
   if (error) {
     return (
@@ -71,6 +43,14 @@ const UserStrategyTable = ({
     <div className="w-full border bg-neutral-900 rounded-md">
       <div className="w-full flex items-center justify-between px-4 py-3 border-b">
         <p className="font-semibold">Your Strategies</p>
+        <Button
+          size="sm"
+          className="border"
+          variant={"outline"}
+          onClick={() => router.push("/create")}
+        >
+          <PlusIcon size={18} />
+        </Button>
       </div>
 
       {loading ? (
@@ -87,11 +67,10 @@ const UserStrategyTable = ({
         <Table className="text-white/50">
           <TableHeader>
             <TableRow className="px-4">
-              <TableHead className="w-12 text-white/60 pl-4">No.</TableHead>
-              <TableHead className="text-white/60">Strategy ID</TableHead>
+              <TableHead className="text-white/60">Strategy Name</TableHead>
               <TableHead className="text-white/60 text-center">Subscribers</TableHead>
-              <TableHead className="text-white/60 text-center">Status</TableHead>
-              <TableHead className="text-white/60 text-center">Type</TableHead>
+              <TableHead className="text-white/60 text-center">Active</TableHead>
+              <TableHead className="text-white/60 text-center">Public</TableHead>
               <TableHead className="w-16 text-right text-white/60 pr-4">
                 Actions
               </TableHead>
@@ -100,29 +79,40 @@ const UserStrategyTable = ({
           <TableBody>
             {data.map((strategy, index) => (
               <TableRow key={strategy.strategyId} className="px-4">
-                <TableCell className="font-medium text-sm pl-4">
-                  {index + 1}
-                </TableCell>
-                <TableCell className="font-mono text-sm">
-                  {strategy.strategyId.slice(0, 8)}...{strategy.strategyId.slice(-4)}
+                <TableCell className="text-sm font-semibold">
+                  {strategy.name}
                 </TableCell>
                 <TableCell className="text-sm text-center">
                   {strategy.subscriberCount}
                 </TableCell>
                 <TableCell className="text-sm text-center">
-                  {getStatusBadge(strategy.isActiveForUser)}
+                  <div className="flex justify-center">
+                    <div
+                      className={`w-3 h-3 rounded-full animate-pulse ${
+                        strategy.isActiveForUser
+                          ? "bg-green-500"
+                          : "bg-red-500"
+                      }`}
+                    />
+                  </div>
                 </TableCell>
                 <TableCell className="text-sm text-center">
-                  {getCreatorBadge(strategy.isCreator)}
+                  <div className="flex justify-center">
+                    <div
+                      className={`w-3 h-3 rounded-full animate-pulse ${
+                        strategy.isPublic ? "bg-green-500" : "bg-red-500"
+                      }`}
+                    />
+                  </div>
                 </TableCell>
                 <TableCell className="text-right pr-4">
                   <Button
                     variant="outline"
                     size="sm"
                     className="gap-2"
-                    title="View strategy details"
+                    title="Settings"
                   >
-                    <InfoIcon size={16} />
+                    <Settings size={16} />
                   </Button>
                 </TableCell>
               </TableRow>

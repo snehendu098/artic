@@ -8,6 +8,17 @@ export const createStrategyHandler = async (c: Context<Env>) => {
   try {
     const body = await c.req.json() as CreateStrategyRequest;
 
+    if (!body.name || typeof body.name !== "string") {
+      return c.json(
+        {
+          success: false,
+          message: "name field is required and must be a string",
+          data: null,
+        } as ApiResponse,
+        400
+      );
+    }
+
     if (!body.strategy || typeof body.strategy !== "string") {
       return c.json(
         {
@@ -30,13 +41,14 @@ export const createStrategyHandler = async (c: Context<Env>) => {
       );
     }
 
-    const isActive = body.activate === true;
+    const isActive = body.isActive === true;
+    const isPublic = body.isPublic === true;
 
     if (isActive && !body.delegationWallet) {
       return c.json(
         {
           success: false,
-          message: "delegationWallet is required when activate is true",
+          message: "delegationWallet is required when isActive is true",
           data: null,
         } as ApiResponse,
         400
@@ -50,10 +62,12 @@ export const createStrategyHandler = async (c: Context<Env>) => {
       const strategy = await createStrategy(
         tx,
         strategyId,
+        body.name,
         body.strategy,
         body.creatorWallet,
         body.delegationWallet || null,
-        isActive
+        isActive,
+        isPublic
       );
 
       return strategy;

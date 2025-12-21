@@ -3,11 +3,9 @@
 import GridInfoCard, {
   GridInfoCardProps,
 } from "@/components/cards/GridInfoCard";
-import Table from "@/components/tables/Table";
 import CreateDelegationDialog from "@/components/dialogs/CreateDelegationDialog";
 import { usePrivy } from "@privy-io/react-auth";
 import { useEffect, useState } from "react";
-import { Plus } from "lucide-react";
 import {
   fetchDelegationWallets,
   fetchStrategies,
@@ -35,7 +33,9 @@ export default function Home() {
   // User strategies state
   const [userStrategies, setUserStrategies] = useState<StrategyInfo[]>([]);
   const [userStrategiesLoading, setUserStrategiesLoading] = useState(false);
-  const [userStrategiesError, setUserStrategiesError] = useState<string | null>(null);
+  const [userStrategiesError, setUserStrategiesError] = useState<string | null>(
+    null,
+  );
 
   // Dialog state
   const [createDelegationOpen, setCreateDelegationOpen] = useState(false);
@@ -85,7 +85,9 @@ export default function Home() {
         setUserStrategies(userStrategyData);
       } catch (error) {
         setUserStrategiesError(
-          error instanceof Error ? error.message : "Failed to fetch user strategies",
+          error instanceof Error
+            ? error.message
+            : "Failed to fetch user strategies",
         );
       } finally {
         setUserStrategiesLoading(false);
@@ -104,15 +106,6 @@ export default function Home() {
     { title: "Strategies", value: String(strategies.length), imageNum: 2 },
     { title: "Projected APY", value: "5%", imageNum: 3 },
   ];
-
-  const handleCreateStrategy = () => {
-    console.log("Create new strategy");
-    // Add your create strategy modal/navigation logic here
-  };
-
-  const handleCreateDelegation = () => {
-    setCreateDelegationOpen(true);
-  };
 
   const handleDelegationCreated = async () => {
     // Refetch delegations after successful creation

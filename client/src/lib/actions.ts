@@ -18,6 +18,7 @@ export interface Strategy {
 
 export interface StrategyInfo {
   strategyId: string;
+  name: string;
   subscriberCount: number;
   isActiveForUser: boolean;
   isCreator: boolean;
@@ -128,6 +129,64 @@ export async function fetchStrategiesForUser(
   } catch (error) {
     console.error("Error fetching user strategies:", error);
     return [];
+  }
+}
+
+export async function createStrategy(
+  name: string,
+  strategyContent: string,
+  creatorWallet: string,
+  isPublic: boolean,
+  activate: boolean,
+  delegationWallet?: string
+): Promise<{ success: boolean; error?: string; data?: any }> {
+  try {
+    const url = `${API_BASE_URL}/strategies/create`;
+    console.log("Creating strategy at:", url);
+
+    const requestBody: any = {
+      name,
+      strategy: strategyContent,
+      creatorWallet,
+      isPublic,
+      isActive: activate,
+    };
+
+    if (activate && delegationWallet) {
+      requestBody.delegationWallet = delegationWallet;
+    }
+
+    console.log("Request body:", requestBody);
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestBody),
+    });
+
+    console.log("Response status:", response.status);
+
+    const data: ApiResponse = await response.json();
+
+    console.log("Response data:", data);
+
+    if (!response.ok || !data.success) {
+      return {
+        success: false,
+        error: data.message || "Failed to create strategy",
+      };
+    }
+
+    console.log("Strategy created successfully!");
+    return { success: true, data: data.data };
+  } catch (error) {
+    console.error("Error creating strategy:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to create strategy",
+    };
   }
 }
 

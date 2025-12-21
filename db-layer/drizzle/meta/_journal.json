@@ -50,6 +50,13 @@
       "when": 1766272671735,
       "tag": "0006_youthful_galactus",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1766274095964,
+      "tag": "0007_long_gorgon",
+      "breakpoints": true
     }
   ]
 }

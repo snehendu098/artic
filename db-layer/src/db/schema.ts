@@ -33,9 +33,11 @@ export const strategySchema = pgTable(
   "strategy",
   {
     id: uuid().primaryKey(),
+    name: text().notNull(),
     strategy: text().notNull(),
     creatorWallet: text(),
     isActive: boolean().default(false),
+    isPublic: boolean().default(false),
     createdAt: date().defaultNow(),
   },
   (table) => [
