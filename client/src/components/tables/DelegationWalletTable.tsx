@@ -61,7 +61,7 @@ const DelegationWalletTable = ({
   }
 
   return (
-    <div className="w-full border border-white/10 bg-card gradient-content rounded-lg overflow-hidden">
+    <div className="w-full border border-white/10 bg-card gradient-card-subtle rounded-lg overflow-hidden">
       <div className="w-full flex items-center justify-between px-4 py-3 border-b border-white/10">
         <p className="font-semibold">Delegation Wallets</p>
         <Button

@@ -143,7 +143,7 @@ export default function CreateStrategyPage() {
   return (
     <div className="w-full min-h-screen">
       {/* Header */}
-      <div className=" border-neutral-800/50 sticky top-0 z-10 backdrop-blur-sm">
+      <div className="border-white/10 sticky top-0 z-10 backdrop-blur-sm">
         <div className="max-w-5xl mx-auto px-4 py-5 flex items-center gap-4">
           <Button
             variant="ghost"
@@ -153,7 +153,7 @@ export default function CreateStrategyPage() {
           >
             <ArrowLeft size={16} />
           </Button>
-          <h1 className="text-xl font-semibold text-white">Create Strategy</h1>
+          <h1 className="text-xl font-semibold">Create Strategy</h1>
         </div>
       </div>
 
@@ -161,7 +161,7 @@ export default function CreateStrategyPage() {
       <div className="max-w-5xl mx-auto px-4 pb-8">
         {/* Error Alert */}
         {error && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-md text-red-400 text-sm">
+          <div className="mb-6 p-4 bg-red-500/5 border border-red-500/30 rounded-lg text-red-500 text-sm gradient-card-subtle">
             {error}
           </div>
         )}
@@ -169,9 +169,9 @@ export default function CreateStrategyPage() {
         {/* Form */}
         <div className="space-y-6">
           {/* Strategy Details Section */}
-          <div className="space-y-4 p-6 bg-neutral-900 border border-neutral-800 rounded-md">
+          <div className="space-y-4 p-6 bg-card gradient-card-subtle border border-white/10 rounded-lg">
             <div>
-              <label className="block text-sm font-semibold text-white mb-2">
+              <label className="block text-sm font-semibold mb-2">
                 Strategy Name <span className="text-red-400">*</span>
               </label>
               <input
@@ -180,15 +180,15 @@ export default function CreateStrategyPage() {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g., Conservative Growth Strategy"
                 disabled={loading}
-                className="w-full px-4 py-2 bg-neutral-800 border border-neutral-700 rounded-md text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-600 focus:border-transparent disabled:opacity-50 transition-all"
+                className="w-full px-4 py-2 bg-background/50 border border-white/10 rounded-md text-foreground placeholder-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent disabled:opacity-50 transition-all"
               />
-              <p className="text-xs text-neutral-400 mt-1">
+              <p className="text-xs text-foreground/50 mt-1">
                 Give your strategy a clear, descriptive name
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-white mb-2">
+              <label className="block text-sm font-semibold mb-2">
                 Strategy Description <span className="text-red-400">*</span>
               </label>
               <textarea
@@ -202,9 +202,9 @@ export default function CreateStrategyPage() {
   - invest 40% of my assets to aave`}
                 disabled={loading}
                 rows={14}
-                className="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-neutral-600 focus:border-transparent disabled:opacity-50 resize-none transition-all whitespace-pre-wrap"
+                className="w-full px-4 py-3 bg-background/50 border border-white/10 rounded-md text-sm text-foreground placeholder-foreground/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent disabled:opacity-50 resize-none transition-all whitespace-pre-wrap"
               />
-              <p className="text-xs text-neutral-400 mt-2">
+              <p className="text-xs text-foreground/50 mt-2">
                 Use bullet points with conditions (if...) and actions (then
                 do...). Write in simple English describing what should happen
                 under different market conditions.
@@ -213,16 +213,16 @@ export default function CreateStrategyPage() {
           </div>
 
           {/* Configuration Section */}
-          <div className="space-y-4 p-6 bg-neutral-900 border border-neutral-800 rounded-md">
-            <h3 className="text-sm font-semibold text-white">Configuration</h3>
+          <div className="space-y-4 p-6 bg-card gradient-card-subtle border border-white/10 rounded-lg">
+            <h3 className="text-sm font-semibold">Configuration</h3>
 
             {/* Marketplace Toggle */}
-            <div className="flex items-center justify-between pt-2 pb-3 border-b border-neutral-800">
+            <div className="flex items-center justify-between pt-2 pb-3 border-b border-white/10">
               <div className="flex-1">
-                <p className="text-sm font-medium text-white">
+                <p className="text-sm font-medium">
                   Available in Marketplace
                 </p>
-                <p className="text-xs text-neutral-400 mt-1">
+                <p className="text-xs text-foreground/50 mt-1">
                   Allow other users to subscribe to this strategy
                 </p>
               </div>
@@ -237,8 +237,8 @@ export default function CreateStrategyPage() {
             {/* Activate Now Toggle */}
             <div className="flex items-center justify-between py-3">
               <div className="flex-1">
-                <p className="text-sm font-medium text-white">Activate Now</p>
-                <p className="text-xs text-neutral-400 mt-1">
+                <p className="text-sm font-medium">Activate Now</p>
+                <p className="text-xs text-foreground/50 mt-1">
                   Immediately activate this strategy on a delegation wallet
                 </p>
               </div>
@@ -253,11 +253,11 @@ export default function CreateStrategyPage() {
 
           {/* Conditional Delegation Wallet Section */}
           {activateNow && (
-            <div className="space-y-4 p-6 bg-neutral-900 border border-neutral-800 rounded-md">
-              <label className="block text-sm font-semibold text-white mb-1">
+            <div className="space-y-4 p-6 bg-card gradient-card-subtle border border-white/10 rounded-lg">
+              <label className="block text-sm font-semibold mb-1">
                 Select Delegation Wallet <span className="text-red-400">*</span>
               </label>
-              <p className="text-xs text-neutral-400 mb-3">
+              <p className="text-xs text-foreground/50 mb-3">
                 Choose which delegation wallet to activate this strategy on
               </p>
               <Select
@@ -283,7 +283,7 @@ export default function CreateStrategyPage() {
                 </SelectContent>
               </Select>
               {delegations.length === 0 && !delegationsLoading && (
-                <p className="text-xs text-yellow-600 mt-2 p-2 bg-yellow-500/10 rounded border border-yellow-500/20">
+                <p className="text-xs text-yellow-600 dark:text-yellow-500/90 mt-2 p-2 bg-yellow-500/10 rounded-md border border-yellow-500/20 gradient-card-subtle">
                   No delegation wallets found. Create one first.
                 </p>
               )}
