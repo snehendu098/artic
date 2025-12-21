@@ -1,5 +1,7 @@
-import { strategySchema, strategySubscriptions } from "../schema";
+import { strategySchema, strategySubscriptions, subscriptionWallets } from "../schema";
 import { eq, count } from "drizzle-orm";
+import { randomUUID } from "crypto";
+import { validateDelegationWalletOwnership } from "./delegation.actions";
 
 export interface CreateStrategyResult {
   strategyId: string;
@@ -36,6 +38,33 @@ export const createStrategy = async (
     isActive,
     isPublic,
   });
+
+  // Auto-subscribe the creator if the strategy is active
+  if (isActive) {
+    // Validate delegation wallet if provided
+    if (delegationWallet) {
+      await validateDelegationWalletOwnership(database, delegationWallet, creatorWallet);
+    } else {
+      throw new Error("delegationWallet is required when isActive is true");
+    }
+
+    const subscriptionId = randomUUID();
+
+    // Create subscription
+    await database.insert(strategySubscriptions).values({
+      id: subscriptionId,
+      strategyId: strategyId,
+      userWallet: creatorWallet,
+      isActive: true,
+    });
+
+    // Link delegation wallet to subscription
+    await database.insert(subscriptionWallets).values({
+      id: randomUUID(),
+      subscriptionId: subscriptionId,
+      delegationWalletId: delegationWallet,
+    });
+  }
 
   return {
     strategyId,

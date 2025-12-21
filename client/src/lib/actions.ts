@@ -24,6 +24,15 @@ export interface StrategyInfo {
   isCreator: boolean;
 }
 
+export interface WalletAction {
+  id: string;
+  action: string;
+  stateChange: string;
+  userWallet: string;
+  createdAt: Date | string;
+  strategyName?: string;
+}
+
 interface ApiResponse<T> {
   success: boolean;
   message: string;
@@ -232,5 +241,38 @@ export async function createDelegationWallet(
       success: false,
       error: error instanceof Error ? error.message : "Failed to create delegation wallet",
     };
+  }
+}
+
+export async function fetchRecentWalletActions(
+  userWallet: string
+): Promise<WalletAction[]> {
+  try {
+    const url = `${API_BASE_URL}/wallet-actions/${encodeURIComponent(userWallet)}`;
+    console.log("Fetching recent wallet actions from:", url);
+
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch wallet actions: ${response.status}`);
+    }
+
+    const data: ApiResponse<WalletAction[]> = await response.json();
+
+    if (!data.success || !data.data) {
+      throw new Error(data.message || "Failed to fetch wallet actions");
+    }
+
+    console.log("Wallet actions fetched successfully:", data.data);
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching wallet actions:", error);
+    return [];
   }
 }

@@ -100,6 +100,9 @@ export const walletActions = pgTable(
     id: uuid().primaryKey(),
     action: text(),
     strategy: uuid(),
+    userWallet: text().notNull(),
+    delegationWalletId: uuid().notNull(),
+    subscriptionId: uuid().notNull(),
     stateChange: text(),
     createdAt: date().defaultNow(),
   },
@@ -108,6 +111,21 @@ export const walletActions = pgTable(
       columns: [table.strategy],
       foreignColumns: [strategySchema.id],
       name: "wallet_actions_strategy_fk",
+    }),
+    foreignKey({
+      columns: [table.userWallet],
+      foreignColumns: [userTable.wallet],
+      name: "wallet_actions_user_fk",
+    }),
+    foreignKey({
+      columns: [table.delegationWalletId],
+      foreignColumns: [delegationWallets.id],
+      name: "wallet_actions_delegation_fk",
+    }),
+    foreignKey({
+      columns: [table.subscriptionId],
+      foreignColumns: [strategySubscriptions.id],
+      name: "wallet_actions_subscription_fk",
     }),
   ],
 );

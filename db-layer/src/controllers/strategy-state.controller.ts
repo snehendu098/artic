@@ -1,11 +1,16 @@
 import { Context } from "hono";
-import { Env, UpdateStrategyStateRequest, WalletActionData, ApiResponse } from "../types";
+import {
+  Env,
+  UpdateStrategyStateRequest,
+  WalletActionData,
+  ApiResponse,
+} from "../types";
 import db from "../db";
-import { validateStrategyExists, createWalletActions } from "../db/actions";
+import { validateStrategyExists, validateSubscriptionHasDelegation, createWalletActions } from "../db/actions";
 
 export const updateStrategyStateHandler = async (c: Context<Env>) => {
   try {
-    const body = await c.req.json() as UpdateStrategyStateRequest;
+    const body = (await c.req.json()) as UpdateStrategyStateRequest;
 
     if (!body.strategyId || typeof body.strategyId !== "string") {
       return c.json(
@@ -14,18 +19,22 @@ export const updateStrategyStateHandler = async (c: Context<Env>) => {
           message: "strategyId field is required and must be a string",
           data: null,
         } as ApiResponse,
-        400
+        400,
       );
     }
 
-    if (!body.actions || !Array.isArray(body.actions) || body.actions.length === 0) {
+    if (
+      !body.actions ||
+      !Array.isArray(body.actions) ||
+      body.actions.length === 0
+    ) {
       return c.json(
         {
           success: false,
           message: "actions field is required and must be a non-empty array",
           data: null,
         } as ApiResponse,
-        400
+        400,
       );
     }
 
@@ -37,27 +46,74 @@ export const updateStrategyStateHandler = async (c: Context<Env>) => {
             message: "Each action must have an action field (string)",
             data: null,
           } as ApiResponse,
-          400
+          400,
         );
       }
 
-      if (!action.stateChange || typeof action.stateChange !== "string") {
+      if (
+        action.stateChange !== undefined &&
+        typeof action.stateChange !== "string"
+      ) {
         return c.json(
           {
             success: false,
-            message: "Each action must have a stateChange field (string)",
+            message: "stateChange field must be a string if provided",
             data: null,
           } as ApiResponse,
-          400
+          400,
         );
       }
+    }
+
+    if (!body.userWallet || typeof body.userWallet !== "string") {
+      return c.json(
+        {
+          success: false,
+          message: "userWallet field is required and must be a string",
+          data: null,
+        } as ApiResponse,
+        400,
+      );
+    }
+
+    if (
+      !body.delegationWalletId ||
+      typeof body.delegationWalletId !== "string"
+    ) {
+      return c.json(
+        {
+          success: false,
+          message: "delegationWalletId field is required and must be a string",
+          data: null,
+        } as ApiResponse,
+        400,
+      );
+    }
+
+    if (!body.subscriptionId || typeof body.subscriptionId !== "string") {
+      return c.json(
+        {
+          success: false,
+          message: "subscriptionId field is required and must be a string",
+          data: null,
+        } as ApiResponse,
+        400,
+      );
     }
 
     const database = db(c.env.DATABASE_URL);
 
     const result = await database.transaction(async (tx) => {
       await validateStrategyExists(tx, body.strategyId);
-      const actions = await createWalletActions(tx, body.strategyId, body.actions);
+      await validateSubscriptionHasDelegation(tx, body.subscriptionId);
+      const actions = await createWalletActions(
+        tx,
+        body.strategyId,
+        body.userWallet,
+        body.delegationWalletId,
+        body.subscriptionId,
+        body.actions,
+      );
       return actions;
     });
 
@@ -67,7 +123,7 @@ export const updateStrategyStateHandler = async (c: Context<Env>) => {
         message: "Strategy state updated successfully",
         data: result,
       } as ApiResponse<WalletActionData[]>,
-      201
+      201,
     );
   } catch (error) {
     const errorMessage =
@@ -79,7 +135,7 @@ export const updateStrategyStateHandler = async (c: Context<Env>) => {
         message: errorMessage,
         data: null,
       } as ApiResponse,
-      500
+      500,
     );
   }
 };

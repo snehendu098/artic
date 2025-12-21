@@ -67,10 +67,18 @@ const UserStrategyTable = ({
         <Table className="text-foreground/70">
           <TableHeader>
             <TableRow className="px-4 border-white/10 hover:bg-white/5">
-              <TableHead className="text-foreground/70">Strategy Name</TableHead>
-              <TableHead className="text-foreground/70 text-center">Subscribers</TableHead>
-              <TableHead className="text-foreground/70 text-center">Active</TableHead>
-              <TableHead className="text-foreground/70 text-center">Public</TableHead>
+              <TableHead className="text-foreground/70">
+                Strategy Name
+              </TableHead>
+              <TableHead className="text-foreground/70 text-center">
+                Subscribers
+              </TableHead>
+              <TableHead className="text-foreground/70 text-center">
+                Active
+              </TableHead>
+              <TableHead className="text-foreground/70 text-center">
+                Public
+              </TableHead>
               <TableHead className="w-16 text-right text-foreground/70 pr-4">
                 Actions
               </TableHead>
@@ -89,9 +97,7 @@ const UserStrategyTable = ({
                   <div className="flex justify-center">
                     <div
                       className={`w-3 h-3 rounded-full animate-pulse ${
-                        strategy.isActiveForUser
-                          ? "bg-green-500"
-                          : "bg-red-500"
+                        strategy.isActiveForUser ? "bg-green-500" : "bg-red-500"
                       }`}
                     />
                   </div>

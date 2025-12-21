@@ -44,3 +44,25 @@ export const getDelegationsByWallet = async (
 
   return delegations;
 };
+
+export const validateDelegationWalletOwnership = async (
+  database: any,
+  delegationWalletId: string,
+  userWallet: string
+): Promise<boolean> => {
+  const wallet = await database
+    .select()
+    .from(delegationWallets)
+    .where(eq(delegationWallets.id, delegationWalletId))
+    .limit(1);
+
+  if (!wallet || wallet.length === 0) {
+    throw new Error("Delegation wallet not found");
+  }
+
+  if (wallet[0].user !== userWallet) {
+    throw new Error("Delegation wallet does not belong to this user");
+  }
+
+  return true;
+};

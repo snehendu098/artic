@@ -3,6 +3,7 @@
 import GridInfoCard, {
   GridInfoCardProps,
 } from "@/components/cards/GridInfoCard";
+import RecentActionsCard from "@/components/cards/RecentActionsCard";
 import CreateDelegationDialog from "@/components/dialogs/CreateDelegationDialog";
 import { usePrivy } from "@privy-io/react-auth";
 import { useEffect, useState } from "react";
@@ -184,8 +185,10 @@ export default function Home() {
               />
             </div>
 
-            {/* Right sidebar - placeholder for future content */}
-            <div className="col-span-3"></div>
+            {/* Right sidebar - Recent Actions */}
+            <div className="col-span-3">
+              <RecentActionsCard userWallet={userWallet} />
+            </div>
           </div>
         </>
       )}

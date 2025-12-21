@@ -1,8 +1,10 @@
 export interface CreateStrategyRequest {
+  name: string;
   strategy: string;
   creatorWallet: string;
   delegationWallet?: string;
-  activate?: boolean;
+  isActive?: boolean;
+  isPublic?: boolean;
 }
 
 export interface CreateStrategyData {
@@ -15,11 +17,14 @@ export interface CreateStrategyData {
 
 export interface StateChangeAction {
   action: string;
-  stateChange: string;
+  stateChange?: string;
 }
 
 export interface UpdateStrategyStateRequest {
   strategyId: string;
+  userWallet: string;
+  delegationWalletId: string;
+  subscriptionId: string;
   actions: StateChangeAction[];
 }
 
@@ -27,5 +32,6 @@ export interface WalletActionData {
   id: string;
   action: string;
   strategy: string;
-  stateChange: string;
+  subscriptionId: string;
+  stateChange?: string;
 }
