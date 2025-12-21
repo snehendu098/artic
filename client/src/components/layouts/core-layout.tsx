@@ -11,7 +11,7 @@ const CoreLayout = ({ children }: { children: React.ReactNode }) => {
         enableSystem
         disableTransitionOnChange
       >
-        <div className="w-full h-full flex flex-col justify-center items-center">
+        <div className="w-full h-full min-h-screen flex flex-col  items-center">
           <Nav />
           <div className="w-full max-w-5xl">{children}</div>
         </div>

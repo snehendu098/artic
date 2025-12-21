@@ -121,7 +121,24 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background/30 text-foreground;
+    background:
+      radial-gradient(ellipse 500px 400px at left, rgb(201 88 48 / 0.09) 0%, transparent 55%),
+      radial-gradient(ellipse 500px 400px at right, rgb(201 88 48 / 0.09) 0%, transparent 55%),
+      linear-gradient(135deg,
+        var(--background) 0%,
+        var(--background) 35%,
+        rgb(201 88 48 / 0.04) 100%);
+    @apply text-foreground;
+  }
+
+  .dark body {
+    background:
+      radial-gradient(ellipse 600px 450px at left, rgb(201 88 48 / 0.14) 0%, transparent 55%),
+      radial-gradient(ellipse 600px 450px at right, rgb(201 88 48 / 0.14) 0%, transparent 55%),
+      linear-gradient(135deg,
+        var(--background) 0%,
+        var(--background) 45%,
+        rgb(201 88 48 / 0.07) 100%);
   }
 }
 
