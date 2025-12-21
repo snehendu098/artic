@@ -40,8 +40,8 @@ const UserStrategyTable = ({
   }
 
   return (
-    <div className="w-full border bg-neutral-900 rounded-md">
-      <div className="w-full flex items-center justify-between px-4 py-3 border-b">
+    <div className="w-full border border-white/10 bg-card gradient-content rounded-lg overflow-hidden">
+      <div className="w-full flex items-center justify-between px-4 py-3 border-b border-white/10">
         <p className="font-semibold">Your Strategies</p>
         <Button
           size="sm"
@@ -64,14 +64,14 @@ const UserStrategyTable = ({
           </p>
         </div>
       ) : (
-        <Table className="text-white/50">
+        <Table className="text-foreground/70">
           <TableHeader>
-            <TableRow className="px-4">
-              <TableHead className="text-white/60">Strategy Name</TableHead>
-              <TableHead className="text-white/60 text-center">Subscribers</TableHead>
-              <TableHead className="text-white/60 text-center">Active</TableHead>
-              <TableHead className="text-white/60 text-center">Public</TableHead>
-              <TableHead className="w-16 text-right text-white/60 pr-4">
+            <TableRow className="px-4 border-white/10 hover:bg-white/5">
+              <TableHead className="text-foreground/70">Strategy Name</TableHead>
+              <TableHead className="text-foreground/70 text-center">Subscribers</TableHead>
+              <TableHead className="text-foreground/70 text-center">Active</TableHead>
+              <TableHead className="text-foreground/70 text-center">Public</TableHead>
+              <TableHead className="w-16 text-right text-foreground/70 pr-4">
                 Actions
               </TableHead>
             </TableRow>

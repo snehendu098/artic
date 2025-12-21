@@ -61,8 +61,8 @@ const DelegationWalletTable = ({
   }
 
   return (
-    <div className="w-full border bg-neutral-900 rounded-md">
-      <div className="w-full flex items-center justify-between px-4 py-3 border-b">
+    <div className="w-full border border-white/10 bg-card gradient-content rounded-lg overflow-hidden">
+      <div className="w-full flex items-center justify-between px-4 py-3 border-b border-white/10">
         <p className="font-semibold">Delegation Wallets</p>
         <Button
           size="sm"
@@ -85,14 +85,14 @@ const DelegationWalletTable = ({
           </p>
         </div>
       ) : (
-        <Table className="text-white/50">
+        <Table className="text-foreground/70">
           <TableHeader>
-            <TableRow className="px-4">
-              <TableHead className="w-12 text-white/60 pl-4">No.</TableHead>
-              <TableHead className="text-white/60">Wallet</TableHead>
-              <TableHead className="text-white/60">Created</TableHead>
+            <TableRow className="px-4 border-white/10 hover:bg-white/5">
+              <TableHead className="w-12 text-foreground/70 pl-4">No.</TableHead>
+              <TableHead className="text-foreground/70">Wallet</TableHead>
+              <TableHead className="text-foreground/70">Created</TableHead>
 
-              <TableHead className="w-16 text-right text-white/60 pr-4">
+              <TableHead className="w-16 text-right text-foreground/70 pr-4">
                 Actions
               </TableHead>
             </TableRow>

@@ -117,6 +117,45 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background/40 text-foreground;
+    @apply bg-background/30 text-foreground;
+  }
+}
+
+@layer components {
+  /* Subtle card gradients - light mode */
+  .gradient-card-subtle {
+    @apply bg-gradient-to-br from-white/12 via-white/6 to-white/1 shadow-sm;
+  }
+
+  .dark .gradient-card-subtle {
+    @apply bg-gradient-to-br from-white/8 via-white/4 to-white/1 shadow-lg shadow-black/20;
+  }
+
+  /* Premium accent gradient */
+  .gradient-accent-subtle {
+    @apply bg-gradient-to-br from-white/12 via-white/6 to-transparent;
+  }
+
+  .dark .gradient-accent-subtle {
+    @apply bg-gradient-to-br from-white/10 via-white/5 to-transparent;
+  }
+
+  /* Header gradient overlay */
+  .gradient-header {
+    @apply bg-gradient-to-b from-white/6 to-transparent;
+  }
+
+  .dark .gradient-header {
+    @apply bg-gradient-to-b from-white/4 to-transparent;
+  }
+
+  /* Navigation gradient */
+  .gradient-nav {
+    @apply bg-gradient-to-b from-card via-card/98 to-card/95 shadow-md shadow-black/10;
+  }
+
+  /* Content card with premium feel */
+  .gradient-content {
+    @apply bg-gradient-to-br from-card via-card/98 to-card/92 shadow-sm shadow-black/5;
   }
 }

@@ -18,7 +18,7 @@ const nav = [
 
 function Nav() {
   return (
-    <div className="w-full p-4 flex px-8 justify-between border-b items-center">
+    <div className="w-full p-4 flex px-8 justify-between border-b items-center border-white/10">
       <div className="flex items-center space-x-4">
         <Image
           src={"/logo.png"}
@@ -27,7 +27,7 @@ function Nav() {
           height={30}
           className="aspect-square"
         />
-        <p className="text-2xl">ARTIC</p>
+        <p className="text-2xl font-semibold">ARTIC</p>
       </div>
       {/* Nav Items */}
       <NavigationMenuDemo />

@@ -143,8 +143,8 @@ export default function Home() {
 
       {/* Wallet Connection Status */}
       {!userWallet && (
-        <div className="w-full mb-8 p-4 border bg-card rounded border-yellow-500/30">
-          <p className="text-sm text-yellow-600">
+        <div className="w-full mb-8 p-4 border border-yellow-500/30 bg-yellow-500/5 rounded-lg gradient-card-subtle">
+          <p className="text-sm text-yellow-600 dark:text-yellow-500/90">
             Connect your wallet using the button in the navbar to view your
             delegation accounts and strategies.
           </p>
