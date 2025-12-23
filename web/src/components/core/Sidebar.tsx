@@ -6,14 +6,10 @@ import {
   SidebarLink,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  IconShoppingCart,
-  IconTrendingUp,
-} from "@tabler/icons-react";
 import Image from "next/image";
 import { motion } from "motion/react";
-import { LayoutDashboard } from "lucide-react";
 import { Dispatch, SetStateAction } from "react";
+import { NAV_LINKS } from "@/constants";
 
 const LogoSection = () => {
   const { open, animate } = useSidebar();
@@ -50,30 +46,6 @@ const SidebarNav = ({
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }) => {
-  const links = [
-    {
-      label: "Dashboard",
-      href: "/app/dashboard",
-      icon: (
-        <LayoutDashboard className="h-5 w-5 shrink-0" />
-      ),
-    },
-    {
-      label: "Marketplace",
-      href: "/app/marketplace",
-      icon: (
-        <IconShoppingCart className="h-5 w-5 shrink-0" />
-      ),
-    },
-    {
-      label: "Strategies",
-      href: "/app/strategies",
-      icon: (
-        <IconTrendingUp className="h-5 w-5 shrink-0" />
-      ),
-    },
-  ];
-
   return (
     <Sidebar open={open} setOpen={setOpen}>
       <SidebarBody className="justify-between border-r gap-0 h-screen p-0 overflow-hidden">
@@ -85,7 +57,7 @@ const SidebarNav = ({
 
           {/* Navigation Links */}
           <div className="flex flex-col gap-1 py-4 shrink-0">
-            {links.map((link, idx) => (
+            {NAV_LINKS.map((link, idx) => (
               <SidebarLink key={idx} link={link} index={idx} />
             ))}
           </div>
