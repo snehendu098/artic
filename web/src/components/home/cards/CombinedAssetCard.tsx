@@ -2,7 +2,7 @@
 
 import CardLayout from "@/components/layouts/card-layout";
 import { dummyAssets } from "@/constants/data";
-import { TrendingUp, TrendingDown, Wallet, ArrowRight } from "lucide-react";
+import { Wallet, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
@@ -55,6 +55,21 @@ const AssetRow = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
+  // Calculate total asset amount across all wallets
+  const totalAmount = asset.wallets.reduce(
+    (sum: number, wallet: { amount: string }) =>
+      sum + parseFloat(wallet.amount),
+    0,
+  );
+
+  // Format the asset amount with appropriate decimals
+  const formatAssetAmount = (amount: number) => {
+    return new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: amount < 1 ? 4 : 2,
+    }).format(amount);
+  };
+
   return (
     <motion.div
       onHoverStart={() => setIsHovered(true)}
@@ -80,22 +95,11 @@ const AssetRow = ({
             className="text-right"
           >
             <p className="text-sm font-semibold">
+              {formatAssetAmount(totalAmount)} {asset.symbol}
+            </p>
+            <p className="text-xs text-white/50 mt-0.5">
               {formatCurrency(asset.valueUSD)}
             </p>
-            <div className="flex items-center gap-1 justify-end mt-0.5">
-              <span
-                className={`text-xs ${
-                  asset.change24h > 0
-                    ? "text-primary"
-                    : asset.change24h < 0
-                      ? "text-red-400"
-                      : "text-white/50"
-                }`}
-              >
-                {asset.change24h > 0 ? "+" : ""}
-                {asset.change24h}%
-              </span>
-            </div>
           </motion.div>
           <motion.div
             initial={{ opacity: 0, x: 20 }}
@@ -104,7 +108,7 @@ const AssetRow = ({
               x: isHovered ? 0 : 20,
             }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="flex items-center gap-1.5 absolute right-0 bg-neutral-700/80 px-2 py-1 rounded border border-primary/30"
+            className="flex items-center gap-1.5 absolute right-0 bg-neutral-700/80 px-2 py-1"
           >
             <Wallet className="w-3.5 h-3.5 text-primary" />
             <span className="text-xs text-white font-medium">

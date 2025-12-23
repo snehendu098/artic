@@ -19,14 +19,16 @@ const Page = () => {
             <CombinedAssetCard />
           </div>
           <div className="w-full space-x-4 grid grid-cols-2 gap-4">
-            <StrategiesCard />
             <SubscriptionsCard />
+
+            <SubscribersCard />
           </div>
         </div>
         <div className="col-span-2 space-y-4">
           <WalletsCard />
+
+          <StrategiesCard />
           <ActionsCard />
-          <SubscribersCard />
         </div>
       </div>
     </div>
