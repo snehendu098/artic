@@ -1,7 +1,7 @@
 import CardLayout from "@/components/layouts/card-layout";
-import { Plus, Users } from "lucide-react";
+import { Plus, Users, ArrowRight } from "lucide-react";
 import { dummyStrategies } from "@/constants/data";
-import ViewAllStrategiesDialog from "@/components/dialog/ViewAllStrategiesDialog";
+import Link from "next/link";
 
 const StrategiesCard = () => {
   const maxDisplay = 3;
@@ -20,25 +20,33 @@ const StrategiesCard = () => {
       </div>
       <div className="w-full space-y-3 mt-4">
         {dummyStrategies.slice(0, maxDisplay).map((strategy) => (
-          <div
-            key={strategy.id}
-            className="p-3 bg-neutral-800 border border-neutral-700 hover:border-primary/50 transition-all duration-200 cursor-pointer group"
-          >
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-medium group-hover:text-primary transition-colors truncate w-[70%]">
-                {strategy.name}
-              </p>
-              <div className="flex items-center gap-1 flex-shrink-0">
-                <Users className="w-3 h-3 text-white/50" />
-                <span className="text-xs text-white/50">
-                  {strategy.subscriberCount}
-                </span>
+          <Link key={strategy.id} href={`/app/strategies/${strategy.id}`}>
+            <div className="p-3 bg-neutral-800 border border-neutral-700 hover:border-primary/50 transition-all duration-200 cursor-pointer group">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-medium group-hover:text-primary transition-colors truncate w-[70%]">
+                  {strategy.name}
+                </p>
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  <Users className="w-3 h-3 text-white/50" />
+                  <span className="text-xs text-white/50">
+                    {strategy.subscriberCount}
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
-      {hasMore && <ViewAllStrategiesDialog />}
+      {hasMore && (
+        <Link href="/app/strategies">
+          <button className="w-full mt-3 py-2 bg-neutral-800 border border-neutral-700 hover:border-primary/50 hover:bg-neutral-750 transition-all duration-200 flex items-center justify-center gap-2 group">
+            <span className="text-xs text-white/70 group-hover:text-primary transition-colors">
+              View All
+            </span>
+            <ArrowRight className="w-3 h-3 text-white/70 group-hover:text-primary transition-colors" />
+          </button>
+        </Link>
+      )}
     </CardLayout>
   );
 };

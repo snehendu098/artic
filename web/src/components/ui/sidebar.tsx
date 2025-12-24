@@ -4,6 +4,7 @@ import React, { useState, createContext, useContext } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { IconMenu2, IconX } from "@tabler/icons-react";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 interface Links {
   label: string;
@@ -175,70 +176,71 @@ export const SidebarLink = ({
   const isActive = pathname.startsWith(link.href);
 
   return (
-    <motion.a
-      href={link.href}
-      className={cn(
-        "flex items-center transition-all duration-300",
-        open ? "justify-start gap-2 py-2 px-4 mx-4" : "justify-center py-2",
-        "text-white/60 hover:bg-neutral-800/50",
-        "border-l-2 border-l-transparent",
-        isActive &&
-          "bg-neutral-800/50 border-l-[var(--primary)] text-[var(--primary)]",
-        isHovered && !isActive && "border-l-white text-white",
-        className,
-      )}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      {...props}
-    >
-      {/* Index number - only show when sidebar is open */}
-      <motion.span
-        animate={{
-          width: animate ? (open ? 24 : 0) : 24,
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        transition={{
-          duration: 0.4,
-          ease: "easeInOut",
-        }}
-        className={cn(
-          "font-mono text-xs text-center overflow-hidden flex-shrink-0 transition-colors duration-300",
-          isActive && "text-[var(--primary)]",
-          isHovered && !isActive && "text-white",
-          !isActive && !isHovered && "text-gray-500",
-        )}
-      >
-        {String(index).padStart(2, "0")}
-      </motion.span>
-
-      {/* Icon */}
-      <div
-        className={cn(
-          "transition-colors duration-300 flex-shrink-0",
-          isActive && "text-[var(--primary)]",
-          isHovered && !isActive && "text-white",
-          !isActive && !isHovered && "text-white/60",
-        )}
-      >
-        {link.icon}
-      </div>
-
-      {/* Label */}
+    <Link href={link.href}>
       <motion.div
-        animate={{
-          maxWidth: animate ? (open ? 500 : 0) : 500,
-          opacity: animate ? (open ? 1 : 0) : 1,
-        }}
-        transition={{
-          duration: 0.4,
-          ease: "easeInOut",
-        }}
-        className="overflow-hidden"
+        className={cn(
+          "flex items-center transition-all duration-300",
+          open ? "justify-start gap-2 py-2 px-4 mx-4" : "justify-center py-2",
+          "text-white/60 hover:bg-neutral-800/50",
+          "border-l-2 border-l-transparent",
+          isActive &&
+            "bg-neutral-800/50 border-l-[var(--primary)] text-[var(--primary)]",
+          isHovered && !isActive && "border-l-white text-white",
+          className,
+        )}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        {...props}
       >
-        <span className="font-mono uppercase text-sm whitespace-nowrap !p-0 !m-0">
-          {link.label}
-        </span>
+        {/* Index number - only show when sidebar is open */}
+        <motion.span
+          animate={{
+            width: animate ? (open ? 24 : 0) : 24,
+            opacity: animate ? (open ? 1 : 0) : 1,
+          }}
+          transition={{
+            duration: 0.4,
+            ease: "easeInOut",
+          }}
+          className={cn(
+            "font-mono text-xs text-center overflow-hidden flex-shrink-0 transition-colors duration-300",
+            isActive && "text-[var(--primary)]",
+            isHovered && !isActive && "text-white",
+            !isActive && !isHovered && "text-gray-500",
+          )}
+        >
+          {String(index).padStart(2, "0")}
+        </motion.span>
+
+        {/* Icon */}
+        <div
+          className={cn(
+            "transition-colors duration-300 flex-shrink-0",
+            isActive && "text-[var(--primary)]",
+            isHovered && !isActive && "text-white",
+            !isActive && !isHovered && "text-white/60",
+          )}
+        >
+          {link.icon}
+        </div>
+
+        {/* Label */}
+        <motion.div
+          animate={{
+            maxWidth: animate ? (open ? 500 : 0) : 500,
+            opacity: animate ? (open ? 1 : 0) : 1,
+          }}
+          transition={{
+            duration: 0.4,
+            ease: "easeInOut",
+          }}
+          className="overflow-hidden"
+        >
+          <span className="font-mono uppercase text-sm whitespace-nowrap !p-0 !m-0">
+            {link.label}
+          </span>
+        </motion.div>
       </motion.div>
-    </motion.a>
+    </Link>
   );
 };
