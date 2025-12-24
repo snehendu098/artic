@@ -10,7 +10,7 @@ import SubscribersCard from "@/components/home/cards/SubscribersCard";
 const Page = () => {
   return (
     <div className="w-full">
-      <Header url="/app/dashboard" />
+      <Header url="/app/dashboard" showActions={true} />
       <div className="mt-6 w-full grid gap-4 grid-cols-6">
         <div className="col-span-4 space-y-4">
           <OverviewCard />

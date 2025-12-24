@@ -1,6 +1,7 @@
 import CardLayout from "@/components/layouts/card-layout";
-import { Plus, Wallet, ArrowRight } from "lucide-react";
+import { Wallet, ArrowRight } from "lucide-react";
 import { dummyWallets } from "@/constants/data";
+import CreateWalletDialog from "@/components/dialog/CreateWalletDialog";
 
 const WalletsCard = () => {
   const formatCurrency = (value: number) => {
@@ -26,9 +27,7 @@ const WalletsCard = () => {
           <p className="text-xs text-white/50">// wallets</p>
           <p className="uppercase">Wallets</p>
         </div>
-        <button className="p-1.5 bg-neutral-700 border border-neutral-600 transition-all duration-300 ease-out group hover:scale-110 hover:border-primary/50 hover:shadow-[0_0_15px_rgba(var(--primary-rgb),0.2)]">
-          <Plus className="w-4 h-4 group-hover:text-primary transition-colors duration-300" />
-        </button>
+        <CreateWalletDialog mode="icon" />
       </div>
       <div className="w-full space-y-3 mt-4">
         {dummyWallets.slice(0, maxDisplay).map((wallet) => (

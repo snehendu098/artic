@@ -1,0 +1,86 @@
+"use client";
+
+import { Wallet } from "lucide-react";
+import { motion } from "framer-motion";
+import { useState } from "react";
+import type { Asset } from "@/types";
+
+interface AssetRowProps {
+  asset: Asset;
+  formatCurrency: (value: number) => string;
+  formatAssetAmount: (value: number) => string;
+  onClick: () => void;
+  isSelected: boolean;
+}
+
+const AssetRow = ({
+  asset,
+  formatCurrency,
+  formatAssetAmount,
+  onClick,
+  isSelected,
+}: AssetRowProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+
+  const totalAmount = asset.wallets.reduce(
+    (sum, wallet) => sum + parseFloat(wallet.amount),
+    0,
+  );
+
+  return (
+    <motion.div
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      onClick={onClick}
+      className={`p-3 bg-neutral-900 border transition-all duration-200 cursor-pointer overflow-hidden ${
+        isSelected
+          ? "border-primary/50"
+          : "border-neutral-700 hover:border-neutral-600"
+      }`}
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-neutral-700 flex items-center justify-center font-bold text-xs text-primary">
+            {asset.symbol.slice(0, 2)}
+          </div>
+          <div>
+            <p className="text-sm font-medium">{asset.symbol}</p>
+            <p className="text-xs text-white/40">{asset.name}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 relative">
+          <motion.div
+            animate={{
+              x: isHovered ? -60 : 0,
+            }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="text-right"
+          >
+            <p className="text-sm font-semibold">
+              {formatAssetAmount(totalAmount)} {asset.symbol}
+            </p>
+            <p className="text-xs text-white/50 mt-0.5">
+              {formatCurrency(asset.valueUSD)}
+            </p>
+          </motion.div>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{
+              opacity: isHovered ? 1 : 0,
+              x: isHovered ? 0 : 20,
+            }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            className="flex items-center gap-1.5 absolute right-0 bg-neutral-700/80 px-2 py-1"
+          >
+            <Wallet className="w-3.5 h-3.5 text-white" />
+            <span className="text-xs text-white font-medium">
+              {asset.wallets.length}
+            </span>
+          </motion.div>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+export default AssetRow;
