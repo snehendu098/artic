@@ -10,15 +10,6 @@ import SubscriptionDetailsPanel from "@/components/subscriptions/SubscriptionDet
 const SubscriptionsPage = () => {
   const [selectedSubscription, setSelectedSubscription] = useState<Subscription | null>(null);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }).format(value);
-  };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -39,7 +30,6 @@ const SubscriptionsPage = () => {
           <SubscriptionDetailsPanel
             selectedSubscription={selectedSubscription}
             onClose={() => setSelectedSubscription(null)}
-            formatCurrency={formatCurrency}
             formatDate={formatDate}
           />
         )
@@ -50,7 +40,6 @@ const SubscriptionsPage = () => {
           <SubscriptionRow
             key={subscription.id}
             subscription={subscription}
-            formatCurrency={formatCurrency}
             onClick={() => setSelectedSubscription(subscription)}
             isSelected={selectedSubscription?.id === subscription.id}
           />

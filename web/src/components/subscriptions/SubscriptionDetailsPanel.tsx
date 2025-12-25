@@ -8,19 +8,14 @@ import type { Subscription } from "@/types";
 interface SubscriptionDetailsPanelProps {
   selectedSubscription: Subscription;
   onClose: () => void;
-  formatCurrency: (value: number) => string;
   formatDate: (dateString: string) => string;
 }
 
 const SubscriptionDetailsPanel = ({
   selectedSubscription,
   onClose,
-  formatCurrency,
   formatDate,
 }: SubscriptionDetailsPanelProps) => {
-  const profit = selectedSubscription.currentValue - selectedSubscription.amountInvested;
-  const profitPercentage = (profit / selectedSubscription.amountInvested) * 100;
-
   return (
     <motion.div
       initial={{ opacity: 0, x: 50 }}
@@ -50,6 +45,14 @@ const SubscriptionDetailsPanel = ({
           </div>
 
           <div className="p-3 bg-neutral-800 border border-neutral-700">
+            <p className="text-xs text-white/50 mb-2">Delegation Wallet</p>
+            <p className="text-sm text-white/90">{selectedSubscription.delegationWalletName}</p>
+            <p className="text-xs text-white/40 mt-1 font-mono">
+              {selectedSubscription.delegationWalletAddress}
+            </p>
+          </div>
+
+          <div className="p-3 bg-neutral-800 border border-neutral-700">
             <p className="text-xs text-white/50 mb-2">Subscribed Date</p>
             <p className="text-sm text-white/90">
               {formatDate(selectedSubscription.subscribedAt)}
@@ -57,41 +60,14 @@ const SubscriptionDetailsPanel = ({
           </div>
 
           <div className="p-3 bg-neutral-800 border border-neutral-700">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-white/50">Profit/Loss</span>
-              <span className={`text-sm font-semibold ${profit >= 0 ? "text-green-400" : "text-red-400"}`}>
-                {profit >= 0 ? "+" : ""}{formatCurrency(profit)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-white/50">Percentage</span>
-              <span className={`text-sm font-semibold ${profit >= 0 ? "text-green-400" : "text-red-400"}`}>
-                {profit >= 0 ? "+" : ""}{profitPercentage.toFixed(2)}%
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-4 p-3 bg-neutral-800/50 border border-neutral-700">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-white/50">Amount Invested</span>
-              <span className="text-sm font-semibold">
-                {formatCurrency(selectedSubscription.amountInvested)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-white/50">Current Value</span>
-              <span className="text-sm font-semibold text-primary">
-                {formatCurrency(selectedSubscription.currentValue)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-white/50">APY</span>
-              <span className="text-sm font-semibold">
-                {selectedSubscription.apy.toFixed(1)}%
-              </span>
-            </div>
+            <p className="text-xs text-white/50 mb-2">Status</p>
+            <span className={`inline-block px-2 py-1 text-xs ${
+              selectedSubscription.isActive
+                ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
+            }`}>
+              {selectedSubscription.isActive ? "ACTIVE" : "PAUSED"}
+            </span>
           </div>
         </div>
       </CardLayout>

@@ -1,1 +1,0 @@
-ALTER TABLE "strategy" ADD COLUMN "isActive" boolean DEFAULT false;

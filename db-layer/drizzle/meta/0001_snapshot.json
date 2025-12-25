@@ -1,43 +1,83 @@
 {
-  "id": "89a17326-20e2-420e-a341-e7aaccccafdd",
-  "prevId": "bc65d6f8-06df-417d-8594-a542b13d3e87",
+  "id": "8be5201a-70e4-4a6b-84c6-26cff0d88b2b",
+  "prevId": "a9aa8cb4-65f3-47c7-8bd4-14fbcc466a59",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.delegations": {
-      "name": "delegations",
+    "public.creator_earnings": {
+      "name": "creator_earnings",
       "schema": "",
       "columns": {
         "id": {
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
-        "user": {
-          "name": "user",
-          "type": "text",
+        "creatorId": {
+          "name": "creatorId",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
         },
-        "delegationWalletPk": {
-          "name": "delegationWalletPk",
-          "type": "text",
+        "purchaseId": {
+          "name": "purchaseId",
+          "type": "uuid",
           "primaryKey": false,
           "notNull": true
+        },
+        "amountMnt": {
+          "name": "amountMnt",
+          "type": "numeric(18, 18)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "claimed": {
+          "name": "claimed",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "claimTxHash": {
+          "name": "claimTxHash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "delegations_user_fk": {
-          "name": "delegations_user_fk",
-          "tableFrom": "delegations",
+        "creator_earnings_creator_fk": {
+          "name": "creator_earnings_creator_fk",
+          "tableFrom": "creator_earnings",
           "tableTo": "users",
           "columnsFrom": [
-            "user"
+            "creatorId"
           ],
           "columnsTo": [
-            "wallet"
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "creator_earnings_purchase_fk": {
+          "name": "creator_earnings_purchase_fk",
+          "tableFrom": "creator_earnings",
+          "tableTo": "strategy_purchases",
+          "columnsFrom": [
+            "purchaseId"
+          ],
+          "columnsTo": [
+            "id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
@@ -49,63 +89,363 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.strategy": {
-      "name": "strategy",
+    "public.delegation_wallets": {
+      "name": "delegation_wallets",
       "schema": "",
       "columns": {
         "id": {
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
-        "strategy": {
-          "name": "strategy",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "creatorWallet": {
-          "name": "creatorWallet",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "delegationWallet": {
-          "name": "delegationWallet",
+        "userId": {
+          "name": "userId",
           "type": "uuid",
           "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encryptedPrivateKey": {
+          "name": "encryptedPrivateKey",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "delegation_wallets_user_fk": {
+          "name": "delegation_wallets_user_fk",
+          "tableFrom": "delegation_wallets",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "delegation_wallets_address_unique": {
+          "name": "delegation_wallets_address_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "address"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.strategies": {
+      "name": "strategies",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "creatorId": {
+          "name": "creatorId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "strategyCode": {
+          "name": "strategyCode",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isPublic": {
+          "name": "isPublic",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false,
+          "default": false
+        },
+        "priceMnt": {
+          "name": "priceMnt",
+          "type": "numeric(18, 18)",
+          "primaryKey": false,
           "notNull": false
+        },
+        "subscriberCount": {
+          "name": "subscriberCount",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "default": 0
+        },
+        "protocols": {
+          "name": "protocols",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'draft'"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "strategies_creator_fk": {
+          "name": "strategies_creator_fk",
+          "tableFrom": "strategies",
+          "tableTo": "users",
+          "columnsFrom": [
+            "creatorId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "strategies_creator_name_unique": {
+          "name": "strategies_creator_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "creatorId",
+            "name"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.strategy_purchases": {
+      "name": "strategy_purchases",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "strategyId": {
+          "name": "strategyId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "buyerId": {
+          "name": "buyerId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "priceMnt": {
+          "name": "priceMnt",
+          "type": "numeric(18, 18)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "txHash": {
+          "name": "txHash",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "blockNumber": {
+          "name": "blockNumber",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "purchasedAt": {
+          "name": "purchasedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "strategy_purchases_strategy_fk": {
+          "name": "strategy_purchases_strategy_fk",
+          "tableFrom": "strategy_purchases",
+          "tableTo": "strategies",
+          "columnsFrom": [
+            "strategyId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "strategy_purchases_buyer_fk": {
+          "name": "strategy_purchases_buyer_fk",
+          "tableFrom": "strategy_purchases",
+          "tableTo": "users",
+          "columnsFrom": [
+            "buyerId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "strategy_purchases_txHash_unique": {
+          "name": "strategy_purchases_txHash_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "txHash"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.subscriptions": {
+      "name": "subscriptions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "strategyId": {
+          "name": "strategyId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "delegationWalletId": {
+          "name": "delegationWalletId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
         },
         "isActive": {
           "name": "isActive",
           "type": "boolean",
           "primaryKey": false,
           "notNull": false,
-          "default": false
+          "default": true
+        },
+        "subscribedAt": {
+          "name": "subscribedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "pausedAt": {
+          "name": "pausedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "strategy_creator_wallet_fk": {
-          "name": "strategy_creator_wallet_fk",
-          "tableFrom": "strategy",
-          "tableTo": "users",
+        "subscriptions_strategy_fk": {
+          "name": "subscriptions_strategy_fk",
+          "tableFrom": "subscriptions",
+          "tableTo": "strategies",
           "columnsFrom": [
-            "creatorWallet"
+            "strategyId"
           ],
           "columnsTo": [
-            "wallet"
+            "id"
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "strategy_delegation_wallet_fk": {
-          "name": "strategy_delegation_wallet_fk",
-          "tableFrom": "strategy",
-          "tableTo": "delegations",
+        "subscriptions_user_fk": {
+          "name": "subscriptions_user_fk",
+          "tableFrom": "subscriptions",
+          "tableTo": "users",
           "columnsFrom": [
-            "delegationWallet"
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "subscriptions_delegation_wallet_fk": {
+          "name": "subscriptions_delegation_wallet_fk",
+          "tableFrom": "subscriptions",
+          "tableTo": "delegation_wallets",
+          "columnsFrom": [
+            "delegationWalletId"
           ],
           "columnsTo": [
             "id"
@@ -128,13 +468,27 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
         "wallet": {
           "name": "wallet",
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "username": {
+          "name": "username",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -161,35 +515,75 @@
           "name": "id",
           "type": "uuid",
           "primaryKey": true,
-          "notNull": true
+          "notNull": true,
+          "default": "gen_random_uuid()"
         },
-        "action": {
-          "name": "action",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "strategy": {
-          "name": "strategy",
+        "subscriptionId": {
+          "name": "subscriptionId",
           "type": "uuid",
           "primaryKey": false,
           "notNull": false
         },
-        "stateChange": {
-          "name": "stateChange",
+        "delegationWalletId": {
+          "name": "delegationWalletId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "actionType": {
+          "name": "actionType",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "note": {
+          "name": "note",
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'pending'"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
         }
       },
       "indexes": {},
       "foreignKeys": {
-        "wallet_actions_strategy_fk": {
-          "name": "wallet_actions_strategy_fk",
+        "wallet_actions_subscription_fk": {
+          "name": "wallet_actions_subscription_fk",
           "tableFrom": "wallet_actions",
-          "tableTo": "strategy",
+          "tableTo": "subscriptions",
           "columnsFrom": [
-            "strategy"
+            "subscriptionId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "wallet_actions_delegation_wallet_fk": {
+          "name": "wallet_actions_delegation_wallet_fk",
+          "tableFrom": "wallet_actions",
+          "tableTo": "delegation_wallets",
+          "columnsFrom": [
+            "delegationWalletId"
           ],
           "columnsTo": [
             "id"

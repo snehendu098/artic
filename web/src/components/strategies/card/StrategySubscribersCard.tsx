@@ -5,12 +5,10 @@ import type { Subscriber } from "@/types";
 
 interface StrategySubscribersCardProps {
   subscribers: Subscriber[];
-  formatCurrency: (value: number) => string;
 }
 
 const StrategySubscribersCard = ({
   subscribers,
-  formatCurrency,
 }: StrategySubscribersCardProps) => {
   if (subscribers.length === 0) return null;
 

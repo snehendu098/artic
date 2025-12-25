@@ -7,23 +7,13 @@ import {
   InfoPopupContent,
 } from "@/components/ui/info-popup";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, Users, TrendingUp } from "lucide-react";
+import { ArrowRight, Users } from "lucide-react";
 import { dummyStrategies } from "@/constants/data";
 import Header from "@/components/common/Header";
 
 export default function ViewAllStrategiesDialog() {
   const [open, setOpen] = useState(false);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
-  const totalTVL = dummyStrategies.reduce((sum, strategy) => sum + strategy.tvl, 0);
   const totalSubscribers = dummyStrategies.reduce(
     (sum, strategy) => sum + strategy.subscriberCount,
     0
@@ -48,7 +38,7 @@ export default function ViewAllStrategiesDialog() {
               <Header
                 url="/strategies"
                 name="Strategies"
-                description="All your created yield optimization strategies"
+                description="All your created strategies"
                 indexEnabled={false}
               />
             </div>
@@ -56,9 +46,9 @@ export default function ViewAllStrategiesDialog() {
             {/* Stats */}
             <div className="px-8 py-4 flex-shrink-0 grid grid-cols-2 gap-4">
               <div>
-                <p className="text-xs text-white/50 mb-1">Total TVL</p>
+                <p className="text-xs text-white/50 mb-1">Total Strategies</p>
                 <p className="text-2xl font-semibold text-primary">
-                  {formatCurrency(totalTVL)}
+                  {dummyStrategies.length}
                 </p>
               </div>
               <div>
@@ -73,7 +63,7 @@ export default function ViewAllStrategiesDialog() {
             <div className="flex-1 min-h-0 overflow-y-auto">
               <div className="px-8 pb-8 space-y-3">
                 <AnimatePresence mode="popLayout">
-                  {dummyStrategies.map((strategy, index) => (
+                  {dummyStrategies.map((strategy) => (
                     <motion.div
                       key={strategy.id}
                       initial={{ opacity: 0, y: 30 }}
@@ -107,8 +97,10 @@ export default function ViewAllStrategiesDialog() {
                           <div className="flex items-center gap-4 text-xs text-white/50">
                             <span className={`px-2 py-0.5 ${
                               strategy.status === "active"
-                                ? "bg-primary/20 text-primary"
-                                : "bg-neutral-700 text-white/50"
+                                ? "bg-green-500/20 text-green-400"
+                                : strategy.status === "paused"
+                                  ? "bg-yellow-500/20 text-yellow-400"
+                                  : "bg-neutral-700 text-white/50"
                             }`}>
                               {strategy.status}
                             </span>
@@ -117,17 +109,21 @@ export default function ViewAllStrategiesDialog() {
                         </div>
                         <div className="text-right flex-shrink-0">
                           <div className="mb-3">
-                            <p className="text-xs text-white/50">APY</p>
-                            <p className="text-lg font-semibold text-primary">
-                              {strategy.apy}%
+                            <p className="text-xs text-white/50">Visibility</p>
+                            <p className={`text-sm font-semibold ${
+                              strategy.isPublic ? "text-green-400" : "text-white/70"
+                            }`}>
+                              {strategy.isPublic ? "Public" : "Private"}
                             </p>
                           </div>
-                          <div className="mb-3">
-                            <p className="text-xs text-white/50">TVL</p>
-                            <p className="text-sm font-medium">
-                              {formatCurrency(strategy.tvl)}
-                            </p>
-                          </div>
+                          {strategy.isPublic && strategy.priceMnt && (
+                            <div className="mb-3">
+                              <p className="text-xs text-white/50">Price</p>
+                              <p className="text-sm font-medium text-primary">
+                                {strategy.priceMnt} MNT
+                              </p>
+                            </div>
+                          )}
                           <div className="flex items-center gap-1 justify-end">
                             <Users className="w-3 h-3 text-white/50" />
                             <span className="text-xs text-white/50">

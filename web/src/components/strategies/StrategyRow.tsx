@@ -1,31 +1,23 @@
 "use client";
 
-import { TrendingUp, Users } from "lucide-react";
-import { motion } from "framer-motion";
-import { useState } from "react";
+import { TrendingUp } from "lucide-react";
 import type { Strategy } from "@/types";
 
 interface StrategyRowProps {
   strategy: Strategy;
-  formatCurrency: (value: number) => string;
   onClick: () => void;
   isSelected: boolean;
 }
 
 const StrategyRow = ({
   strategy,
-  formatCurrency,
   onClick,
   isSelected,
 }: StrategyRowProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-
   return (
-    <motion.div
-      onHoverStart={() => setIsHovered(true)}
-      onHoverEnd={() => setIsHovered(false)}
+    <div
       onClick={onClick}
-      className={`p-3 bg-neutral-900 border transition-all duration-200 cursor-pointer overflow-hidden ${
+      className={`p-3 bg-neutral-900 border transition-all duration-200 cursor-pointer ${
         isSelected
           ? "border-primary/50"
           : "border-neutral-700 hover:border-neutral-600"
@@ -43,36 +35,22 @@ const StrategyRow = ({
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-3 relative ml-3">
-          <motion.div
-            animate={{
-              x: isHovered ? -60 : 0,
-            }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="text-right"
-          >
-            <p className="text-sm font-semibold">{strategy.apy.toFixed(1)}% APY</p>
-            <p className="text-xs text-white/50 mt-0.5">
-              {formatCurrency(strategy.tvl)} TVL
-            </p>
-          </motion.div>
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{
-              opacity: isHovered ? 1 : 0,
-              x: isHovered ? 0 : 20,
-            }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            className="flex items-center gap-1.5 absolute right-0 bg-neutral-700/80 px-2 py-1"
-          >
-            <Users className="w-3.5 h-3.5 text-white" />
-            <span className="text-xs text-white font-medium">
-              {strategy.subscriberCount}
-            </span>
-          </motion.div>
+        <div className="text-right ml-3">
+          <span className={`text-xs px-2 py-0.5 ${
+            strategy.status === "active"
+              ? "bg-green-500/20 text-green-400"
+              : strategy.status === "paused"
+                ? "bg-yellow-500/20 text-yellow-400"
+                : "bg-neutral-700 text-white/50"
+          }`}>
+            {strategy.status}
+          </span>
+          <p className="text-xs text-white/50 mt-1">
+            {strategy.subscriberCount} subscribers
+          </p>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

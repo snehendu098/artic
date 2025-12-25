@@ -8,13 +8,11 @@ import type { Strategy } from "@/types";
 interface StrategyDetailsPanelProps {
   selectedStrategy: Strategy;
   onClose: () => void;
-  formatCurrency: (value: number) => string;
 }
 
 const StrategyDetailsPanel = ({
   selectedStrategy,
   onClose,
-  formatCurrency,
 }: StrategyDetailsPanelProps) => {
   return (
     <motion.div
@@ -80,27 +78,25 @@ const StrategyDetailsPanel = ({
         <div className="mt-4 p-3 bg-neutral-800/50 border border-neutral-700">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-white/50">APY</span>
-              <span className="text-sm font-semibold text-primary">
-                {selectedStrategy.apy.toFixed(1)}%
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-white/50">TVL</span>
-              <span className="text-sm font-semibold">
-                {formatCurrency(selectedStrategy.tvl)}
-              </span>
-            </div>
-            <div className="flex items-center justify-between">
               <span className="text-xs text-white/50">Subscribers</span>
               <span className="text-sm font-semibold">
                 {selectedStrategy.subscriberCount}
               </span>
             </div>
+            {selectedStrategy.isPublic && selectedStrategy.priceMnt && (
+              <div className="flex items-center justify-between">
+                <span className="text-xs text-white/50">Price</span>
+                <span className="text-sm font-semibold text-primary">
+                  {selectedStrategy.priceMnt} MNT
+                </span>
+              </div>
+            )}
             <div className="flex items-center justify-between">
-              <span className="text-xs text-white/50">Monthly Revenue</span>
-              <span className="text-sm font-semibold">
-                {formatCurrency(selectedStrategy.monthlyRevenue)}
+              <span className="text-xs text-white/50">Visibility</span>
+              <span className={`text-sm font-semibold ${
+                selectedStrategy.isPublic ? "text-green-400" : "text-white/70"
+              }`}>
+                {selectedStrategy.isPublic ? "Public" : "Private"}
               </span>
             </div>
           </div>

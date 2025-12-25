@@ -1,49 +1,45 @@
 import { Context } from "hono";
-import {
-  Env,
-  CreateDelegationRequest,
-  CreateDelegationData,
-  ApiResponse,
-} from "../types";
+import { Env, ApiResponse } from "../types";
 import db from "../db";
-import { upsertUser, createDelegation } from "../db/actions";
-import { randomUUID } from "crypto";
-import { generatePrivateKey } from "viem/accounts";
+import { upsertUser, createDelegation, getUserByWallet } from "../db/actions";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { verifyMessage } from "viem";
 
-interface CreateDelegationWithSignatureRequest {
+interface CreateDelegationRequest {
   wallet: string;
   signature: string;
+  name: string;
 }
 
 export const createDelegationWallet = async (c: Context<Env>) => {
   try {
-    const body = (await c.req.json()) as CreateDelegationWithSignatureRequest;
+    const body = (await c.req.json()) as CreateDelegationRequest;
 
-    // Validate input
     if (!body.wallet || typeof body.wallet !== "string") {
-      return c.json(
-        {
-          success: false,
-          message: "wallet field is required and must be a string",
-          data: null,
-        } as ApiResponse,
-        400,
-      );
+      return c.json({
+        success: false,
+        message: "wallet field is required",
+        data: null,
+      } as ApiResponse, 400);
     }
 
     if (!body.signature || typeof body.signature !== "string") {
-      return c.json(
-        {
-          success: false,
-          message: "signature field is required and must be a string",
-          data: null,
-        } as ApiResponse,
-        400,
-      );
+      return c.json({
+        success: false,
+        message: "signature field is required",
+        data: null,
+      } as ApiResponse, 400);
     }
 
-    // Verify the signature
+    if (!body.name || typeof body.name !== "string") {
+      return c.json({
+        success: false,
+        message: "name field is required",
+        data: null,
+      } as ApiResponse, 400);
+    }
+
+    // Verify signature
     const message = `Create delegation wallet for ${body.wallet}`;
     try {
       const isValid = await verifyMessage({
@@ -53,69 +49,123 @@ export const createDelegationWallet = async (c: Context<Env>) => {
       });
 
       if (!isValid) {
-        return c.json(
-          {
-            success: false,
-            message:
-              "Signature verification failed. Signature must be from the wallet owner.",
-            data: null,
-          } as ApiResponse,
-          401,
-        );
-      }
-    } catch (error) {
-      console.error("Signature verification error:", error);
-      return c.json(
-        {
+        return c.json({
           success: false,
-          message: "Invalid signature format or verification failed",
+          message: "Invalid signature",
           data: null,
-        } as ApiResponse,
-        401,
-      );
+        } as ApiResponse, 401);
+      }
+    } catch {
+      return c.json({
+        success: false,
+        message: "Signature verification failed",
+        data: null,
+      } as ApiResponse, 401);
     }
 
     const database = db(c.env.DATABASE_URL);
-    const userId = randomUUID();
-    const delegationId = randomUUID();
-    const delegationWalletPk = generatePrivateKey();
+    const privateKey = generatePrivateKey();
+    const account = privateKeyToAccount(privateKey);
 
     const result = await database.transaction(async (tx) => {
-      const user = await upsertUser(tx, userId, body.wallet);
-      const delegation = await createDelegation(
-        tx,
-        delegationId,
-        user.wallet,
-        delegationWalletPk,
-      );
+      // Upsert user
+      const user = await upsertUser(tx, body.wallet);
+
+      // Create delegation
+      const delegation = await createDelegation(tx, {
+        userId: user.id,
+        name: body.name,
+        address: account.address,
+        encryptedPrivateKey: privateKey, // TODO: encrypt with AES-256
+      });
 
       return {
         userId: user.id,
         wallet: user.wallet,
-        delegationId: delegation.delegationId,
-        delegationWalletPk: delegation.delegationWalletPk,
+        delegation: {
+          id: delegation.id,
+          name: delegation.name,
+          address: delegation.address,
+        },
       };
     });
 
-    return c.json(
-      {
-        success: true,
-        message: "Delegation wallet created successfully",
-        data: result,
-      } as ApiResponse<CreateDelegationData>,
-      201,
-    );
+    return c.json({
+      success: true,
+      message: "Delegation wallet created",
+      data: result,
+    } as ApiResponse, 201);
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Internal server error";
+    return c.json({
+      success: false,
+      message: error instanceof Error ? error.message : "Internal error",
+      data: null,
+    } as ApiResponse, 500);
+  }
+};
 
-    return c.json(
-      {
+export const getUser = async (c: Context<Env>) => {
+  try {
+    const wallet = c.req.param("wallet");
+
+    if (!wallet) {
+      return c.json({
         success: false,
-        message: errorMessage,
+        message: "wallet param required",
         data: null,
-      } as ApiResponse,
-      500,
-    );
+      } as ApiResponse, 400);
+    }
+
+    const database = db(c.env.DATABASE_URL);
+    const user = await getUserByWallet(database, wallet);
+
+    if (!user) {
+      return c.json({
+        success: false,
+        message: "User not found",
+        data: null,
+      } as ApiResponse, 404);
+    }
+
+    return c.json({
+      success: true,
+      message: "User found",
+      data: user,
+    } as ApiResponse, 200);
+  } catch (error) {
+    return c.json({
+      success: false,
+      message: error instanceof Error ? error.message : "Internal error",
+      data: null,
+    } as ApiResponse, 500);
+  }
+};
+
+export const upsertUserHandler = async (c: Context<Env>) => {
+  try {
+    const body = await c.req.json();
+
+    if (!body.wallet) {
+      return c.json({
+        success: false,
+        message: "wallet required",
+        data: null,
+      } as ApiResponse, 400);
+    }
+
+    const database = db(c.env.DATABASE_URL);
+    const user = await upsertUser(database, body.wallet, body.username);
+
+    return c.json({
+      success: true,
+      message: "User upserted",
+      data: user,
+    } as ApiResponse, 200);
+  } catch (error) {
+    return c.json({
+      success: false,
+      message: error instanceof Error ? error.message : "Internal error",
+      data: null,
+    } as ApiResponse, 500);
   }
 };

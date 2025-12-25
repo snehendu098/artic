@@ -7,6 +7,7 @@ import {
 } from "@/constants";
 import { motion } from "framer-motion";
 import CreateWalletDialog from "@/components/dialog/CreateWalletDialog";
+import Link from "next/link";
 
 interface HeaderProps {
   url: string;
@@ -52,14 +53,16 @@ const Header = ({
       </div>
       {showActions && (
         <div className="flex items-center gap-2">
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
-            className="px-3 py-1.5 bg-neutral-800 border border-neutral-700 hover:border-primary/50 hover:bg-neutral-750 transition-all duration-200 text-xs text-white/70 hover:text-primary"
-          >
-            Create Strategy
-          </motion.button>
+          <Link href="/app/strategies/create">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              className="px-3 py-1.5 bg-neutral-800 border border-neutral-700 hover:border-primary/50 hover:bg-neutral-750 transition-all duration-200 text-xs text-white/70 hover:text-primary"
+            >
+              Create Strategy
+            </motion.button>
+          </Link>
 
           <CreateWalletDialog mode="text" />
         </div>

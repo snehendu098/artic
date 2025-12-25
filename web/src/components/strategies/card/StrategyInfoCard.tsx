@@ -15,37 +15,47 @@ const StrategyInfoCard = ({
   isActive,
   onToggleStatus,
 }: StrategyInfoCardProps) => {
+  const isDraft = strategy.status === "draft";
+
+  const statusColor = {
+    active: "bg-green-500",
+    paused: "bg-yellow-500",
+    draft: "bg-neutral-500",
+  }[strategy.status];
+
+  const statusLabel = {
+    active: "Active",
+    paused: "Paused",
+    draft: "Draft",
+  }[strategy.status];
+
   return (
     <CardLayout>
       <div className="relative">
         {/* Status Indicator - Top Right */}
         <div className="absolute -top-3 -right-3 flex items-center gap-2">
           <div className="flex items-center gap-1.5">
-            <div
-              className={`w-2 h-2 rounded-full ${
-                isActive ? "bg-green-500" : "bg-neutral-500"
-              }`}
-            />
-            <span className="text-xs text-white/70">
-              {isActive ? "Active" : "Paused"}
-            </span>
+            <div className={`w-2 h-2 rounded-full ${statusColor}`} />
+            <span className="text-xs text-white/70">{statusLabel}</span>
           </div>
-          <button
-            onClick={onToggleStatus}
-            className="flex items-center gap-1.5 px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 hover:border-primary/50 transition-all text-xs text-white/90"
-          >
-            {isActive ? (
-              <>
-                <Pause className="w-3 h-3" />
-                <span>Pause</span>
-              </>
-            ) : (
-              <>
-                <Play className="w-3 h-3" />
-                <span>Resume</span>
-              </>
-            )}
-          </button>
+          {!isDraft && (
+            <button
+              onClick={onToggleStatus}
+              className="flex items-center gap-1.5 px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 hover:border-primary/50 transition-all text-xs text-white/90"
+            >
+              {isActive ? (
+                <>
+                  <Pause className="w-3 h-3" />
+                  <span>Pause</span>
+                </>
+              ) : (
+                <>
+                  <Play className="w-3 h-3" />
+                  <span>Resume</span>
+                </>
+              )}
+            </button>
+          )}
         </div>
 
         <div className="flex items-start gap-3">
@@ -55,7 +65,6 @@ const StrategyInfoCard = ({
           <div className="flex-1 pr-32">
             <p className="text-xs text-white/50">Strategy</p>
             <p className="text-sm font-medium mt-0.5">{strategy.name}</p>
-            <p className="text-xs text-white/70 mt-2">{strategy.description}</p>
 
             <div className="flex flex-wrap gap-1.5 mt-3">
               {strategy.protocols.map((protocol) => (

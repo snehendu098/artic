@@ -1,6 +1,7 @@
 "use client";
 
 import { PrivyProvider } from "@privy-io/react-auth";
+import { mantle, mantleSepoliaTestnet } from "viem/chains";
 
 export default function PrivyProviderMain({
   children,
@@ -16,6 +17,8 @@ export default function PrivyProviderMain({
             createOnLogin: "users-without-wallets",
           },
         },
+        supportedChains: [mantleSepoliaTestnet, mantle],
+        defaultChain: mantleSepoliaTestnet,
       }}
     >
       {children}

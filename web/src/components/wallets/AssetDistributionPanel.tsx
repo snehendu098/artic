@@ -1,12 +1,12 @@
 "use client";
 
 import CardLayout from "@/components/layouts/card-layout";
-import { Coins, X } from "lucide-react";
+import { X } from "lucide-react";
 import { motion } from "framer-motion";
-import type { Wallet } from "@/types";
+import type { ProgressiveWallet } from "@/types";
 
 interface AssetDistributionPanelProps {
-  selectedWallet: Wallet;
+  selectedWallet: ProgressiveWallet;
   onClose: () => void;
   formatCurrency: (value: number) => string;
   formatAssetAmount: (value: number) => string;
@@ -41,8 +41,29 @@ const AssetDistributionPanel = ({
         </div>
 
         <div className="mt-4 space-y-3">
-          {selectedWallet.assets.map((asset, index) => {
-            return (
+          {selectedWallet.loadingState === "initial" ? (
+            [1, 2].map((i) => (
+              <div
+                key={i}
+                className="p-3 bg-neutral-800 border border-neutral-700"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-neutral-700 animate-pulse" />
+                    <div>
+                      <div className="h-4 w-12 bg-neutral-700 animate-pulse rounded" />
+                      <div className="h-3 w-16 bg-neutral-700 animate-pulse rounded mt-1" />
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="h-4 w-16 bg-neutral-700 animate-pulse rounded" />
+                    <div className="h-3 w-12 bg-neutral-700 animate-pulse rounded mt-1" />
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (selectedWallet.assets ?? []).length > 0 ? (
+            (selectedWallet.assets ?? []).map((asset, index) => (
               <motion.div
                 key={`${asset.id}-${index}`}
                 initial={{ opacity: 0 }}
@@ -70,30 +91,34 @@ const AssetDistributionPanel = ({
                     <p className="text-sm font-medium">
                       {formatAssetAmount(asset.value)} {asset.symbol}
                     </p>
-                    <p className="text-xs text-primary mt-0.5">
-                      {formatCurrency(asset.valueUSD)}
-                    </p>
+                    {selectedWallet.loadingState === "complete" ? (
+                      <p className="text-xs text-primary mt-0.5">
+                        {formatCurrency(asset.valueUSD)}
+                      </p>
+                    ) : (
+                      <div className="h-3 w-12 bg-neutral-700 animate-pulse rounded mt-1" />
+                    )}
                   </div>
                 </div>
               </motion.div>
-            );
-          })}
+            ))
+          ) : (
+            <div className="p-3 bg-neutral-800 border border-neutral-700 text-center">
+              <p className="text-sm text-white/40">No assets</p>
+            </div>
+          )}
         </div>
 
         <div className="mt-4 p-3 bg-neutral-800/50 border border-neutral-700">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-white/50">Total Value</span>
+          <div className="flex items-center justify-between">
+            <span className="text-xs text-white/50">Total Value</span>
+            {selectedWallet.loadingState === "complete" ? (
               <span className="text-sm font-semibold text-primary">
-                {formatCurrency(selectedWallet.balanceUSD)}
+                {formatCurrency(selectedWallet.balanceUSD ?? 0)}
               </span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-white/50">ETH Balance</span>
-              <span className="text-sm font-semibold">
-                {selectedWallet.balance.toFixed(4)} ETH
-              </span>
-            </div>
+            ) : (
+              <div className="h-4 w-16 bg-neutral-700 animate-pulse rounded" />
+            )}
           </div>
         </div>
       </CardLayout>

@@ -1,36 +1,92 @@
 import { Hono } from "hono";
 import { Env } from "./types";
-import { createDelegationWallet } from "./controllers/user.controller";
-import { createStrategyHandler } from "./controllers/strategy.controller";
-import { updateStrategyStateHandler } from "./controllers/strategy-state.controller";
-import { fetchDelegationWallets, fetchStrategies, fetchStrategiesForUser, fetchStrategyDetailsById } from "./controllers/fetch.controller";
-import { fetchRecentWalletActions } from "./controllers/wallet-action.controller";
 import { requireApiKey } from "./middleware/auth.middleware";
-import { fetchActiveSubscriptionsHandler } from "./controllers/bot.controller";
+
+// Controllers
+import { createDelegationWallet, getUser, upsertUserHandler } from "./controllers/user.controller";
+import { getDelegationsHandler } from "./controllers/delegation.controller";
+import {
+  createStrategyHandler,
+  getMyStrategies,
+  getMarketplaceStrategies,
+  getStrategyDetailsHandler,
+  updateStrategyHandler,
+  activateStrategyHandler,
+  publishStrategyHandler,
+} from "./controllers/strategy.controller";
+import {
+  createSubscriptionHandler,
+  getSubscriptionsHandler,
+  pauseSubscriptionHandler,
+  activateSubscriptionHandler,
+  getSubscribersHandler,
+  getActiveSubscriptionsForBotHandler,
+} from "./controllers/subscription.controller";
+import { createPurchaseHandler, getPurchasesHandler } from "./controllers/purchase.controller";
+import { getEarningsHandler, claimEarningHandler } from "./controllers/earnings.controller";
+import { createActionHandler, getActionsHandler } from "./controllers/action.controller";
 
 const app = new Hono<Env>();
 
-app.get("/", (c) => {
-  console.log(c.env.DATABASE_URL);
-  return c.text("Hello Hono!");
-});
+app.get("/", (c) => c.text("Artic Protocol API"));
 
-// User delegation endpoints
-app.post("/users/delegation/create", createDelegationWallet);
-app.post("/users/create-delegation", createDelegationWallet);
-app.get("/users/delegations/:wallet", fetchDelegationWallets);
+// ============================================
+// USER ROUTES
+// ============================================
+app.post("/users", upsertUserHandler);
+app.get("/users/:wallet", getUser);
 
-// Strategy endpoints
-app.post("/strategies/create", createStrategyHandler);
-app.post("/strategies/state-update", updateStrategyStateHandler);
-app.get("/strategies/:strategyId/details", fetchStrategyDetailsById);
-app.get("/strategies/:creatorWallet", fetchStrategies);
-app.get("/user/:userWallet/strategies", fetchStrategiesForUser);
+// ============================================
+// DELEGATION ROUTES
+// ============================================
+app.post("/delegations", createDelegationWallet);
+app.get("/delegations/:wallet", getDelegationsHandler);
 
-// Wallet actions endpoints
-app.get("/wallet-actions/:userWallet", fetchRecentWalletActions);
+// ============================================
+// STRATEGY ROUTES
+// ============================================
+app.post("/strategies", createStrategyHandler);
+app.get("/strategies", getMarketplaceStrategies);
+app.get("/strategies/mine/:wallet", getMyStrategies);
+app.get("/strategies/:id", getStrategyDetailsHandler);
+app.patch("/strategies/:id", updateStrategyHandler);
+app.patch("/strategies/:id/activate", activateStrategyHandler);
+app.patch("/strategies/:id/publish", publishStrategyHandler);
 
-// Bot endpoints (protected by API key)
-app.get("/bot/active-subscriptions", requireApiKey, fetchActiveSubscriptionsHandler);
+// ============================================
+// PURCHASE ROUTES
+// ============================================
+app.post("/purchases", createPurchaseHandler);
+app.get("/purchases/:wallet", getPurchasesHandler);
+
+// ============================================
+// SUBSCRIPTION ROUTES
+// ============================================
+app.post("/subscriptions", createSubscriptionHandler);
+app.get("/subscriptions/:wallet", getSubscriptionsHandler);
+app.patch("/subscriptions/:id/pause", pauseSubscriptionHandler);
+app.patch("/subscriptions/:id/activate", activateSubscriptionHandler);
+
+// ============================================
+// SUBSCRIBER ROUTES (people subscribed to user's strategies)
+// ============================================
+app.get("/subscribers/:wallet", getSubscribersHandler);
+
+// ============================================
+// ACTION ROUTES
+// ============================================
+app.post("/actions", createActionHandler);
+app.get("/actions/:wallet", getActionsHandler);
+
+// ============================================
+// EARNINGS ROUTES
+// ============================================
+app.get("/earnings/:wallet", getEarningsHandler);
+app.patch("/earnings/:id/claim", claimEarningHandler);
+
+// ============================================
+// BOT ROUTES (protected)
+// ============================================
+app.get("/bot/active-subscriptions", requireApiKey, getActiveSubscriptionsForBotHandler);
 
 export default app;

@@ -1,49 +1,37 @@
+"use client";
+
 import CardLayout from "@/components/layouts/card-layout";
-import { dummyActions } from "@/constants/data";
 import Link from "next/link";
-import {
-  ArrowDownLeft,
-  ArrowUpRight,
-  Play,
-  UserPlus,
-  Plus,
-  ArrowRight,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { useActions } from "@/hooks";
 
-const ActionsCard = () => {
-  const getActionIcon = (type: string) => {
-    switch (type) {
-      case "execution":
-        return <Play className="w-3 h-3" />;
-      case "subscription":
-        return <UserPlus className="w-3 h-3" />;
-      case "withdrawal":
-        return <ArrowUpRight className="w-3 h-3" />;
-      case "deposit":
-        return <ArrowDownLeft className="w-3 h-3" />;
-      case "strategy_created":
-        return <Plus className="w-3 h-3" />;
-      default:
-        return <Play className="w-3 h-3" />;
-    }
-  };
+interface ActionsCardProps {
+  walletAddress?: string;
+}
 
-  const getActionColor = (type: string) => {
-    switch (type) {
-      case "execution":
-        return "bg-blue-500/20 text-blue-400";
-      case "subscription":
-        return "bg-primary/20 text-primary";
-      case "withdrawal":
-        return "bg-red-500/20 text-red-400";
-      case "deposit":
-        return "bg-green-500/20 text-green-400";
-      case "strategy_created":
-        return "bg-purple-500/20 text-purple-400";
-      default:
-        return "bg-neutral-500/20 text-neutral-400";
-    }
-  };
+const ActionsCardSkeleton = () => (
+  <CardLayout>
+    <div>
+      <p className="text-xs text-white/50">// recent activity</p>
+      <p className="uppercase">Actions</p>
+    </div>
+    <div className="w-full space-y-3 mt-4">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="p-3 bg-neutral-800 border border-neutral-700">
+          <div className="flex items-start gap-3">
+            <div className="flex-1 min-w-0">
+              <div className="h-3 bg-neutral-700 animate-pulse w-full mb-2" />
+              <div className="h-3 bg-neutral-700 animate-pulse w-16" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </CardLayout>
+);
+
+const ActionsCard = ({ walletAddress }: ActionsCardProps) => {
+  const { data: actions, isLoading } = useActions(walletAddress);
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -62,8 +50,11 @@ const ActionsCard = () => {
     }
   };
 
+  if (isLoading) return <ActionsCardSkeleton />;
+
+  const hasData = actions && actions.length > 0;
   const maxDisplay = 3;
-  const hasMore = dummyActions.length > maxDisplay;
+  const hasMore = hasData && actions.length > maxDisplay;
 
   return (
     <CardLayout>
@@ -71,25 +62,32 @@ const ActionsCard = () => {
         <p className="text-xs text-white/50">// recent activity</p>
         <p className="uppercase">Actions</p>
       </div>
-      <div className="w-full space-y-3 mt-4">
-        {dummyActions.slice(0, maxDisplay).map((action) => (
-          <div
-            key={action.id}
-            className="p-3 bg-neutral-800 border border-neutral-700 hover:border-neutral-600 transition-all duration-200 cursor-pointer group"
-          >
-            <div className="flex items-start gap-3">
-              <div className="flex-1 min-w-0">
-                <p className="text-xs leading-relaxed text-white/90">
-                  {action.description}
-                </p>
-                <p className="text-xs text-white/40 mt-1.5">
-                  {formatTime(action.timestamp)}
-                </p>
+      {hasData ? (
+        <div className="w-full space-y-3 mt-4">
+          {actions.slice(0, maxDisplay).map((action) => (
+            <div
+              key={action.id}
+              className="p-3 bg-neutral-800 border border-neutral-700 hover:border-neutral-600 transition-all duration-200 cursor-pointer group"
+            >
+              <div className="flex items-start gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs leading-relaxed text-white/90">
+                    {action.description}
+                  </p>
+                  <p className="text-xs text-white/40 mt-1.5">
+                    {formatTime(action.timestamp)}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-4 p-6 border border-dashed border-neutral-700 flex flex-col items-center justify-center text-center">
+          <p className="text-sm text-white/40">No activity yet</p>
+          <p className="text-xs text-white/30 mt-1">Actions will appear here</p>
+        </div>
+      )}
       {hasMore && (
         <Link href="/app/dashboard/actions">
           <button className="w-full mt-3 py-2 bg-neutral-800 border border-neutral-700 hover:border-primary/50 hover:bg-neutral-750 transition-all duration-200 flex items-center justify-center gap-2 group">

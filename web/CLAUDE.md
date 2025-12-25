@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Next.js 16 (App Router) web application for a DeFi strategy management platform built with React 19, TypeScript, and Tailwind CSS. The app uses Privy for authentication and features a dashboard for managing wallets, assets, strategies, subscriptions, and subscribers.
+This is a Next.js 16 (App Router) web application for a DeFi strategy management platform built with React 19, TypeScript, and Tailwind CSS. React Compiler is enabled. The app uses Privy for authentication and features a dashboard for managing wallets, assets, strategies, subscriptions, and subscribers.
 
 ## Development Commands
 
@@ -36,13 +36,16 @@ The codebase follows a modular component structure:
 ### Key Architectural Patterns
 
 #### 1. Split Panel Layout Pattern
+
 The app uses a reusable `SplitPanelLayout` component for list-detail views:
+
 - Main content centered at 60% viewport width
 - Slides left when detail panel opens (40% width)
 - Smooth animations using framer-motion
 - Used in: assets, wallets, strategies, subscriptions, subscribers pages
 
 Example usage:
+
 ```tsx
 <SplitPanelLayout
   backUrl="/app/dashboard"
@@ -56,23 +59,27 @@ Example usage:
 ```
 
 #### 2. Row + Detail Panel Pattern
+
 Each feature domain has:
+
 - **Row Component**: Displays list item with hover animations (e.g., `AssetRow`, `WalletRow`)
 - **Detail Panel Component**: Slide-in panel showing full details (e.g., `WalletDistributionPanel`, `AssetDistributionPanel`)
 
 #### 3. Next.js 15+ Params Handling
+
 **IMPORTANT**: All dynamic route params are Promises and must be unwrapped:
+
 ```tsx
 // Correct
 const MyPage = ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = use(params);
   // ...
-}
+};
 
 // Wrong - will cause errors
 const MyPage = ({ params }: { params: { id: string } }) => {
   const id = params.id; // Error!
-}
+};
 ```
 
 ### Routing Structure
@@ -108,8 +115,8 @@ const MyPage = ({ params }: { params: { id: string } }) => {
   - Text hierarchy: white → `text-white/70` → `text-white/50` → `text-white/40`
 - **Spacing**:
   - List spacing: `space-y-2` between rows
-  - Card padding: `p-3` for compact items, `p-6` for main cards (via `CardLayout`)
-  - Section spacing: `space-y-4` or `space-y-6`
+  - Card padding: `p-3` for compact items, `p-4` for main cards (via `CardLayout`)
+  - Section spacing: `space-y-4` or `space-y-2`
 - **Typography**:
   - Headers: `text-xs text-white/50` for labels, `uppercase` for titles
   - Content: `text-sm` for primary text, `text-xs` for secondary
@@ -118,6 +125,7 @@ const MyPage = ({ params }: { params: { id: string } }) => {
 ### Strategy Detail Page
 
 The `/app/strategies/[id]` page uses a linear card layout with modular components:
+
 - Full width (`w-full max-w-5xl mx-auto`) centered container
 - Each card is a separate component in `src/components/strategies/card/`:
   - `StrategyInfoCard` - Strategy details with status indicator (top-right absolute position)
@@ -142,15 +150,17 @@ The `/app/strategies/[id]` page uses a linear card layout with modular component
 ### Card Component Pattern
 
 All cards should use the `CardLayout` wrapper component:
+
 ```tsx
 import CardLayout from "@/components/layouts/card-layout";
 
 <CardLayout>
   {/* Card content with p-6 padding, bg-neutral-900, and hover effects */}
-</CardLayout>
+</CardLayout>;
 ```
 
 The `CardLayout` provides:
+
 - Consistent padding (`p-6`)
 - Background color (`bg-neutral-900`)
 - Border with hover effect (`hover:border-primary`)
@@ -159,6 +169,7 @@ The `CardLayout` provides:
 ### Component Creation Guidelines
 
 **For List-Detail Pages:**
+
 1. Create Row component in `src/components/[feature]/` (e.g., `AssetRow`, `WalletRow`, `ActionRow`)
 2. Create Detail Panel component in same directory
 3. Create page in `src/app/app/dashboard/[feature]/`
@@ -166,6 +177,7 @@ The `CardLayout` provides:
 5. Add navigation link to dashboard card
 
 **For Complex Detail Pages:**
+
 1. Break down large pages into smaller card components
 2. Place card components in `src/components/[feature]/card/`
 3. Each card should be self-contained with clear props interface
@@ -174,7 +186,90 @@ The `CardLayout` provides:
 
 ### Animation Standards
 
-- Use `framer-motion` for all animations
+- Use `motion` package (framer-motion) for all animations
 - Transitions: `type: "spring", stiffness: 300, damping: 30`
 - Fade-ins: `initial={{ opacity: 0 }}` → `animate={{ opacity: 1 }}`
 - Stagger delays: `delay: index * 0.05` for list items
+
+---
+
+## API Integration Patterns
+
+### Server Actions
+
+- Location: `src/actions/`
+- Use `"use server"` directive
+- Call db-layer via `api()` helper from `src/lib/api.ts`
+
+**Read pattern:**
+
+```ts
+export async function getData(wallet: string): Promise<T[]> {
+  const data = await api<DBType[]>(`/endpoint/${wallet}`);
+  return data ? data.map(mapToFrontendType) : [];
+}
+```
+
+**Write pattern (with full response):**
+
+```ts
+export async function createThing(
+  params,
+): Promise<{ success: boolean; message: string; data: T | null }> {
+  const res = await fetch(`${API_URL}/endpoint`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+  const json = await res.json();
+  return { success: json.success, message: json.message, data: json.data };
+}
+```
+
+### API Client
+
+- `src/lib/api.ts` - generic fetch wrapper
+- Expects db-layer response: `{ success, message, data }`
+- Returns `data` or `null` on error
+
+### Privy Signing for Mutations
+
+For write operations requiring wallet ownership proof:
+
+```ts
+import { usePrivy, useWallets } from "@privy-io/react-auth";
+
+const { user } = usePrivy();
+const { wallets } = useWallets();
+
+const wallet = wallets.find((w) => w.address === user?.wallet?.address);
+const signature = await wallet.sign(`Message for ${walletAddress}`);
+```
+
+### Data Refresh Pattern
+
+Pass refetch callback through component hierarchy:
+
+```
+DashboardClient (defines fetchDashboardData)
+  → WalletsCard (accepts onWalletCreated prop)
+    → CreateWalletDialog (accepts onSuccess prop, calls on success)
+```
+
+### DB-Layer API Endpoints
+
+Base URL: `NEXT_PUBLIC_API_URL` (default: `http://localhost:8787`)
+
+| Method | Endpoint                    | Purpose                                       |
+| ------ | --------------------------- | --------------------------------------------- |
+| POST   | /delegations                | Create delegation wallet (requires signature) |
+| GET    | /delegations/:wallet        | Get user's delegation wallets                 |
+| POST   | /strategies                 | Create strategy                               |
+| GET    | /strategies/mine/:wallet    | Get user's strategies                         |
+| GET    | /strategies                 | Marketplace strategies                        |
+| POST   | /subscriptions              | Create subscription                           |
+| GET    | /subscriptions/:wallet      | Get user's subscriptions                      |
+| PATCH  | /subscriptions/:id/pause    | Pause subscription                            |
+| PATCH  | /subscriptions/:id/activate | Activate subscription                         |
+| GET    | /actions/:wallet            | Get wallet actions                            |
+| GET    | /subscribers/:wallet        | Get strategy subscribers                      |

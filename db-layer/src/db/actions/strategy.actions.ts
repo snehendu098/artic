@@ -1,304 +1,343 @@
-import { strategySchema, strategySubscriptions, subscriptionWallets, delegationWallets, walletActions } from "../schema";
-import { eq, count } from "drizzle-orm";
-import { randomUUID } from "crypto";
-import { validateDelegationWalletOwnership } from "./delegation.actions";
-import { privateKeyToAccount } from "viem/accounts";
-
-export interface CreateStrategyResult {
-  strategyId: string;
-  strategy: string;
-  creatorWallet: string;
-  delegationWallet: string | null;
-  isActive: boolean;
-}
+import { strategies, subscriptions, users, delegationWallets, walletActions } from "../schema";
+import { eq, count, and, sql } from "drizzle-orm";
+import { validateDelegationOwnership } from "./delegation.actions";
 
 export interface Strategy {
   id: string;
-  strategy: string;
-  creatorWallet: string | null;
-  delegationWallet: string | null;
-  isActive: boolean;
-  createdAt: string | null;
+  creatorId: string;
+  name: string;
+  strategyCode: string;
+  isPublic: boolean;
+  priceMnt: string | null;
+  subscriberCount: number;
+  protocols: string[] | null;
+  status: "draft" | "active" | "paused";
+  createdAt: Date | null;
+  updatedAt: Date | null;
+}
+
+export interface CreateStrategyParams {
+  creatorId: string;
+  name: string;
+  strategyCode: string;
+  isPublic?: boolean;
+  priceMnt?: string;
+  protocols?: string[];
+  status?: "draft" | "active" | "paused";
+  delegationWalletId?: string;
 }
 
 export const createStrategy = async (
   database: any,
-  strategyId: string,
-  name: string,
-  strategy: string,
-  creatorWallet: string,
-  delegationWallet: string | null,
-  isActive: boolean,
-  isPublic: boolean = false
-): Promise<CreateStrategyResult> => {
-  await database.insert(strategySchema).values({
-    id: strategyId,
-    name,
-    strategy,
-    creatorWallet,
-    isActive,
-    isPublic,
-  });
+  params: CreateStrategyParams
+): Promise<Strategy> => {
+  const inserted = await database
+    .insert(strategies)
+    .values({
+      creatorId: params.creatorId,
+      name: params.name,
+      strategyCode: params.strategyCode,
+      isPublic: params.isPublic ?? false,
+      priceMnt: params.priceMnt,
+      protocols: params.protocols,
+      status: params.status ?? "draft",
+    })
+    .returning();
 
-  // Auto-subscribe the creator if the strategy is active
-  if (isActive) {
-    // Validate delegation wallet if provided
-    if (delegationWallet) {
-      await validateDelegationWalletOwnership(database, delegationWallet, creatorWallet);
-    } else {
-      throw new Error("delegationWallet is required when isActive is true");
-    }
+  const strategy = inserted[0];
 
-    const subscriptionId = randomUUID();
+  // Auto-subscribe creator if status is active
+  if (params.status === "active" && params.delegationWalletId) {
+    await validateDelegationOwnership(database, params.delegationWalletId, params.creatorId);
 
-    // Create subscription
-    await database.insert(strategySubscriptions).values({
-      id: subscriptionId,
-      strategyId: strategyId,
-      userWallet: creatorWallet,
+    await database.insert(subscriptions).values({
+      strategyId: strategy.id,
+      userId: params.creatorId,
+      delegationWalletId: params.delegationWalletId,
       isActive: true,
     });
 
-    // Link delegation wallet to subscription
-    await database.insert(subscriptionWallets).values({
-      id: randomUUID(),
-      subscriptionId: subscriptionId,
-      delegationWalletId: delegationWallet,
-    });
+    // Update subscriber count
+    await database
+      .update(strategies)
+      .set({ subscriberCount: 1 })
+      .where(eq(strategies.id, strategy.id));
   }
 
-  return {
-    strategyId,
-    strategy,
-    creatorWallet,
-    delegationWallet,
-    isActive,
-  };
+  return strategy;
 };
 
 export const getStrategiesByCreator = async (
   database: any,
-  creatorWallet: string
+  userWallet: string
 ): Promise<Strategy[]> => {
-  const strategies = await database
+  const user = await database
     .select()
-    .from(strategySchema)
-    .where(eq(strategySchema.creatorWallet, creatorWallet));
+    .from(users)
+    .where(eq(users.wallet, userWallet))
+    .limit(1);
 
-  return strategies;
+  if (!user || user.length === 0) return [];
+
+  return database
+    .select()
+    .from(strategies)
+    .where(eq(strategies.creatorId, user[0].id));
 };
 
-export interface StrategyInfo {
-  strategyId: string;
-  name: string;
-  subscriberCount: number;
-  isActiveForUser: boolean;
-  isCreator: boolean;
-}
-
-export const getStrategiesForUser = async (
-  database: any,
-  userWallet: string
-): Promise<StrategyInfo[]> => {
-  // Query 1: Get strategies created by the user
-  const createdStrategies = await database
+export const getPublicStrategies = async (
+  database: any
+): Promise<(Strategy & { creatorWallet: string; creatorUsername: string | null })[]> => {
+  const results = await database
     .select({
-      id: strategySchema.id,
-      name: strategySchema.name,
-      isActive: strategySchema.isActive,
+      id: strategies.id,
+      creatorId: strategies.creatorId,
+      name: strategies.name,
+      strategyCode: strategies.strategyCode,
+      isPublic: strategies.isPublic,
+      priceMnt: strategies.priceMnt,
+      subscriberCount: strategies.subscriberCount,
+      protocols: strategies.protocols,
+      status: strategies.status,
+      createdAt: strategies.createdAt,
+      updatedAt: strategies.updatedAt,
+      creatorWallet: users.wallet,
+      creatorUsername: users.username,
     })
-    .from(strategySchema)
-    .where(eq(strategySchema.creatorWallet, userWallet));
-
-  // Query 2: Get strategies subscribed by the user with their names
-  const subscribedStrategiesWithNames = await database
-    .select({
-      subscriptionId: strategySubscriptions.id,
-      strategyId: strategySubscriptions.strategyId,
-      isActive: strategySubscriptions.isActive,
-      strategyName: strategySchema.name,
-    })
-    .from(strategySubscriptions)
-    .innerJoin(
-      strategySchema,
-      eq(strategySubscriptions.strategyId, strategySchema.id)
-    )
-    .where(eq(strategySubscriptions.userWallet, userWallet));
-
-  // Query 3: Get subscriber counts for all strategies
-  const subscriberCounts = await database
-    .select({
-      strategyId: strategySubscriptions.strategyId,
-      count: count(strategySubscriptions.id),
-    })
-    .from(strategySubscriptions)
-    .groupBy(strategySubscriptions.strategyId);
-
-  // Build a map of subscriber counts
-  const countMap = new Map(
-    subscriberCounts.map((item: any) => [item.strategyId, item.count])
-  );
-
-  // Combine created and subscribed strategies
-  const results: StrategyInfo[] = [];
-
-  // Add created strategies
-  for (const strategy of createdStrategies) {
-    results.push({
-      strategyId: strategy.id,
-      name: strategy.name,
-      subscriberCount: countMap.get(strategy.id) || 0,
-      isActiveForUser: strategy.isActive,
-      isCreator: true,
-    });
-  }
-
-  // Add subscribed strategies (avoid duplicates if user is also creator)
-  for (const subscription of subscribedStrategiesWithNames) {
-    if (!createdStrategies.some((s: any) => s.id === subscription.strategyId)) {
-      results.push({
-        strategyId: subscription.strategyId,
-        name: subscription.strategyName,
-        subscriberCount: countMap.get(subscription.strategyId) || 0,
-        isActiveForUser: subscription.isActive,
-        isCreator: false,
-      });
-    }
-  }
+    .from(strategies)
+    .innerJoin(users, eq(strategies.creatorId, users.id))
+    .where(eq(strategies.isPublic, true));
 
   return results;
 };
 
+export const getStrategyById = async (
+  database: any,
+  strategyId: string
+): Promise<Strategy | null> => {
+  const result = await database
+    .select()
+    .from(strategies)
+    .where(eq(strategies.id, strategyId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+};
+
 export interface StrategyDetailResponse {
-  strategy: {
+  strategy: Strategy & { creatorWallet: string; creatorUsername: string | null };
+  isOwned: boolean;
+  isCreator: boolean;
+  subscription: {
     id: string;
-    name: string;
-    strategy: string;
-    creatorWallet: string | null;
     isActive: boolean;
-    createdAt: string | null;
-    subscriberCount: number;
-  };
-  isActiveForUser: boolean;
-  delegationWallet: string | null;
-  walletActions: Array<{
+    delegationWalletId: string;
+    delegationWalletName: string;
+    delegationWalletAddress: string;
+  } | null;
+  subscribers: Array<{ username: string | null; wallet: string; subscribedAt: Date | null }>;
+  recentActions: Array<{
     id: string;
-    action: string;
-    emoji?: string;
-    stateChange?: string;
-    userWallet: string;
+    actionType: string;
+    description: string;
+    note: string | null;
+    status: string;
     createdAt: Date | null;
   }>;
-  subscribers: Array<{ userWallet: string }>;
 }
 
-export const getStrategyDetailsById = async (
+export const getStrategyDetails = async (
   database: any,
   strategyId: string,
   userWallet?: string
 ): Promise<StrategyDetailResponse | null> => {
-  // Query 1: Get strategy details
-  const strategy = await database
-    .select()
-    .from(strategySchema)
-    .where(eq(strategySchema.id, strategyId))
+  // Get strategy with creator info
+  const strategyResult = await database
+    .select({
+      id: strategies.id,
+      creatorId: strategies.creatorId,
+      name: strategies.name,
+      strategyCode: strategies.strategyCode,
+      isPublic: strategies.isPublic,
+      priceMnt: strategies.priceMnt,
+      subscriberCount: strategies.subscriberCount,
+      protocols: strategies.protocols,
+      status: strategies.status,
+      createdAt: strategies.createdAt,
+      updatedAt: strategies.updatedAt,
+      creatorWallet: users.wallet,
+      creatorUsername: users.username,
+    })
+    .from(strategies)
+    .innerJoin(users, eq(strategies.creatorId, users.id))
+    .where(eq(strategies.id, strategyId))
     .limit(1);
 
-  if (!strategy || strategy.length === 0) {
-    return null;
-  }
+  if (!strategyResult || strategyResult.length === 0) return null;
 
-  const strategyData = strategy[0];
-
-  // Query 2: Get subscriber count
-  const subscriberCountResult = await database
-    .select({
-      count: count(strategySubscriptions.id),
-    })
-    .from(strategySubscriptions)
-    .where(eq(strategySubscriptions.strategyId, strategyId));
-
-  const subscriberCount = subscriberCountResult[0]?.count || 0;
-
-  // Query 3: Check if user is subscribed
-  let isActiveForUser = false;
-  let delegationWallet: string | null = null;
+  const strategy = strategyResult[0];
+  let isOwned = false;
+  let isCreator = false;
+  let subscription = null;
 
   if (userWallet) {
-    const subscription = await database
+    const user = await database
       .select()
-      .from(strategySubscriptions)
-      .where(
-        eq(strategySubscriptions.strategyId, strategyId)
-      )
-      .where(eq(strategySubscriptions.userWallet, userWallet))
+      .from(users)
+      .where(eq(users.wallet, userWallet))
       .limit(1);
 
-    if (subscription && subscription.length > 0) {
-      isActiveForUser = subscription[0].isActive;
+    if (user && user.length > 0) {
+      isCreator = strategy.creatorId === user[0].id;
 
-      // Get delegation wallet for this subscription
-      const delegationRecord = await database
+      // Check subscription
+      const sub = await database
         .select({
-          delegationWalletId: subscriptionWallets.delegationWalletId,
+          id: subscriptions.id,
+          isActive: subscriptions.isActive,
+          delegationWalletId: subscriptions.delegationWalletId,
+          delegationWalletName: delegationWallets.name,
+          delegationWalletAddress: delegationWallets.address,
         })
-        .from(subscriptionWallets)
-        .where(eq(subscriptionWallets.subscriptionId, subscription[0].id))
+        .from(subscriptions)
+        .innerJoin(delegationWallets, eq(subscriptions.delegationWalletId, delegationWallets.id))
+        .where(
+          and(
+            eq(subscriptions.strategyId, strategyId),
+            eq(subscriptions.userId, user[0].id)
+          )
+        )
         .limit(1);
 
-      if (delegationRecord && delegationRecord.length > 0) {
-        const delegationWalletRecord = await database
-          .select()
-          .from(delegationWallets)
-          .where(eq(delegationWallets.id, delegationRecord[0].delegationWalletId))
-          .limit(1);
-
-        if (delegationWalletRecord && delegationWalletRecord.length > 0) {
-          const account = privateKeyToAccount(
-            delegationWalletRecord[0].delegationWalletPk as `0x${string}`
-          );
-          delegationWallet = account.address;
-        }
+      if (sub && sub.length > 0) {
+        isOwned = true;
+        subscription = sub[0];
       }
     }
   }
 
-  // Query 4: Get wallet actions for this strategy
-  const actions = await database
-    .select()
-    .from(walletActions)
-    .where(eq(walletActions.strategy, strategyId));
-
-  // Query 5: Get all subscribers
-  const subscribers = await database
+  // Get subscribers
+  const subscriberResults = await database
     .select({
-      userWallet: strategySubscriptions.userWallet,
+      username: users.username,
+      wallet: users.wallet,
+      subscribedAt: subscriptions.subscribedAt,
     })
-    .from(strategySubscriptions)
-    .where(eq(strategySubscriptions.strategyId, strategyId));
+    .from(subscriptions)
+    .innerJoin(users, eq(subscriptions.userId, users.id))
+    .where(eq(subscriptions.strategyId, strategyId));
+
+  // Get recent actions for this strategy's subscriptions
+  const actionResults = await database
+    .select({
+      id: walletActions.id,
+      actionType: walletActions.actionType,
+      description: walletActions.description,
+      note: walletActions.note,
+      status: walletActions.status,
+      createdAt: walletActions.createdAt,
+    })
+    .from(walletActions)
+    .innerJoin(subscriptions, eq(walletActions.subscriptionId, subscriptions.id))
+    .where(eq(subscriptions.strategyId, strategyId))
+    .limit(5);
 
   return {
-    strategy: {
-      id: strategyData.id,
-      name: strategyData.name,
-      strategy: strategyData.strategy,
-      creatorWallet: strategyData.creatorWallet,
-      isActive: strategyData.isActive,
-      createdAt: strategyData.createdAt,
-      subscriberCount,
-    },
-    isActiveForUser,
-    delegationWallet,
-    walletActions: actions.map((action: any) => ({
-      id: action.id,
-      action: action.action,
-      emoji: action.emoji,
-      stateChange: action.stateChange,
-      userWallet: action.userWallet,
-      createdAt: action.createdAt,
-    })),
-    subscribers: subscribers.map((sub: any) => ({
-      userWallet: sub.userWallet,
-    })),
+    strategy,
+    isOwned,
+    isCreator,
+    subscription,
+    subscribers: subscriberResults,
+    recentActions: actionResults,
   };
+};
+
+export const updateStrategy = async (
+  database: any,
+  strategyId: string,
+  updates: Partial<{
+    name: string;
+    isPublic: boolean;
+    priceMnt: string;
+    protocols: string[];
+    status: "draft" | "active" | "paused";
+  }>
+): Promise<Strategy | null> => {
+  const result = await database
+    .update(strategies)
+    .set({ ...updates, updatedAt: new Date() })
+    .where(eq(strategies.id, strategyId))
+    .returning();
+
+  return result.length > 0 ? result[0] : null;
+};
+
+export const incrementSubscriberCount = async (
+  database: any,
+  strategyId: string
+): Promise<void> => {
+  await database
+    .update(strategies)
+    .set({ subscriberCount: sql`${strategies.subscriberCount} + 1` })
+    .where(eq(strategies.id, strategyId));
+};
+
+export const decrementSubscriberCount = async (
+  database: any,
+  strategyId: string
+): Promise<void> => {
+  await database
+    .update(strategies)
+    .set({ subscriberCount: sql`GREATEST(${strategies.subscriberCount} - 1, 0)` })
+    .where(eq(strategies.id, strategyId));
+};
+
+export const activateStrategy = async (
+  database: any,
+  strategyId: string,
+  userId: string,
+  delegationWalletId: string
+): Promise<Strategy | null> => {
+  // Validate delegation wallet ownership
+  await validateDelegationOwnership(database, delegationWalletId, userId);
+
+  // Update strategy status to active
+  const result = await database
+    .update(strategies)
+    .set({ status: "active", updatedAt: new Date() })
+    .where(eq(strategies.id, strategyId))
+    .returning();
+
+  if (result.length === 0) return null;
+
+  // Create subscription for creator
+  await database.insert(subscriptions).values({
+    strategyId,
+    userId,
+    delegationWalletId,
+    isActive: true,
+  });
+
+  // Increment subscriber count
+  await incrementSubscriberCount(database, strategyId);
+
+  return result[0];
+};
+
+export const publishStrategy = async (
+  database: any,
+  strategyId: string,
+  priceMnt?: string
+): Promise<Strategy | null> => {
+  const result = await database
+    .update(strategies)
+    .set({
+      isPublic: true,
+      priceMnt: priceMnt ?? null,
+      updatedAt: new Date(),
+    })
+    .where(eq(strategies.id, strategyId))
+    .returning();
+
+  return result.length > 0 ? result[0] : null;
 };

@@ -5,85 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1766198143289,
-      "tag": "0000_colorful_sleepwalker",
+      "when": 1766556042251,
+      "tag": "0000_bright_monster_badoon",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1766200485641,
-      "tag": "0001_luxuriant_young_avengers",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1766261578738,
-      "tag": "0002_luxuriant_blob",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1766261656639,
-      "tag": "0003_moaning_namor",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1766271718261,
-      "tag": "0004_loud_jasper_sitwell",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1766271998205,
-      "tag": "0005_safe_satana",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1766272671735,
-      "tag": "0006_youthful_galactus",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1766274095964,
-      "tag": "0007_long_gorgon",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1766319652508,
-      "tag": "0008_clammy_peter_quill",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1766321337796,
-      "tag": "0009_wet_dreaming_celestial",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "7",
-      "when": 1766325994353,
-      "tag": "0010_sour_wraith",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "7",
-      "when": 1766332641002,
-      "tag": "0011_jittery_ma_gnuci",
+      "when": 1766560177771,
+      "tag": "0001_colorful_excalibur",
       "breakpoints": true
     }
   ]

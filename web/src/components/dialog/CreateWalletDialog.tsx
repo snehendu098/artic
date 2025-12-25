@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePrivy, useWallets } from "@privy-io/react-auth";
 import {
   Dialog,
   DialogTrigger,
@@ -11,21 +12,80 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { motion } from "framer-motion";
-import { Plus } from "lucide-react";
+import { Plus, Loader2 } from "lucide-react";
+import { createDelegationWallet } from "@/actions/delegation.actions";
 
 interface CreateWalletDialogProps {
   mode?: "text" | "icon";
   className?: string;
+  onSuccess?: () => void;
 }
 
 export default function CreateWalletDialog({
   mode = "text",
   className,
+  onSuccess,
 }: CreateWalletDialogProps) {
   const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const { user } = usePrivy();
+  const { wallets } = useWallets();
+
+  const handleSubmit = async () => {
+    if (!name.trim()) {
+      setError("Wallet name is required");
+      return;
+    }
+
+    const walletAddress = user?.wallet?.address;
+    if (!walletAddress) {
+      setError("No wallet connected");
+      return;
+    }
+
+    const connectedWallet = wallets.find((w) => w.address === walletAddress);
+    if (!connectedWallet) {
+      setError("Wallet not found");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const message = `Create delegation wallet for ${walletAddress}`;
+      const signature = await connectedWallet.sign(message);
+
+      const result = await createDelegationWallet(walletAddress, signature, name.trim());
+
+      if (!result.success) {
+        setError(result.message);
+        return;
+      }
+
+      setOpen(false);
+      setName("");
+      onSuccess?.();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create wallet");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      setName("");
+      setError(null);
+    }
+  };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {mode === "text" ? (
           <motion.button
@@ -64,20 +124,32 @@ export default function CreateWalletDialog({
             </label>
             <input
               type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               className="w-full px-3 py-2 bg-neutral-800 border border-neutral-700 focus:border-primary/50 outline-none text-sm transition-colors"
               placeholder="e.g., Main Trading Wallet"
+              disabled={loading}
             />
+            {error && (
+              <p className="mt-1.5 text-xs text-red-400">{error}</p>
+            )}
           </div>
         </div>
 
         <DialogFooter>
           <button
             onClick={() => setOpen(false)}
-            className="px-4 py-2 text-sm bg-neutral-800 border transition-colors"
+            disabled={loading}
+            className="px-4 py-2 text-sm bg-neutral-800 border transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
-          <button className="px-4 py-2 text-sm text-primary border border-primary  transition-colors">
+          <button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="px-4 py-2 text-sm text-primary border border-primary transition-colors disabled:opacity-50 flex items-center gap-2"
+          >
+            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
             Create Wallet
           </button>
         </DialogFooter>

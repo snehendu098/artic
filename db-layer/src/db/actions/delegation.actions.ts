@@ -1,54 +1,84 @@
-import { delegationWallets } from "../schema";
+import { delegationWallets, users } from "../schema";
 import { eq } from "drizzle-orm";
-
-export interface CreateDelegationResult {
-  delegationId: string;
-  userWallet: string;
-  delegationWalletPk: string;
-}
 
 export interface DelegationWallet {
   id: string;
-  user: string;
-  delegationWalletPk: string;
-  createdAt: string | null;
+  userId: string;
+  name: string;
+  address: string;
+  createdAt: Date | null;
+}
+
+export interface CreateDelegationParams {
+  userId: string;
+  name: string;
+  address: string;
+  encryptedPrivateKey: string;
 }
 
 export const createDelegation = async (
   database: any,
-  delegationId: string,
-  userWallet: string,
-  delegationWalletPk: string
-): Promise<CreateDelegationResult> => {
-  await database.insert(delegationWallets).values({
-    id: delegationId,
-    user: userWallet,
-    delegationWalletPk,
-  });
+  params: CreateDelegationParams
+): Promise<DelegationWallet> => {
+  const inserted = await database
+    .insert(delegationWallets)
+    .values({
+      userId: params.userId,
+      name: params.name,
+      address: params.address,
+      encryptedPrivateKey: params.encryptedPrivateKey,
+    })
+    .returning();
 
-  return {
-    delegationId,
-    userWallet,
-    delegationWalletPk,
-  };
+  const { encryptedPrivateKey, ...rest } = inserted[0];
+  return rest;
 };
 
 export const getDelegationsByWallet = async (
   database: any,
   userWallet: string
 ): Promise<DelegationWallet[]> => {
-  const delegations = await database
+  const user = await database
     .select()
+    .from(users)
+    .where(eq(users.wallet, userWallet))
+    .limit(1);
+
+  if (!user || user.length === 0) {
+    return [];
+  }
+
+  const delegations = await database
+    .select({
+      id: delegationWallets.id,
+      userId: delegationWallets.userId,
+      name: delegationWallets.name,
+      address: delegationWallets.address,
+      createdAt: delegationWallets.createdAt,
+    })
     .from(delegationWallets)
-    .where(eq(delegationWallets.user, userWallet));
+    .where(eq(delegationWallets.userId, user[0].id));
 
   return delegations;
 };
 
-export const validateDelegationWalletOwnership = async (
+export const getDelegationById = async (
+  database: any,
+  delegationId: string
+): Promise<(DelegationWallet & { encryptedPrivateKey: string }) | null> => {
+  const result = await database
+    .select()
+    .from(delegationWallets)
+    .where(eq(delegationWallets.id, delegationId))
+    .limit(1);
+
+  return result.length > 0 ? result[0] : null;
+};
+
+export const validateDelegationOwnership = async (
   database: any,
   delegationWalletId: string,
-  userWallet: string
+  userId: string
 ): Promise<boolean> => {
   const wallet = await database
     .select()
@@ -60,7 +90,7 @@ export const validateDelegationWalletOwnership = async (
     throw new Error("Delegation wallet not found");
   }
 
-  if (wallet[0].user !== userWallet) {
+  if (wallet[0].userId !== userId) {
     throw new Error("Delegation wallet does not belong to this user");
   }
 

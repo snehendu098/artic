@@ -14,15 +14,6 @@ import Header from "@/components/common/Header";
 export default function ViewAllSubscribersDialog() {
   const [open, setOpen] = useState(false);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
@@ -31,11 +22,6 @@ export default function ViewAllSubscribersDialog() {
       year: "numeric",
     });
   };
-
-  const totalInvested = dummySubscribers.reduce(
-    (sum, sub) => sum + sub.amountInvested,
-    0
-  );
 
   return (
     <InfoPopup open={open} onOpenChange={setOpen}>
@@ -63,9 +49,9 @@ export default function ViewAllSubscribersDialog() {
 
             {/* Stats */}
             <div className="px-8 py-4 flex-shrink-0">
-              <p className="text-xs text-white/50 mb-1">Total Capital Invested</p>
+              <p className="text-xs text-white/50 mb-1">Total Subscribers</p>
               <p className="text-3xl font-semibold text-primary">
-                {formatCurrency(totalInvested)}
+                {dummySubscribers.length}
               </p>
             </div>
 
@@ -73,7 +59,7 @@ export default function ViewAllSubscribersDialog() {
             <div className="flex-1 min-h-0 overflow-y-auto">
               <div className="px-8 pb-8 space-y-3">
                 <AnimatePresence mode="popLayout">
-                  {dummySubscribers.map((subscriber, index) => (
+                  {dummySubscribers.map((subscriber) => (
                     <motion.div
                       key={subscriber.id}
                       initial={{ opacity: 0, y: 30 }}
@@ -92,7 +78,7 @@ export default function ViewAllSubscribersDialog() {
                             <Users className="w-5 h-5 text-primary" />
                           </div>
                           <div>
-                            <p className="text-sm font-medium">{subscriber.username}</p>
+                            <p className="text-sm font-medium">{subscriber.username || "Anonymous"}</p>
                             <p className="text-xs text-white/50 mb-1">
                               {subscriber.strategyName}
                             </p>
@@ -102,9 +88,8 @@ export default function ViewAllSubscribersDialog() {
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="text-xs text-white/50 mb-1">Amount Invested</p>
-                          <p className="text-lg font-semibold text-primary">
-                            {formatCurrency(subscriber.amountInvested)}
+                          <p className="text-xs text-white/40 font-mono">
+                            {subscriber.wallet.slice(0, 6)}...{subscriber.wallet.slice(-4)}
                           </p>
                         </div>
                       </div>
