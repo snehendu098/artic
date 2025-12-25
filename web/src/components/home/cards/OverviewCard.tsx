@@ -1,6 +1,7 @@
 "use client";
 
 import CardLayout from "@/components/layouts/card-layout";
+import Link from "next/link";
 import { useWallets, useStrategies, useSubscribers, useAssets } from "@/hooks";
 
 interface OverviewCardProps {
@@ -13,33 +14,37 @@ const SubCard = ({
   main,
   incrementor,
   isLoading,
+  href,
 }: {
   heading: string;
   main: string;
   incrementor?: string;
   isLoading?: boolean;
+  href: string;
 }) => (
-  <div className="w-full bg-neutral-800 relative p-4 border border-neutral-700 transition-all duration-300 ease-out hover:scale-[1.02] hover:bg-neutral-750 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] cursor-pointer">
-    <p className="uppercase text-xs text-white/50">{heading}</p>
-    {isLoading ? (
-      <div className="h-7 bg-neutral-700 animate-pulse w-16 mt-2" />
-    ) : (
-      <p className="text-xl mt-2 font-semibold">{main}</p>
-    )}
-    {incrementor && !isLoading && (
-      <p
-        className={`text-xs bottom-2 right-2 absolute font-medium ${
-          incrementor.startsWith("+")
-            ? "text-primary"
-            : incrementor.startsWith("-")
-              ? "text-red-400"
-              : "text-white/40"
-        }`}
-      >
-        {incrementor}
-      </p>
-    )}
-  </div>
+  <Link href={href}>
+    <div className="w-full bg-neutral-800 relative p-4 border border-neutral-700 transition-all duration-300 ease-out hover:scale-[1.02] hover:bg-neutral-750 hover:border-primary/50 hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.15)] cursor-pointer">
+      <p className="uppercase text-xs text-white/50">{heading}</p>
+      {isLoading ? (
+        <div className="h-7 bg-neutral-700 animate-pulse w-16 mt-2" />
+      ) : (
+        <p className="text-xl mt-2 font-semibold">{main}</p>
+      )}
+      {incrementor && !isLoading && (
+        <p
+          className={`text-xs bottom-2 right-2 absolute font-medium ${
+            incrementor.startsWith("+")
+              ? "text-primary"
+              : incrementor.startsWith("-")
+                ? "text-red-400"
+                : "text-white/40"
+          }`}
+        >
+          {incrementor}
+        </p>
+      )}
+    </div>
+  </Link>
 );
 
 const OverviewCard = ({ walletAddress, chainId }: OverviewCardProps) => {
@@ -89,6 +94,7 @@ const OverviewCard = ({ walletAddress, chainId }: OverviewCardProps) => {
               : ""
           }
           isLoading={isLoading}
+          href="/app/dashboard/assets"
         />
         <SubCard
           heading="Strategies"
@@ -99,6 +105,7 @@ const OverviewCard = ({ walletAddress, chainId }: OverviewCardProps) => {
               : ""
           }
           isLoading={isLoading}
+          href="/app/strategies"
         />
         <SubCard
           heading="Wallets"
@@ -109,6 +116,7 @@ const OverviewCard = ({ walletAddress, chainId }: OverviewCardProps) => {
               : ""
           }
           isLoading={isLoading}
+          href="/app/dashboard/wallets"
         />
         <SubCard
           heading="Subscribers"
@@ -119,6 +127,7 @@ const OverviewCard = ({ walletAddress, chainId }: OverviewCardProps) => {
               : ""
           }
           isLoading={isLoading}
+          href="/app/dashboard/subscribers"
         />
       </div>
     </CardLayout>

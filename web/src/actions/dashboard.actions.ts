@@ -11,6 +11,7 @@ import type {
   DBStrategy,
   DBSubscription,
   DBSubscriber,
+  DBPurchase,
 } from "@/types";
 
 // Transform DB action to frontend Action type
@@ -72,6 +73,33 @@ function mapSubscriber(dbSub: DBSubscriber): Subscriber {
 export async function getUserStrategies(wallet: string): Promise<Strategy[]> {
   const data = await api<DBStrategy[]>(`/strategies/mine/${wallet}`);
   return data ? data.map(mapStrategy) : [];
+}
+
+// Transform purchased strategy to frontend Strategy type
+function mapPurchasedToStrategy(purchase: DBPurchase): Strategy {
+  return {
+    id: purchase.strategyId,
+    name: purchase.strategyName,
+    subscriberCount: purchase.strategySubscriberCount,
+    status: purchase.strategyStatus,
+    createdAt: purchase.strategyCreatedAt ?? new Date().toISOString(),
+    protocols: purchase.strategyProtocols ?? [],
+    isPublic: true,
+    priceMnt: purchase.priceMnt,
+  };
+}
+
+export async function getPurchasedStrategies(wallet: string): Promise<Strategy[]> {
+  const data = await api<DBPurchase[]>(`/purchases/${wallet}`);
+  return data ? data.map(mapPurchasedToStrategy) : [];
+}
+
+export async function getAllUserStrategies(wallet: string): Promise<Strategy[]> {
+  const [created, purchased] = await Promise.all([
+    getUserStrategies(wallet),
+    getPurchasedStrategies(wallet),
+  ]);
+  return [...created, ...purchased];
 }
 
 export async function getUserSubscriptions(wallet: string): Promise<Subscription[]> {

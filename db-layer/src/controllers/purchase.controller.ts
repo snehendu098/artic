@@ -5,7 +5,7 @@ import {
   createPurchase,
   getPurchasesByWallet,
   hasPurchasedStrategy,
-  getUserByWallet,
+  upsertUser,
 } from "../db/actions";
 
 interface CreatePurchaseRequest {
@@ -18,26 +18,21 @@ interface CreatePurchaseRequest {
 
 export const createPurchaseHandler = async (c: Context<Env>) => {
   try {
-    const body = await c.req.json() as CreatePurchaseRequest;
+    const body = (await c.req.json()) as CreatePurchaseRequest;
 
     if (!body.wallet || !body.strategyId || !body.priceMnt || !body.txHash) {
-      return c.json({
-        success: false,
-        message: "wallet, strategyId, priceMnt, txHash required",
-        data: null,
-      } as ApiResponse, 400);
+      return c.json(
+        {
+          success: false,
+          message: "wallet, strategyId, priceMnt, txHash required",
+          data: null,
+        } as ApiResponse,
+        400,
+      );
     }
 
     const database = db(c.env.DATABASE_URL);
-    const user = await getUserByWallet(database, body.wallet);
-
-    if (!user) {
-      return c.json({
-        success: false,
-        message: "User not found",
-        data: null,
-      } as ApiResponse, 404);
-    }
+    const user = await upsertUser(database, body.wallet);
 
     const purchase = await createPurchase(database, {
       strategyId: body.strategyId,
@@ -47,17 +42,23 @@ export const createPurchaseHandler = async (c: Context<Env>) => {
       blockNumber: body.blockNumber,
     });
 
-    return c.json({
-      success: true,
-      message: "Purchase recorded",
-      data: purchase,
-    } as ApiResponse, 201);
+    return c.json(
+      {
+        success: true,
+        message: "Purchase recorded",
+        data: purchase,
+      },
+      201,
+    );
   } catch (error) {
-    return c.json({
-      success: false,
-      message: error instanceof Error ? error.message : "Internal error",
-      data: null,
-    } as ApiResponse, 500);
+    return c.json(
+      {
+        success: false,
+        message: error instanceof Error ? error.message : "Internal error",
+        data: null,
+      } as ApiResponse,
+      500,
+    );
   }
 };
 
@@ -66,26 +67,35 @@ export const getPurchasesHandler = async (c: Context<Env>) => {
     const wallet = c.req.param("wallet");
 
     if (!wallet) {
-      return c.json({
-        success: false,
-        message: "wallet param required",
-        data: null,
-      } as ApiResponse, 400);
+      return c.json(
+        {
+          success: false,
+          message: "wallet param required",
+          data: null,
+        } as ApiResponse,
+        400,
+      );
     }
 
     const database = db(c.env.DATABASE_URL);
     const purchases = await getPurchasesByWallet(database, wallet);
 
-    return c.json({
-      success: true,
-      message: "Purchases retrieved",
-      data: purchases,
-    } as ApiResponse, 200);
+    return c.json(
+      {
+        success: true,
+        message: "Purchases retrieved",
+        data: purchases,
+      },
+      200,
+    );
   } catch (error) {
-    return c.json({
-      success: false,
-      message: error instanceof Error ? error.message : "Internal error",
-      data: null,
-    } as ApiResponse, 500);
+    return c.json(
+      {
+        success: false,
+        message: error instanceof Error ? error.message : "Internal error",
+        data: null,
+      } as ApiResponse,
+      500,
+    );
   }
 };

@@ -28,7 +28,9 @@ const SubscriberDetailsPanel = ({
         <div className="flex items-start justify-between">
           <div>
             <p className="text-xs text-white/50">// subscriber details</p>
-            <p className="uppercase">{selectedSubscriber.username}</p>
+            <p className="uppercase">
+              {selectedSubscriber.username || `${selectedSubscriber.wallet.slice(0, 6)}...${selectedSubscriber.wallet.slice(-4)}`}
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -39,9 +41,16 @@ const SubscriberDetailsPanel = ({
         </div>
 
         <div className="mt-4 space-y-3">
+          {selectedSubscriber.username && (
+            <div className="p-3 bg-neutral-800 border border-neutral-700">
+              <p className="text-xs text-white/50 mb-2">Username</p>
+              <p className="text-sm text-white/90">{selectedSubscriber.username}</p>
+            </div>
+          )}
+
           <div className="p-3 bg-neutral-800 border border-neutral-700">
-            <p className="text-xs text-white/50 mb-2">Username</p>
-            <p className="text-sm text-white/90">{selectedSubscriber.username}</p>
+            <p className="text-xs text-white/50 mb-2">Wallet</p>
+            <p className="text-sm text-white/90 font-mono">{selectedSubscriber.wallet}</p>
           </div>
 
           <div className="p-3 bg-neutral-800 border border-neutral-700">

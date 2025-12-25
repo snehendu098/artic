@@ -7,10 +7,7 @@ import {
 } from "../db/actions/delegation.actions";
 import {
   getStrategiesByCreator,
-  getStrategiesForUser,
-  getStrategyDetailsById,
   Strategy,
-  StrategyInfo,
   StrategyDetailResponse,
 } from "../db/actions/strategy.actions";
 import { privateKeyToAccount } from "viem/accounts";
@@ -43,14 +40,16 @@ export const fetchDelegationWallets = async (c: Context<Env>) => {
     // Convert private keys to public addresses
     const publicDelegations: DelegationWalletPublic[] = delegations.map(
       (delegation) => {
-        const account = privateKeyToAccount(delegation.delegationWalletPk as `0x${string}`);
+        const account = privateKeyToAccount(
+          delegation.delegationWalletPk as `0x${string}`,
+        );
         return {
           id: delegation.id,
           user: delegation.user,
           delegationWalletAddress: account.address,
           createdAt: delegation.createdAt,
         };
-      }
+      },
     );
 
     return c.json(
@@ -181,7 +180,7 @@ export const fetchStrategyDetailsById = async (c: Context<Env>) => {
     const strategyDetails = await getStrategyDetailsById(
       database,
       strategyId,
-      userWallet
+      userWallet,
     );
 
     if (!strategyDetails) {

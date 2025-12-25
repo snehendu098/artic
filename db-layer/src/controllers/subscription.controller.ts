@@ -210,7 +210,7 @@ export const getSubscribersHandler = async (c: Context<Env>) => {
 export const getActiveSubscriptionsForBotHandler = async (c: Context<Env>) => {
   try {
     const database = db(c.env.DATABASE_URL);
-    const subscriptions = await getActiveSubscriptionsForBot(database);
+    const subscriptions = await getActiveSubscriptionsForBot(database, c.env.ENCRYPTION_KEY);
 
     return c.json({
       success: true,

@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { getAllUserStrategies } from "@/actions/dashboard.actions";
-import type { Strategy } from "@/types";
+import { getUserPurchases, type Purchase } from "@/actions/marketplace.actions";
 
-export function useStrategies(walletAddress: string | undefined) {
-  const [data, setData] = useState<Strategy[]>([]);
+export function usePurchases(walletAddress: string | undefined) {
+  const [data, setData] = useState<Purchase[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const refetch = useCallback(async () => {
@@ -15,10 +14,10 @@ export function useStrategies(walletAddress: string | undefined) {
     }
     setIsLoading(true);
     try {
-      const result = await getAllUserStrategies(walletAddress);
+      const result = await getUserPurchases(walletAddress);
       setData(result);
     } catch (error) {
-      console.error("Failed to fetch strategies:", error);
+      console.error("Failed to fetch purchases:", error);
     } finally {
       setIsLoading(false);
     }

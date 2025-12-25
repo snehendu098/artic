@@ -4,30 +4,38 @@ import CardLayout from "@/components/layouts/card-layout";
 import { TrendingUp, Pause, Play } from "lucide-react";
 import type { Strategy } from "@/types";
 
+type UserStatus = "active" | "paused" | "draft" | "not_activated";
+
 interface StrategyInfoCardProps {
   strategy: Strategy;
+  userStatus: UserStatus;
   isActive: boolean;
   onToggleStatus: () => void;
+  showToggle?: boolean;
 }
 
 const StrategyInfoCard = ({
   strategy,
+  userStatus,
   isActive,
   onToggleStatus,
+  showToggle = true,
 }: StrategyInfoCardProps) => {
-  const isDraft = strategy.status === "draft";
-
-  const statusColor = {
+  const statusColor: Record<UserStatus, string> = {
     active: "bg-green-500",
     paused: "bg-yellow-500",
     draft: "bg-neutral-500",
-  }[strategy.status];
+    not_activated: "bg-blue-500",
+  };
 
-  const statusLabel = {
+  const statusLabel: Record<UserStatus, string> = {
     active: "Active",
     paused: "Paused",
     draft: "Draft",
-  }[strategy.status];
+    not_activated: "Not Activated",
+  };
+
+  const canToggle = showToggle && (userStatus === "active" || userStatus === "paused");
 
   return (
     <CardLayout>
@@ -35,10 +43,10 @@ const StrategyInfoCard = ({
         {/* Status Indicator - Top Right */}
         <div className="absolute -top-3 -right-3 flex items-center gap-2">
           <div className="flex items-center gap-1.5">
-            <div className={`w-2 h-2 rounded-full ${statusColor}`} />
-            <span className="text-xs text-white/70">{statusLabel}</span>
+            <div className={`w-2 h-2 rounded-full ${statusColor[userStatus]}`} />
+            <span className="text-xs text-white/70">{statusLabel[userStatus]}</span>
           </div>
-          {!isDraft && (
+          {canToggle && (
             <button
               onClick={onToggleStatus}
               className="flex items-center gap-1.5 px-2.5 py-1 bg-neutral-700 hover:bg-neutral-600 border border-neutral-600 hover:border-primary/50 transition-all text-xs text-white/90"

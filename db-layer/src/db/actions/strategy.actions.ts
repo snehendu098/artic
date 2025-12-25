@@ -1,4 +1,4 @@
-import { strategies, subscriptions, users, delegationWallets, walletActions } from "../schema";
+import { strategies, subscriptions, users, delegationWallets, walletActions, strategyPurchases } from "../schema";
 import { eq, count, and, sql } from "drizzle-orm";
 import { validateDelegationOwnership } from "./delegation.actions";
 
@@ -128,6 +128,7 @@ export interface StrategyDetailResponse {
   strategy: Strategy & { creatorWallet: string; creatorUsername: string | null };
   isOwned: boolean;
   isCreator: boolean;
+  isPurchased: boolean;
   subscription: {
     id: string;
     isActive: boolean;
@@ -178,6 +179,7 @@ export const getStrategyDetails = async (
   const strategy = strategyResult[0];
   let isOwned = false;
   let isCreator = false;
+  let isPurchased = false;
   let subscription = null;
 
   if (userWallet) {
@@ -213,6 +215,21 @@ export const getStrategyDetails = async (
         isOwned = true;
         subscription = sub[0];
       }
+
+      // Check if user purchased the strategy (for non-creators)
+      if (!isCreator) {
+        const purchase = await database
+          .select()
+          .from(strategyPurchases)
+          .where(
+            and(
+              eq(strategyPurchases.strategyId, strategyId),
+              eq(strategyPurchases.buyerId, user[0].id)
+            )
+          )
+          .limit(1);
+        isPurchased = purchase.length > 0;
+      }
     }
   }
 
@@ -246,6 +263,7 @@ export const getStrategyDetails = async (
     strategy,
     isOwned,
     isCreator,
+    isPurchased,
     subscription,
     subscribers: subscriberResults,
     recentActions: actionResults,

@@ -2,9 +2,18 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Zap, Globe, Wallet, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import {
+  Zap,
+  Globe,
+  Wallet,
+  Loader2,
+  ChevronDown,
+  ChevronUp,
+  Plus,
+} from "lucide-react";
 import CardLayout from "@/components/layouts/card-layout";
 import { Button } from "@/components/ui/button";
+import CreateWalletDialog from "@/components/dialog/CreateWalletDialog";
 import type { Strategy } from "@/types";
 
 interface StrategyActionsPanelProps {
@@ -13,6 +22,7 @@ interface StrategyActionsPanelProps {
   wallets: Array<{ id: string; name: string; address: string }>;
   onActivate: (walletId: string) => Promise<void>;
   onPublish: (price?: string) => Promise<void>;
+  onWalletCreated?: () => void;
 }
 
 const StrategyActionsPanel = ({
@@ -21,8 +31,11 @@ const StrategyActionsPanel = ({
   wallets,
   onActivate,
   onPublish,
+  onWalletCreated,
 }: StrategyActionsPanelProps) => {
-  const [expandedSection, setExpandedSection] = useState<"activate" | "publish" | null>(null);
+  const [expandedSection, setExpandedSection] = useState<
+    "activate" | "publish" | null
+  >("activate");
   const [selectedWalletId, setSelectedWalletId] = useState<string | null>(null);
   const [price, setPrice] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -30,9 +43,9 @@ const StrategyActionsPanel = ({
   const isDraft = strategy.status === "draft";
   const isPublic = strategy.isPublic;
 
-  // Only show for creators who can take actions
-  if (!isCreator) return null;
-  if (!isDraft && isPublic) return null; // No actions needed
+  // For creators: hide if already active and public
+  // For non-creators (purchased): always show activation
+  if (isCreator && !isDraft && isPublic) return null;
 
   const handleActivate = async () => {
     if (!selectedWalletId || isSubmitting) return;
@@ -59,8 +72,8 @@ const StrategyActionsPanel = ({
       <div className="space-y-3">
         <p className="text-xs text-white/50 uppercase">Actions</p>
 
-        {/* Activate Section - Only for drafts */}
-        {isDraft && (
+        {/* Activate Section - For creators with drafts OR non-creators (purchased) */}
+        {(isDraft || !isCreator) && (
           <div className="border border-neutral-700">
             <button
               onClick={() => toggleSection("activate")}
@@ -85,10 +98,21 @@ const StrategyActionsPanel = ({
                   exit={{ height: 0, opacity: 0 }}
                   className="overflow-hidden"
                 >
-                  <div className="p-3 pt-0 border-t border-neutral-700 space-y-3">
-                    <p className="text-xs text-white/50">Select a delegation wallet</p>
+                  <div className="p-3 border-t border-neutral-700 space-y-3">
+                    <p className="text-xs text-white/50">
+                      Select a delegation wallet
+                    </p>
                     {wallets.length === 0 ? (
-                      <p className="text-xs text-white/40 py-2">No wallets found</p>
+                      <div className="space-y-3">
+                        <p className="text-xs text-white/40">
+                          You need a delegation wallet to activate this strategy
+                        </p>
+                        <CreateWalletDialog
+                          mode="text"
+                          onSuccess={onWalletCreated}
+                          className="w-full"
+                        />
+                      </div>
                     ) : (
                       <div className="grid grid-cols-2 gap-2">
                         {wallets.map((wallet) => (
@@ -101,17 +125,19 @@ const StrategyActionsPanel = ({
                         ))}
                       </div>
                     )}
-                    <Button
-                      onClick={handleActivate}
-                      disabled={!selectedWalletId || isSubmitting}
-                      className="w-full"
-                    >
-                      {isSubmitting ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        "Activate"
-                      )}
-                    </Button>
+                    {wallets.length > 0 && (
+                      <Button
+                        onClick={handleActivate}
+                        disabled={!selectedWalletId || isSubmitting}
+                        className="w-full"
+                      >
+                        {isSubmitting ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          "Activate"
+                        )}
+                      </Button>
+                    )}
                   </div>
                 </motion.div>
               )}
@@ -119,8 +145,8 @@ const StrategyActionsPanel = ({
           </div>
         )}
 
-        {/* Publish Section - Only if not already public */}
-        {!isPublic && (
+        {/* Publish Section - Only for creators who haven't published yet */}
+        {isCreator && !isPublic && (
           <div className="border border-neutral-700">
             <button
               onClick={() => toggleSection("publish")}

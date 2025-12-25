@@ -17,6 +17,9 @@ export default function PrivyProviderMain({
             createOnLogin: "users-without-wallets",
           },
         },
+        appearance: {
+          theme: "dark",
+        },
         supportedChains: [mantleSepoliaTestnet, mantle],
         defaultChain: mantleSepoliaTestnet,
       }}

@@ -39,9 +39,18 @@ const SubscriptionsCard = ({ walletAddress }: SubscriptionsCardProps) => {
 
   return (
     <CardLayout>
-      <div>
-        <p className="text-xs text-white/50">// active subscriptions</p>
-        <p className="uppercase">Subscriptions</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs text-white/50">// active subscriptions</p>
+          <p className="uppercase">Subscriptions</p>
+        </div>
+        {hasData && !hasMore && (
+          <Link href="/app/dashboard/subscriptions">
+            <button className="p-1.5 bg-neutral-700 border border-neutral-600 transition-all duration-300 ease-out group hover:scale-110 hover:border-primary/50 hover:shadow-[0_0_15px_rgba(var(--primary-rgb),0.2)]">
+              <ArrowRight className="w-4 h-4 group-hover:text-primary transition-colors duration-300" />
+            </button>
+          </Link>
+        )}
       </div>
       {hasData ? (
         <div className="w-full space-y-2 mt-4">

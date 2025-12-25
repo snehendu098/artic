@@ -14,6 +14,7 @@ import StrategyActionsCard from "@/components/strategies/card/StrategyActionsCar
 import { getStrategyDetails, activateStrategy, publishStrategy, type StrategyDetailsResponse } from "@/actions/strategy.actions";
 import { getWalletAssets } from "@/lib/blockchain/assets";
 import { useWallets } from "@/hooks/useWallets";
+import { useMarketplace } from "@/hooks/useMarketplace";
 import type { Wallet, Subscriber, Action } from "@/types";
 
 const StrategyDetailPage = ({
@@ -24,14 +25,16 @@ const StrategyDetailPage = ({
   const { id } = use(params);
   const { user } = usePrivy();
   const walletAddress = user?.wallet?.address;
-  const { data: delegationWallets } = useWallets(walletAddress);
+  const { data: delegationWallets, refetch: refetchWallets } = useWallets(walletAddress);
+  const { listStrategy } = useMarketplace();
 
   const [data, setData] = useState<StrategyDetailsResponse | null>(null);
   const [wallet, setWallet] = useState<Wallet | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedWallet, setSelectedWallet] = useState<string | null>(null);
-  const [strategyStatus, setStrategyStatus] = useState<"draft" | "active" | "paused">("draft");
   const [isPublic, setIsPublic] = useState(false);
+  const [hasSubscription, setHasSubscription] = useState(false);
+  const [subscriptionActive, setSubscriptionActive] = useState(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -40,8 +43,9 @@ const StrategyDetailPage = ({
         const result = await getStrategyDetails(id, walletAddress);
         if (result) {
           setData(result);
-          setStrategyStatus(result.strategy.status);
           setIsPublic(result.strategy.isPublic ?? false);
+          setHasSubscription(!!result.subscription);
+          setSubscriptionActive(result.subscription?.isActive ?? false);
 
           // Fetch wallet assets if there's a subscription
           if (result.subscription?.delegationWalletAddress) {
@@ -130,12 +134,25 @@ const StrategyDetailPage = ({
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
+  // Compute user-specific status based on subscription
+  const getUserStatus = (): "active" | "paused" | "draft" | "not_activated" => {
+    if (data?.isCreator && !hasSubscription) {
+      return strategy.status === "draft" ? "draft" : "not_activated";
+    }
+    if (!hasSubscription) {
+      return "not_activated";
+    }
+    return subscriptionActive ? "active" : "paused";
+  };
+
+  const userStatus = getUserStatus();
+
   const handleToggleStatus = () => {
-    // Toggle between active and paused (draft strategies can't be toggled without activation)
-    if (strategyStatus === "active") {
-      setStrategyStatus("paused");
-    } else if (strategyStatus === "paused") {
-      setStrategyStatus("active");
+    // Toggle subscription active state
+    if (subscriptionActive) {
+      setSubscriptionActive(false);
+    } else {
+      setSubscriptionActive(true);
     }
     // TODO: Call API to update subscription status
   };
@@ -144,16 +161,30 @@ const StrategyDetailPage = ({
     if (!walletAddress) return;
     const result = await activateStrategy(id, walletAddress, delegationWalletId);
     if (result.success) {
-      setStrategyStatus("active");
-      // Optionally refetch data
+      setHasSubscription(true);
+      setSubscriptionActive(true);
+      // Refetch to get updated subscription data
+      const updatedData = await getStrategyDetails(id, walletAddress);
+      if (updatedData) {
+        setData(updatedData);
+      }
     }
   };
 
   const handlePublish = async (priceMnt?: string) => {
     if (!walletAddress) return;
-    const result = await publishStrategy(id, walletAddress, priceMnt);
-    if (result.success) {
-      setIsPublic(true);
+    try {
+      // First, list on-chain
+      const price = priceMnt || "0";
+      await listStrategy(id, price);
+
+      // Then update DB
+      const result = await publishStrategy(id, walletAddress, priceMnt);
+      if (result.success) {
+        setIsPublic(true);
+      }
+    } catch (error) {
+      console.error("Failed to publish strategy:", error);
     }
   };
 
@@ -176,27 +207,32 @@ const StrategyDetailPage = ({
         {/* Content */}
         <div className="mt-4 space-y-2">
           <StrategyInfoCard
-            strategy={{ ...strategy, status: strategyStatus }}
-            isActive={strategyStatus === "active"}
+            strategy={strategy}
+            userStatus={userStatus}
+            isActive={subscriptionActive}
             onToggleStatus={handleToggleStatus}
+            showToggle={hasSubscription}
           />
 
-          {strategy.strategyCode && (
+          {data.isCreator && strategy.strategyCode && (
             <StrategyCodeCard code={strategy.strategyCode} />
           )}
 
-          {data.isCreator && (
+          {(data.isCreator || data.isPurchased) && !data.subscription && (
             <StrategyActionsPanel
-              strategy={{ ...strategy, status: strategyStatus, isPublic }}
+              strategy={{ ...strategy, isPublic }}
               isCreator={data.isCreator}
               wallets={delegationWallets}
               onActivate={handleActivate}
               onPublish={handlePublish}
+              onWalletCreated={refetchWallets}
             />
           )}
 
           <StrategySubscribersCard
             subscribers={strategySubscribers}
+            isCreator={data.isCreator}
+            currentUserWallet={walletAddress}
           />
 
           <StrategyWalletCard

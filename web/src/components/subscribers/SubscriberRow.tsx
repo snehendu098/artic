@@ -32,7 +32,14 @@ const SubscriberRow = ({
             <User className="w-4 h-4 text-primary" />
           </div>
           <div>
-            <p className="text-sm font-medium">{subscriber.username}</p>
+            <p className="text-sm font-medium">
+              {subscriber.username || `${subscriber.wallet.slice(0, 6)}...${subscriber.wallet.slice(-4)}`}
+            </p>
+            {subscriber.username && (
+              <p className="text-xs text-white/40 mt-0.5">
+                {subscriber.wallet.slice(0, 6)}...{subscriber.wallet.slice(-4)}
+              </p>
+            )}
             <p className="text-xs text-white/40 mt-0.5">
               {formatDate(subscriber.subscribedAt)}
             </p>

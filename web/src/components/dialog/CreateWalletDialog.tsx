@@ -59,7 +59,11 @@ export default function CreateWalletDialog({
       const message = `Create delegation wallet for ${walletAddress}`;
       const signature = await connectedWallet.sign(message);
 
-      const result = await createDelegationWallet(walletAddress, signature, name.trim());
+      const result = await createDelegationWallet(
+        walletAddress,
+        signature,
+        name.trim(),
+      );
 
       if (!result.success) {
         setError(result.message);
@@ -89,7 +93,7 @@ export default function CreateWalletDialog({
       <DialogTrigger asChild>
         {mode === "text" ? (
           <motion.button
-            whileHover={{ scale: 1.05 }}
+            whileHover={{ scale: 1 }}
             whileTap={{ scale: 0.95 }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
             className={`px-3 py-1.5 bg-neutral-800 border border-neutral-700 hover:border-primary/50 hover:bg-neutral-750 transition-all duration-200 text-xs text-white/70 hover:text-primary ${className || ""}`}
@@ -130,9 +134,7 @@ export default function CreateWalletDialog({
               placeholder="e.g., Main Trading Wallet"
               disabled={loading}
             />
-            {error && (
-              <p className="mt-1.5 text-xs text-red-400">{error}</p>
-            )}
+            {error && <p className="mt-1.5 text-xs text-red-400">{error}</p>}
           </div>
         </div>
 

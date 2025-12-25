@@ -101,6 +101,7 @@ export interface StrategyDetailsResponse {
   strategy: Strategy & { creatorWallet: string; creatorUsername?: string };
   isOwned: boolean;
   isCreator: boolean;
+  isPurchased: boolean;
   subscription: {
     id: string;
     isActive: boolean;
@@ -135,6 +136,7 @@ interface DBStrategyDetailResponse {
   };
   isOwned: boolean;
   isCreator: boolean;
+  isPurchased: boolean;
   subscription: {
     id: string;
     isActive: boolean;
@@ -171,7 +173,7 @@ export async function getStrategyDetails(
     // Map API subscribers to frontend Subscriber type
     const mappedSubscribers: Subscriber[] = data.subscribers.map((s, idx) => ({
       id: `subscriber-${idx}`,
-      username: s.username ?? "Anonymous",
+      username: s.username ?? null,
       wallet: s.wallet,
       strategyId: id,
       strategyName: data.strategy.name,
@@ -198,6 +200,7 @@ export async function getStrategyDetails(
       },
       isOwned: data.isOwned,
       isCreator: data.isCreator,
+      isPurchased: data.isPurchased,
       subscription: data.subscription,
       subscribers: mappedSubscribers,
       recentActions: mappedActions,

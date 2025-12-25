@@ -120,7 +120,16 @@ const WalletsCard = ({ walletAddress }: WalletsCardProps) => {
           <p className="text-xs text-white/50">// wallets</p>
           <p className="uppercase">Wallets</p>
         </div>
-        <CreateWalletDialog mode="icon" onSuccess={refetch} />
+        <div className="flex items-center gap-2">
+          {hasData && !hasMore && (
+            <Link href="/app/dashboard/wallets">
+              <button className="p-1.5 bg-neutral-700 border border-neutral-600 transition-all duration-300 ease-out group hover:scale-110 hover:border-primary/50 hover:shadow-[0_0_15px_rgba(var(--primary-rgb),0.2)]">
+                <ArrowRight className="w-4 h-4 group-hover:text-primary transition-colors duration-300" />
+              </button>
+            </Link>
+          )}
+          <CreateWalletDialog mode="icon" onSuccess={refetch} />
+        </div>
       </div>
       {hasData ? (
         <div className="w-full space-y-3 mt-4">

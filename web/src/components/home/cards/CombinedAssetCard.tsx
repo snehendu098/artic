@@ -65,9 +65,18 @@ const CombinedAssetCard = ({ walletAddress, chainId }: CombinedAssetCardProps) =
 
   return (
     <CardLayout>
-      <div>
-        <p className="text-xs text-white/50">// combined assets</p>
-        <p className="uppercase">Assets</p>
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-xs text-white/50">// combined assets</p>
+          <p className="uppercase">Assets</p>
+        </div>
+        {hasData && !hasMore && (
+          <Link href="/app/dashboard/assets">
+            <button className="p-1.5 bg-neutral-700 border border-neutral-600 transition-all duration-300 ease-out group hover:scale-110 hover:border-primary/50 hover:shadow-[0_0_15px_rgba(var(--primary-rgb),0.2)]">
+              <ArrowRight className="w-4 h-4 group-hover:text-primary transition-colors duration-300" />
+            </button>
+          </Link>
+        )}
       </div>
       {hasData ? (
         <div className="w-full space-y-2 mt-4">

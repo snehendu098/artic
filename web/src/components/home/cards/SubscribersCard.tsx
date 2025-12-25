@@ -38,9 +38,10 @@ const SubscribersCard = ({ walletAddress }: SubscribersCardProps) => {
 
   if (isLoading) return <SubscribersCardSkeleton />;
 
-  const hasData = subscribers && subscribers.length > 0;
+  const filteredSubscribers = subscribers?.filter(s => s.wallet !== walletAddress) || [];
+  const hasData = filteredSubscribers.length > 0;
   const maxDisplay = 3;
-  const hasMore = hasData && subscribers.length > maxDisplay;
+  const hasMore = hasData && filteredSubscribers.length > maxDisplay;
 
   return (
     <CardLayout>
@@ -49,10 +50,17 @@ const SubscribersCard = ({ walletAddress }: SubscribersCardProps) => {
           <p className="text-xs text-white/50">// subscribers</p>
           <p className="uppercase">Subscribers</p>
         </div>
+        {hasData && !hasMore && (
+          <Link href="/app/dashboard/subscribers">
+            <button className="p-1.5 bg-neutral-700 border border-neutral-600 transition-all duration-300 ease-out group hover:scale-110 hover:border-primary/50 hover:shadow-[0_0_15px_rgba(var(--primary-rgb),0.2)]">
+              <ArrowRight className="w-4 h-4 group-hover:text-primary transition-colors duration-300" />
+            </button>
+          </Link>
+        )}
       </div>
       {hasData ? (
         <div className="w-full space-y-2 mt-4">
-          {subscribers.slice(0, maxDisplay).map((subscriber) => (
+          {filteredSubscribers.slice(0, maxDisplay).map((subscriber) => (
             <div
               key={subscriber.id}
               className="p-2.5 bg-neutral-800 border border-neutral-700 hover:border-neutral-600 transition-all duration-200 cursor-pointer"
@@ -63,7 +71,7 @@ const SubscribersCard = ({ walletAddress }: SubscribersCardProps) => {
                     <Users className="w-3 h-3 text-primary" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium">{subscriber.username || "Anonymous"}</p>
+                    <p className="text-xs font-medium">{subscriber.username || `${subscriber.wallet.slice(0, 6)}...${subscriber.wallet.slice(-4)}`}</p>
                   </div>
                 </div>
                 <div className="text-right">

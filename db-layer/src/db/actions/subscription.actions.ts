@@ -1,5 +1,6 @@
 import { eq, and } from "drizzle-orm";
 import { subscriptions, strategies, users, delegationWallets, walletActions } from "../schema";
+import { decrypt } from "../../utils/crypto";
 import { incrementSubscriberCount, decrementSubscriberCount } from "./strategy.actions";
 
 export interface Subscription {
@@ -154,7 +155,8 @@ export interface ActiveSubscriptionForBot {
 }
 
 export const getActiveSubscriptionsForBot = async (
-  database: any
+  database: any,
+  encryptionKey: string
 ): Promise<ActiveSubscriptionForBot[]> => {
   const results = await database
     .select({
@@ -193,10 +195,23 @@ export const getActiveSubscriptionsForBot = async (
     actionsMap.set(subId, actions);
   }
 
-  return results.map((r: any) => ({
-    ...r,
-    recentActions: actionsMap.get(r.subscriptionId) || [],
-  }));
+  // Decrypt private keys
+  const decryptedResults = await Promise.all(
+    results.map(async (r: any) => {
+      let privateKey = r.encryptedPrivateKey;
+      // Decrypt if encrypted (contains colons from iv:ciphertext:authTag format)
+      if (privateKey.includes(":")) {
+        privateKey = await decrypt(privateKey, encryptionKey);
+      }
+      return {
+        ...r,
+        encryptedPrivateKey: privateKey,
+        recentActions: actionsMap.get(r.subscriptionId) || [],
+      };
+    })
+  );
+
+  return decryptedResults;
 };
 
 export const getSubscribersForStrategy = async (

@@ -78,7 +78,7 @@ export default function ViewAllSubscribersDialog() {
                             <Users className="w-5 h-5 text-primary" />
                           </div>
                           <div>
-                            <p className="text-sm font-medium">{subscriber.username || "Anonymous"}</p>
+                            <p className="text-sm font-medium">{subscriber.username || `${subscriber.wallet.slice(0, 6)}...${subscriber.wallet.slice(-4)}`}</p>
                             <p className="text-xs text-white/50 mb-1">
                               {subscriber.strategyName}
                             </p>

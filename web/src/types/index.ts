@@ -26,4 +26,6 @@ export type {
   DBStrategy,
   DBSubscription,
   DBSubscriber,
+  DBPurchase,
+  DBMarketplaceStrategy,
 } from "./api";

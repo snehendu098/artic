@@ -63,6 +63,10 @@ export interface PurchaseWithDetails {
   id: string;
   strategyId: string;
   strategyName: string;
+  strategySubscriberCount: number;
+  strategyStatus: "draft" | "active" | "paused";
+  strategyProtocols: string[] | null;
+  strategyCreatedAt: Date | null;
   priceMnt: string;
   txHash: string;
   purchasedAt: Date | null;
@@ -85,6 +89,10 @@ export const getPurchasesByWallet = async (
       id: strategyPurchases.id,
       strategyId: strategyPurchases.strategyId,
       strategyName: strategies.name,
+      strategySubscriberCount: strategies.subscriberCount,
+      strategyStatus: strategies.status,
+      strategyProtocols: strategies.protocols,
+      strategyCreatedAt: strategies.createdAt,
       priceMnt: strategyPurchases.priceMnt,
       txHash: strategyPurchases.txHash,
       purchasedAt: strategyPurchases.purchasedAt,

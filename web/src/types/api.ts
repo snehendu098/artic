@@ -50,3 +50,29 @@ export interface DBSubscriber {
   strategyName: string;
   subscribedAt: string | null;
 }
+
+export interface DBPurchase {
+  id: string;
+  strategyId: string;
+  strategyName: string;
+  strategySubscriberCount: number;
+  strategyStatus: "draft" | "active" | "paused";
+  strategyProtocols: string[] | null;
+  strategyCreatedAt: string | null;
+  priceMnt: string;
+  txHash: string;
+  purchasedAt: string | null;
+}
+
+export interface DBMarketplaceStrategy {
+  id: string;
+  name: string;
+  isPublic: boolean;
+  priceMnt: string | null;
+  subscriberCount: number;
+  protocols: string[] | null;
+  status: "draft" | "active" | "paused";
+  createdAt: string | null;
+  creatorWallet: string;
+  creatorUsername: string | null;
+}
