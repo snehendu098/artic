@@ -1,5 +1,5 @@
 {
-  "id": "a9aa8cb4-65f3-47c7-8bd4-14fbcc466a59",
+  "id": "043940c9-421c-49d7-8cd6-7d5392707b40",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -185,14 +185,8 @@
           "primaryKey": false,
           "notNull": true
         },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "strategyPrompt": {
-          "name": "strategyPrompt",
+        "strategyCode": {
+          "name": "strategyCode",
           "type": "text",
           "primaryKey": false,
           "notNull": true

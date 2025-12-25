@@ -351,6 +351,7 @@ export const publishStrategy = async (
     .update(strategies)
     .set({
       isPublic: true,
+      status: "active",
       priceMnt: priceMnt ?? null,
       updatedAt: new Date(),
     })

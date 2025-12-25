@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1766556042251,
-      "tag": "0000_bright_monster_badoon",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1766560177771,
-      "tag": "0001_colorful_excalibur",
+      "when": 1766684197416,
+      "tag": "0000_spooky_zarek",
       "breakpoints": true
     }
   ]

@@ -116,6 +116,8 @@ export const createDelegationWallet = async (c: Context<Env>) => {
       201,
     );
   } catch (error) {
+    console.log(error);
+
     return c.json(
       {
         success: false,

@@ -3,7 +3,7 @@
 import CardLayout from "@/components/layouts/card-layout";
 import { Plus, Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useStrategies } from "@/hooks";
+import { useStrategies, usePurchases } from "@/hooks";
 
 interface StrategiesCardProps {
   walletAddress?: string;
@@ -32,7 +32,19 @@ const StrategiesCardSkeleton = () => (
 );
 
 const StrategiesCard = ({ walletAddress }: StrategiesCardProps) => {
-  const { data: strategies, isLoading } = useStrategies(walletAddress);
+  const { data: created, isLoading: loadingCreated } = useStrategies(walletAddress);
+  const { data: purchases, isLoading: loadingPurchases } = usePurchases(walletAddress);
+  const isLoading = loadingCreated || loadingPurchases;
+
+  const purchasedAsStrategies = purchases.map(p => ({
+    id: p.strategyId,
+    name: p.strategyName,
+    subscriberCount: 0,
+    status: "active" as const,
+    createdAt: p.purchasedAt,
+    protocols: [] as string[],
+  }));
+  const strategies = [...created, ...purchasedAsStrategies];
 
   if (isLoading) return <StrategiesCardSkeleton />;
 

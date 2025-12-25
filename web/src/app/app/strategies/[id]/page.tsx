@@ -182,6 +182,11 @@ const StrategyDetailPage = ({
       const result = await publishStrategy(id, walletAddress, priceMnt);
       if (result.success) {
         setIsPublic(true);
+        // Refetch to get updated strategy data
+        const updatedData = await getStrategyDetails(id, walletAddress);
+        if (updatedData) {
+          setData(updatedData);
+        }
       }
     } catch (error) {
       console.error("Failed to publish strategy:", error);

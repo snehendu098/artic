@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { getAllUserStrategies } from "@/actions/dashboard.actions";
+import { getUserStrategies } from "@/actions/dashboard.actions";
 import type { Strategy } from "@/types";
 
 export function useStrategies(walletAddress: string | undefined) {
@@ -15,7 +15,7 @@ export function useStrategies(walletAddress: string | undefined) {
     }
     setIsLoading(true);
     try {
-      const result = await getAllUserStrategies(walletAddress);
+      const result = await getUserStrategies(walletAddress);
       setData(result);
     } catch (error) {
       console.error("Failed to fetch strategies:", error);

@@ -43,10 +43,6 @@ const StrategyActionsPanel = ({
   const isDraft = strategy.status === "draft";
   const isPublic = strategy.isPublic;
 
-  // For creators: hide if already active and public
-  // For non-creators (purchased): always show activation
-  if (isCreator && !isDraft && isPublic) return null;
-
   const handleActivate = async () => {
     if (!selectedWalletId || isSubmitting) return;
     setIsSubmitting(true);
@@ -72,9 +68,8 @@ const StrategyActionsPanel = ({
       <div className="space-y-3">
         <p className="text-xs text-white/50 uppercase">Actions</p>
 
-        {/* Activate Section - For creators with drafts OR non-creators (purchased) */}
-        {(isDraft || !isCreator) && (
-          <div className="border border-neutral-700">
+        {/* Activate Section */}
+        <div className="border border-neutral-700">
             <button
               onClick={() => toggleSection("activate")}
               className="w-full p-3 flex items-center justify-between hover:bg-neutral-800 transition-colors"
@@ -143,7 +138,6 @@ const StrategyActionsPanel = ({
               )}
             </AnimatePresence>
           </div>
-        )}
 
         {/* Publish Section - Only for creators who haven't published yet */}
         {isCreator && !isPublic && (

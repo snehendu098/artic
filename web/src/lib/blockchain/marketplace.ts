@@ -14,7 +14,10 @@ import { DEFAULT_CHAIN_ID } from "./config";
 /**
  * Get listing details for a strategy
  */
-export async function getListing(strategyId: string, chainId = DEFAULT_CHAIN_ID) {
+export async function getListing(
+  strategyId: string,
+  chainId = DEFAULT_CHAIN_ID,
+) {
   const client = getPublicClient(chainId);
   const strategyBytes = uuidToBytes32(strategyId);
 
@@ -39,7 +42,7 @@ export async function getListing(strategyId: string, chainId = DEFAULT_CHAIN_ID)
 export async function hasPurchased(
   strategyId: string,
   buyerAddress: Address,
-  chainId = DEFAULT_CHAIN_ID
+  chainId = DEFAULT_CHAIN_ID,
 ) {
   const client = getPublicClient(chainId);
   const strategyBytes = uuidToBytes32(strategyId);
@@ -55,7 +58,10 @@ export async function hasPurchased(
 /**
  * Get subscriber count for a strategy
  */
-export async function getSubscriberCount(strategyId: string, chainId = DEFAULT_CHAIN_ID) {
+export async function getSubscriberCount(
+  strategyId: string,
+  chainId = DEFAULT_CHAIN_ID,
+) {
   const client = getPublicClient(chainId);
   const strategyBytes = uuidToBytes32(strategyId);
 
@@ -75,7 +81,7 @@ export async function getSubscriberCount(strategyId: string, chainId = DEFAULT_C
 export async function isSubscribed(
   strategyId: string,
   delegationWallet: Address,
-  chainId = DEFAULT_CHAIN_ID
+  chainId = DEFAULT_CHAIN_ID,
 ) {
   const client = getPublicClient(chainId);
   const strategyBytes = uuidToBytes32(strategyId);
@@ -94,7 +100,7 @@ export async function isSubscribed(
 export async function getSubscription(
   strategyId: string,
   delegationWallet: Address,
-  chainId = DEFAULT_CHAIN_ID
+  chainId = DEFAULT_CHAIN_ID,
 ) {
   const client = getPublicClient(chainId);
   const strategyBytes = uuidToBytes32(strategyId);
@@ -120,7 +126,7 @@ export async function getSubscription(
 export async function getUserSubscriptions(
   strategyId: string,
   ownerAddress: Address,
-  chainId = DEFAULT_CHAIN_ID
+  chainId = DEFAULT_CHAIN_ID,
 ) {
   const client = getPublicClient(chainId);
   const strategyBytes = uuidToBytes32(strategyId);
@@ -136,7 +142,10 @@ export async function getUserSubscriptions(
 /**
  * Get creator balance available for withdrawal
  */
-export async function getCreatorBalance(creatorAddress: Address, chainId = DEFAULT_CHAIN_ID) {
+export async function getCreatorBalance(
+  creatorAddress: Address,
+  chainId = DEFAULT_CHAIN_ID,
+) {
   const client = getPublicClient(chainId);
 
   const balance = await client.readContract({
@@ -193,7 +202,10 @@ export function getPurchaseStrategyArgs(strategyId: string, priceMnt: string) {
   };
 }
 
-export function getSubscribeArgs(strategyId: string, delegationWallet: Address) {
+export function getSubscribeArgs(
+  strategyId: string,
+  delegationWallet: Address,
+) {
   return {
     address: ARTIC_MARKETPLACE_ADDRESS,
     abi: ARTIC_MARKETPLACE_ABI,
@@ -202,7 +214,10 @@ export function getSubscribeArgs(strategyId: string, delegationWallet: Address) 
   };
 }
 
-export function getPauseSubscriptionArgs(strategyId: string, delegationWallet: Address) {
+export function getPauseSubscriptionArgs(
+  strategyId: string,
+  delegationWallet: Address,
+) {
   return {
     address: ARTIC_MARKETPLACE_ADDRESS,
     abi: ARTIC_MARKETPLACE_ABI,
@@ -211,7 +226,10 @@ export function getPauseSubscriptionArgs(strategyId: string, delegationWallet: A
   };
 }
 
-export function getActivateSubscriptionArgs(strategyId: string, delegationWallet: Address) {
+export function getActivateSubscriptionArgs(
+  strategyId: string,
+  delegationWallet: Address,
+) {
   return {
     address: ARTIC_MARKETPLACE_ADDRESS,
     abi: ARTIC_MARKETPLACE_ABI,
@@ -223,7 +241,7 @@ export function getActivateSubscriptionArgs(strategyId: string, delegationWallet
 export function getUpdateSubscriptionWalletArgs(
   strategyId: string,
   oldWallet: Address,
-  newWallet: Address
+  newWallet: Address,
 ) {
   return {
     address: ARTIC_MARKETPLACE_ADDRESS,
@@ -249,7 +267,10 @@ export function getWithdrawEarningsArgs() {
 /**
  * Wait for transaction confirmation
  */
-export async function waitForTransaction(hash: `0x${string}`, chainId = DEFAULT_CHAIN_ID) {
+export async function waitForTransaction(
+  hash: `0x${string}`,
+  chainId = DEFAULT_CHAIN_ID,
+) {
   const client = getPublicClient(chainId);
-  return client.waitForTransactionReceipt({ hash });
+  return await client.waitForTransactionReceipt({ hash });
 }

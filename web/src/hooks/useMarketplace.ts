@@ -2,7 +2,13 @@
 
 import { useState, useCallback } from "react";
 import { useWallets } from "@privy-io/react-auth";
-import { createWalletClient, custom, encodeFunctionData, type Address, parseEther } from "viem";
+import {
+  createWalletClient,
+  custom,
+  encodeFunctionData,
+  type Address,
+  parseEther,
+} from "viem";
 import { mantleSepoliaTestnet } from "viem/chains";
 import {
   ARTIC_MARKETPLACE_ADDRESS,
@@ -71,7 +77,7 @@ export function useMarketplace() {
         throw e;
       }
     },
-    [getWalletClient]
+    [getWalletClient],
   );
 
   // Update strategy price
@@ -102,7 +108,7 @@ export function useMarketplace() {
         throw e;
       }
     },
-    [getWalletClient]
+    [getWalletClient],
   );
 
   // Delist strategy
@@ -133,7 +139,7 @@ export function useMarketplace() {
         throw e;
       }
     },
-    [getWalletClient]
+    [getWalletClient],
   );
 
   // Purchase strategy
@@ -156,8 +162,9 @@ export function useMarketplace() {
         });
 
         setTxState({ status: "pending", hash });
-        await waitForTransaction(hash);
-        setTxState({ status: "success", hash });
+        const hs = await waitForTransaction(hash);
+        console.log("wait", hs);
+        setTxState({ status: "success", hash: hs.transactionHash });
         return hash;
       } catch (e) {
         const error = e instanceof Error ? e.message : "Transaction failed";
@@ -165,7 +172,7 @@ export function useMarketplace() {
         throw e;
       }
     },
-    [getWalletClient]
+    [getWalletClient],
   );
 
   // Subscribe to strategy
@@ -196,7 +203,7 @@ export function useMarketplace() {
         throw e;
       }
     },
-    [getWalletClient]
+    [getWalletClient],
   );
 
   // Pause subscription
@@ -227,7 +234,7 @@ export function useMarketplace() {
         throw e;
       }
     },
-    [getWalletClient]
+    [getWalletClient],
   );
 
   // Activate subscription
@@ -258,7 +265,7 @@ export function useMarketplace() {
         throw e;
       }
     },
-    [getWalletClient]
+    [getWalletClient],
   );
 
   // Update subscription wallet
@@ -289,7 +296,7 @@ export function useMarketplace() {
         throw e;
       }
     },
-    [getWalletClient]
+    [getWalletClient],
   );
 
   // Withdraw earnings
