@@ -59,9 +59,9 @@ const SubscriberDetailsPanel = ({
           </div>
 
           <div className="p-3 bg-neutral-800 border border-neutral-700">
-            <p className="text-xs text-white/50 mb-2">Subscribed Date</p>
+            <p className="text-xs text-white/50 mb-2">Purchased Date</p>
             <p className="text-sm text-white/90">
-              {formatDate(selectedSubscriber.subscribedAt)}
+              {formatDate(selectedSubscriber.purchasedAt)}
             </p>
           </div>
         </div>

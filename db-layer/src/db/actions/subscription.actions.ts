@@ -1,5 +1,5 @@
 import { eq, and } from "drizzle-orm";
-import { subscriptions, strategies, users, delegationWallets, walletActions } from "../schema";
+import { subscriptions, strategies, users, delegationWallets, walletActions, strategyPurchases } from "../schema";
 import { decrypt } from "../../utils/crypto";
 import { incrementSubscriberCount, decrementSubscriberCount } from "./strategy.actions";
 
@@ -217,17 +217,17 @@ export const getActiveSubscriptionsForBot = async (
 export const getSubscribersForStrategy = async (
   database: any,
   strategyId: string
-): Promise<Array<{ id: string; username: string | null; wallet: string; subscribedAt: Date | null }>> => {
+): Promise<Array<{ id: string; username: string | null; wallet: string; purchasedAt: Date | null }>> => {
   const results = await database
     .select({
-      id: subscriptions.id,
+      id: strategyPurchases.id,
       username: users.username,
       wallet: users.wallet,
-      subscribedAt: subscriptions.subscribedAt,
+      purchasedAt: strategyPurchases.purchasedAt,
     })
-    .from(subscriptions)
-    .innerJoin(users, eq(subscriptions.userId, users.id))
-    .where(eq(subscriptions.strategyId, strategyId));
+    .from(strategyPurchases)
+    .innerJoin(users, eq(strategyPurchases.buyerId, users.id))
+    .where(eq(strategyPurchases.strategyId, strategyId));
 
   return results;
 };

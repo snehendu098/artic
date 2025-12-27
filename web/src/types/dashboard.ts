@@ -27,5 +27,5 @@ export interface IDashboard {
     subscribedAt: Date;
   }[];
   actions: { wallet: string; action: string; triggeredAt: Date }[];
-  subscribers: { wallet: string; subscribedAt: Date }[];
+  subscribers: { wallet: string; purchasedAt: Date }[];
 }

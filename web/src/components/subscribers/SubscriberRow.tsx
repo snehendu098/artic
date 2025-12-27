@@ -41,7 +41,7 @@ const SubscriberRow = ({
               </p>
             )}
             <p className="text-xs text-white/40 mt-0.5">
-              {formatDate(subscriber.subscribedAt)}
+              {formatDate(subscriber.purchasedAt)}
             </p>
           </div>
         </div>

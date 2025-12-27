@@ -66,7 +66,7 @@ function mapSubscriber(dbSub: DBSubscriber): Subscriber {
     wallet: dbSub.wallet,
     strategyId: dbSub.strategyId,
     strategyName: dbSub.strategyName,
-    subscribedAt: dbSub.subscribedAt ?? new Date().toISOString(),
+    purchasedAt: dbSub.purchasedAt ?? new Date().toISOString(),
   };
 }
 

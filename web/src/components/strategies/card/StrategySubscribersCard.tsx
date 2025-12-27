@@ -43,7 +43,7 @@ const StrategySubscribersCard = ({
               </p>
             </div>
             <p className="text-xs font-semibold text-white/60">
-              {new Date(subscriber.subscribedAt).toLocaleDateString()}
+              {new Date(subscriber.purchasedAt).toLocaleDateString()}
             </p>
           </div>
         ))}

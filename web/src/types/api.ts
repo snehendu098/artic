@@ -48,7 +48,7 @@ export interface DBSubscriber {
   wallet: string;
   strategyId: string;
   strategyName: string;
-  subscribedAt: string | null;
+  purchasedAt: string | null;
 }
 
 export interface DBPurchase {

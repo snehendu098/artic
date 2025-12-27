@@ -16,6 +16,6 @@ export interface Subscriber {
   wallet: string;
   strategyId: string;
   strategyName: string;
-  subscribedAt: string;
+  purchasedAt: string;
   avatar?: string;
 }

@@ -337,7 +337,7 @@ export const dummySubscriptions: Subscription[] = [
   },
 ];
 
-// Dummy Subscribers Data (People Subscribing to User's Strategies)
+// Dummy Subscribers Data (People Who Purchased User's Strategies)
 export const dummySubscribers: Subscriber[] = [
   {
     id: "1",
@@ -345,7 +345,7 @@ export const dummySubscribers: Subscriber[] = [
     wallet: "0x1234567890abcdef1234567890abcdef12345678",
     strategyId: "1",
     strategyName: "ETH Yield Maximizer",
-    subscribedAt: "2024-12-10",
+    purchasedAt: "2024-12-10",
   },
   {
     id: "2",
@@ -353,7 +353,7 @@ export const dummySubscribers: Subscriber[] = [
     wallet: "0xabcdef1234567890abcdef1234567890abcdef12",
     strategyId: "1",
     strategyName: "ETH Yield Maximizer",
-    subscribedAt: "2024-12-08",
+    purchasedAt: "2024-12-08",
   },
   {
     id: "3",
@@ -361,7 +361,7 @@ export const dummySubscribers: Subscriber[] = [
     wallet: "0x567890abcdef1234567890abcdef123456789012",
     strategyId: "2",
     strategyName: "Stable Coin Arbitrage",
-    subscribedAt: "2024-12-05",
+    purchasedAt: "2024-12-05",
   },
   {
     id: "4",
@@ -369,7 +369,7 @@ export const dummySubscribers: Subscriber[] = [
     wallet: "0x890abcdef1234567890abcdef12345678901234",
     strategyId: "2",
     strategyName: "Stable Coin Arbitrage",
-    subscribedAt: "2024-12-01",
+    purchasedAt: "2024-12-01",
   },
 ];
 

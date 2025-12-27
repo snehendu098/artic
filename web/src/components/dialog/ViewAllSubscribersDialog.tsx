@@ -83,7 +83,7 @@ export default function ViewAllSubscribersDialog() {
                               {subscriber.strategyName}
                             </p>
                             <p className="text-xs text-white/40">
-                              Subscribed {formatDate(subscriber.subscribedAt)}
+                              Purchased {formatDate(subscriber.purchasedAt)}
                             </p>
                           </div>
                         </div>
