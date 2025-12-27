@@ -20,7 +20,7 @@ import {
   SystemMessage,
 } from "langchain";
 import { ChatGoogleGenerativeAI } from "@langchain/google-genai";
-import { OrchestratorOutput } from "../types";
+import { MainAgentOutput, OrchestratorOutput } from "../types";
 
 export class Agent {
   public account: PrivateKeyAccount;
@@ -43,7 +43,7 @@ export class Agent {
     });
   }
 
-  async messageAgent(strategy: string, toolNames: string[]) {
+  async messageAgent(strategy: string, actions: string, toolNames: string[]) {
     const allTools = getAllTools(this.deps);
     const tools = filterToolsByNames(allTools, toolNames);
 
@@ -60,14 +60,30 @@ IMPORTANT NOTES:
 - Strategies will be in plaintext
 - Be extremely concise but accurate in your final response
 `;
+    const prompt = `
+Strategy:
+${strategy}
 
-    // TODO: invoke agent with filtered tools
-    return { tools, systemPrompt };
+Previous Actions Notes:
+${actions}
+`;
+
+    const mainAgent = createAgent({
+      model: this.model,
+      tools,
+      responseFormat: providerStrategy(MainAgentOutput),
+    });
+
+    const result = await mainAgent.invoke({
+      messages: [new SystemMessage(systemPrompt), new HumanMessage(prompt)],
+    });
+
+    return result;
   }
 
-  async execute(strategy: string) {
+  async execute(strategy: string, actions: string) {
     const { toolNames } = await this.orchestrate(strategy);
-    return this.messageAgent(strategy, toolNames);
+    return this.messageAgent(strategy, actions, toolNames);
   }
 
   async orchestrate(strategy: string) {

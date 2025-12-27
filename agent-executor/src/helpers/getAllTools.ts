@@ -1,9 +1,19 @@
 import { StructuredToolInterface } from "@langchain/core/tools";
 import { ToolDependencies } from "../types/tools";
-import { createSendTransactionTool } from "../tools";
+import {
+  createSendTransactionTool,
+  createSwapTool,
+  createGetBalanceTool,
+  createGetTokenListTool,
+} from "../tools";
 
 export const getAllTools = (deps: ToolDependencies) => {
-  return [createSendTransactionTool(deps)];
+  return [
+    createSendTransactionTool(deps),
+    createSwapTool(deps),
+    createGetBalanceTool(deps),
+    createGetTokenListTool(deps),
+  ];
 };
 
 export const buildToolMap = (tools: StructuredToolInterface[]) => {
