@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { Env, ApiResponse } from "../types";
+import { Env } from "../types";
 import db from "../db";
 import { getDelegationsByWallet } from "../db/actions";
 
@@ -12,7 +12,7 @@ export const getDelegationsHandler = async (c: Context<Env>) => {
         success: false,
         message: "wallet param required",
         data: null,
-      } as ApiResponse, 400);
+      }, 400);
     }
 
     const database = db(c.env.DATABASE_URL);
@@ -28,6 +28,6 @@ export const getDelegationsHandler = async (c: Context<Env>) => {
       success: false,
       message: error instanceof Error ? error.message : "Internal error",
       data: null,
-    } as ApiResponse, 500);
+    }, 500);
   }
 };

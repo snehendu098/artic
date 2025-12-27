@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { Env, ApiResponse, ActiveSubscriptionData } from "../types";
+import { Env } from "../types";
 import db from "../db";
 import { getActiveSubscriptionsForBot } from "../db/actions/subscription.actions";
 
@@ -7,15 +7,18 @@ export const fetchActiveSubscriptionsHandler = async (c: Context<Env>) => {
   try {
     const database = db(c.env.DATABASE_URL);
 
-    const activeSubscriptions = await getActiveSubscriptionsForBot(database);
+    const activeSubscriptions = await getActiveSubscriptionsForBot(
+      database,
+      c.env.ENCRYPTION_KEY,
+    );
 
     return c.json(
       {
         success: true,
         message: `Retrieved ${activeSubscriptions.length} active subscription(s)`,
         data: activeSubscriptions,
-      } as ApiResponse<ActiveSubscriptionData[]>,
-      200
+      },
+      200,
     );
   } catch (error) {
     const errorMessage =
@@ -26,8 +29,8 @@ export const fetchActiveSubscriptionsHandler = async (c: Context<Env>) => {
         success: false,
         message: errorMessage,
         data: null,
-      } as ApiResponse,
-      500
+      },
+      500,
     );
   }
 };

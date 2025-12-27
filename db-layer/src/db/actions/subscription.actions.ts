@@ -1,7 +1,17 @@
 import { eq, and } from "drizzle-orm";
-import { subscriptions, strategies, users, delegationWallets, walletActions, strategyPurchases } from "../schema";
+import {
+  subscriptions,
+  strategies,
+  users,
+  delegationWallets,
+  walletActions,
+  strategyPurchases,
+} from "../schema";
 import { decrypt } from "../../utils/crypto";
-import { incrementSubscriberCount, decrementSubscriberCount } from "./strategy.actions";
+import {
+  incrementSubscriberCount,
+  decrementSubscriberCount,
+} from "./strategy.actions";
 
 export interface Subscription {
   id: string;
@@ -33,7 +43,7 @@ export interface CreateSubscriptionParams {
 
 export const createSubscription = async (
   database: any,
-  params: CreateSubscriptionParams
+  params: CreateSubscriptionParams,
 ): Promise<Subscription> => {
   const inserted = await database
     .insert(subscriptions)
@@ -52,7 +62,7 @@ export const createSubscription = async (
 
 export const getSubscriptionsByWallet = async (
   database: any,
-  userWallet: string
+  userWallet: string,
 ): Promise<SubscriptionWithDetails[]> => {
   const user = await database
     .select()
@@ -76,7 +86,10 @@ export const getSubscriptionsByWallet = async (
     })
     .from(subscriptions)
     .innerJoin(strategies, eq(subscriptions.strategyId, strategies.id))
-    .innerJoin(delegationWallets, eq(subscriptions.delegationWalletId, delegationWallets.id))
+    .innerJoin(
+      delegationWallets,
+      eq(subscriptions.delegationWalletId, delegationWallets.id),
+    )
     .where(eq(subscriptions.userId, user[0].id));
 
   // Get creator wallets
@@ -103,7 +116,7 @@ export const getSubscriptionsByWallet = async (
 
 export const pauseSubscription = async (
   database: any,
-  subscriptionId: string
+  subscriptionId: string,
 ): Promise<Subscription | null> => {
   const result = await database
     .update(subscriptions)
@@ -120,7 +133,7 @@ export const pauseSubscription = async (
 
 export const activateSubscription = async (
   database: any,
-  subscriptionId: string
+  subscriptionId: string,
 ): Promise<Subscription | null> => {
   const result = await database
     .update(subscriptions)
@@ -138,7 +151,7 @@ export const activateSubscription = async (
 export interface ActiveSubscriptionForBot {
   subscriptionId: string;
   strategyId: string;
-  strategyPrompt: string;
+  strategyCode: string;
   strategyName: string;
   userId: string;
   userWallet: string;
@@ -156,13 +169,13 @@ export interface ActiveSubscriptionForBot {
 
 export const getActiveSubscriptionsForBot = async (
   database: any,
-  encryptionKey: string
+  encryptionKey: string,
 ): Promise<ActiveSubscriptionForBot[]> => {
   const results = await database
     .select({
       subscriptionId: subscriptions.id,
       strategyId: strategies.id,
-      strategyPrompt: strategies.strategyPrompt,
+      strategyCode: strategies.strategyCode,
       strategyName: strategies.name,
       userId: subscriptions.userId,
       userWallet: users.wallet,
@@ -173,7 +186,10 @@ export const getActiveSubscriptionsForBot = async (
     .from(subscriptions)
     .innerJoin(strategies, eq(subscriptions.strategyId, strategies.id))
     .innerJoin(users, eq(subscriptions.userId, users.id))
-    .innerJoin(delegationWallets, eq(subscriptions.delegationWalletId, delegationWallets.id))
+    .innerJoin(
+      delegationWallets,
+      eq(subscriptions.delegationWalletId, delegationWallets.id),
+    )
     .where(eq(subscriptions.isActive, true));
 
   // Get recent actions for each subscription
@@ -208,7 +224,7 @@ export const getActiveSubscriptionsForBot = async (
         encryptedPrivateKey: privateKey,
         recentActions: actionsMap.get(r.subscriptionId) || [],
       };
-    })
+    }),
   );
 
   return decryptedResults;
@@ -216,8 +232,15 @@ export const getActiveSubscriptionsForBot = async (
 
 export const getSubscribersForStrategy = async (
   database: any,
-  strategyId: string
-): Promise<Array<{ id: string; username: string | null; wallet: string; purchasedAt: Date | null }>> => {
+  strategyId: string,
+): Promise<
+  Array<{
+    id: string;
+    username: string | null;
+    wallet: string;
+    purchasedAt: Date | null;
+  }>
+> => {
   const results = await database
     .select({
       id: strategyPurchases.id,

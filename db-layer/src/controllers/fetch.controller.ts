@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { Env, ApiResponse } from "../types";
+import { Env } from "../types";
 import db from "../db";
 import {
   getDelegationsByWallet,
@@ -29,7 +29,7 @@ export const fetchDelegationWallets = async (c: Context<Env>) => {
           success: false,
           message: "wallet parameter is required and must be a string",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -57,7 +57,7 @@ export const fetchDelegationWallets = async (c: Context<Env>) => {
         success: true,
         message: "Delegation wallets retrieved successfully",
         data: publicDelegations,
-      } as ApiResponse<DelegationWalletPublic[]>,
+      },
       200,
     );
   } catch (error) {
@@ -69,7 +69,7 @@ export const fetchDelegationWallets = async (c: Context<Env>) => {
         success: false,
         message: errorMessage,
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }
@@ -86,7 +86,7 @@ export const fetchStrategies = async (c: Context<Env>) => {
           success: false,
           message: "creatorWallet parameter is required and must be a string",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -99,7 +99,7 @@ export const fetchStrategies = async (c: Context<Env>) => {
         success: true,
         message: "Strategies retrieved successfully",
         data: strategies,
-      } as ApiResponse<Strategy[]>,
+      },
       200,
     );
   } catch (error) {
@@ -111,7 +111,7 @@ export const fetchStrategies = async (c: Context<Env>) => {
         success: false,
         message: errorMessage,
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }
@@ -128,7 +128,7 @@ export const fetchStrategiesForUser = async (c: Context<Env>) => {
           success: false,
           message: "userWallet parameter is required and must be a string",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -141,7 +141,7 @@ export const fetchStrategiesForUser = async (c: Context<Env>) => {
         success: true,
         message: "User strategies retrieved successfully",
         data: strategies,
-      } as ApiResponse<StrategyInfo[]>,
+      },
       200,
     );
   } catch (error) {
@@ -153,7 +153,7 @@ export const fetchStrategiesForUser = async (c: Context<Env>) => {
         success: false,
         message: errorMessage,
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }
@@ -171,7 +171,7 @@ export const fetchStrategyDetailsById = async (c: Context<Env>) => {
           success: false,
           message: "strategyId parameter is required and must be a string",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -189,7 +189,7 @@ export const fetchStrategyDetailsById = async (c: Context<Env>) => {
           success: false,
           message: "Strategy not found",
           data: null,
-        } as ApiResponse,
+        },
         404,
       );
     }
@@ -199,7 +199,7 @@ export const fetchStrategyDetailsById = async (c: Context<Env>) => {
         success: true,
         message: "Strategy details retrieved successfully",
         data: strategyDetails,
-      } as ApiResponse<StrategyDetailResponse>,
+      },
       200,
     );
   } catch (error) {
@@ -211,7 +211,7 @@ export const fetchStrategyDetailsById = async (c: Context<Env>) => {
         success: false,
         message: errorMessage,
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }

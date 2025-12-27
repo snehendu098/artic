@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { Env, ApiResponse } from "../types";
+import { Env } from "../types";
 import db from "../db";
 import {
   createPurchase,
@@ -26,7 +26,7 @@ export const createPurchaseHandler = async (c: Context<Env>) => {
           success: false,
           message: "wallet, strategyId, priceMnt, txHash required",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -56,7 +56,7 @@ export const createPurchaseHandler = async (c: Context<Env>) => {
         success: false,
         message: error instanceof Error ? error.message : "Internal error",
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }
@@ -72,7 +72,7 @@ export const getPurchasesHandler = async (c: Context<Env>) => {
           success: false,
           message: "wallet param required",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -94,7 +94,7 @@ export const getPurchasesHandler = async (c: Context<Env>) => {
         success: false,
         message: error instanceof Error ? error.message : "Internal error",
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }

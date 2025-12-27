@@ -3,7 +3,6 @@ import {
   Env,
   UpdateStrategyStateRequest,
   WalletActionData,
-  ApiResponse,
 } from "../types";
 import db from "../db";
 import { validateStrategyExists, validateSubscriptionHasDelegation, createWalletActions } from "../db/actions";
@@ -18,7 +17,7 @@ export const updateStrategyStateHandler = async (c: Context<Env>) => {
           success: false,
           message: "strategyId field is required and must be a string",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -33,7 +32,7 @@ export const updateStrategyStateHandler = async (c: Context<Env>) => {
           success: false,
           message: "actions field is required and must be a non-empty array",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -45,7 +44,7 @@ export const updateStrategyStateHandler = async (c: Context<Env>) => {
             success: false,
             message: "Each action must have an action field (string)",
             data: null,
-          } as ApiResponse,
+          },
           400,
         );
       }
@@ -59,7 +58,7 @@ export const updateStrategyStateHandler = async (c: Context<Env>) => {
             success: false,
             message: "stateChange field must be a string if provided",
             data: null,
-          } as ApiResponse,
+          },
           400,
         );
       }
@@ -71,7 +70,7 @@ export const updateStrategyStateHandler = async (c: Context<Env>) => {
           success: false,
           message: "userWallet field is required and must be a string",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -85,7 +84,7 @@ export const updateStrategyStateHandler = async (c: Context<Env>) => {
           success: false,
           message: "delegationWalletId field is required and must be a string",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -96,7 +95,7 @@ export const updateStrategyStateHandler = async (c: Context<Env>) => {
           success: false,
           message: "subscriptionId field is required and must be a string",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -122,7 +121,7 @@ export const updateStrategyStateHandler = async (c: Context<Env>) => {
         success: true,
         message: "Strategy state updated successfully",
         data: result,
-      } as ApiResponse<WalletActionData[]>,
+      },
       201,
     );
   } catch (error) {
@@ -134,7 +133,7 @@ export const updateStrategyStateHandler = async (c: Context<Env>) => {
         success: false,
         message: errorMessage,
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }

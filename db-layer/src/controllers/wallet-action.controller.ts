@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { Env, ApiResponse } from "../types";
+import { Env } from "../types";
 import db from "../db";
 import {
   getRecentWalletActions,
@@ -17,7 +17,7 @@ export const fetchRecentWalletActions = async (c: Context<Env>) => {
           success: false,
           message: "userWallet parameter is required and must be a string",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -30,7 +30,7 @@ export const fetchRecentWalletActions = async (c: Context<Env>) => {
         success: true,
         message: "Recent wallet actions retrieved successfully",
         data: actions,
-      } as ApiResponse<RecentWalletAction[]>,
+      },
       200,
     );
   } catch (error) {
@@ -42,7 +42,7 @@ export const fetchRecentWalletActions = async (c: Context<Env>) => {
         success: false,
         message: errorMessage,
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }

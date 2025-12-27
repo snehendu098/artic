@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { Env, ApiResponse } from "../types";
+import { Env } from "../types";
 import db from "../db";
 import {
   getEarningsByWallet,
@@ -16,7 +16,7 @@ export const getEarningsHandler = async (c: Context<Env>) => {
         success: false,
         message: "wallet param required",
         data: null,
-      } as ApiResponse, 400);
+      }, 400);
     }
 
     const database = db(c.env.DATABASE_URL);
@@ -27,13 +27,13 @@ export const getEarningsHandler = async (c: Context<Env>) => {
       success: true,
       message: "Earnings retrieved",
       data: { earnings, summary },
-    } as ApiResponse, 200);
+    }, 200);
   } catch (error) {
     return c.json({
       success: false,
       message: error instanceof Error ? error.message : "Internal error",
       data: null,
-    } as ApiResponse, 500);
+    }, 500);
   }
 };
 
@@ -51,7 +51,7 @@ export const claimEarningHandler = async (c: Context<Env>) => {
         success: false,
         message: "id param required",
         data: null,
-      } as ApiResponse, 400);
+      }, 400);
     }
 
     if (!body.claimTxHash) {
@@ -59,7 +59,7 @@ export const claimEarningHandler = async (c: Context<Env>) => {
         success: false,
         message: "claimTxHash required",
         data: null,
-      } as ApiResponse, 400);
+      }, 400);
     }
 
     const database = db(c.env.DATABASE_URL);
@@ -70,19 +70,19 @@ export const claimEarningHandler = async (c: Context<Env>) => {
         success: false,
         message: "Earning not found",
         data: null,
-      } as ApiResponse, 404);
+      }, 404);
     }
 
     return c.json({
       success: true,
       message: "Earning marked as claimed",
       data: earning,
-    } as ApiResponse, 200);
+    }, 200);
   } catch (error) {
     return c.json({
       success: false,
       message: error instanceof Error ? error.message : "Internal error",
       data: null,
-    } as ApiResponse, 500);
+    }, 500);
   }
 };

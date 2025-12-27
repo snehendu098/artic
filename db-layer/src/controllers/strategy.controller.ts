@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { Env, ApiResponse } from "../types";
+import { Env } from "../types";
 import db from "../db";
 import {
   createStrategy,
@@ -34,7 +34,7 @@ export const createStrategyHandler = async (c: Context<Env>) => {
           success: false,
           message: "wallet required",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -45,7 +45,7 @@ export const createStrategyHandler = async (c: Context<Env>) => {
           success: false,
           message: "name required",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -56,7 +56,7 @@ export const createStrategyHandler = async (c: Context<Env>) => {
           success: false,
           message: "strategyCode required",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -67,7 +67,7 @@ export const createStrategyHandler = async (c: Context<Env>) => {
           success: false,
           message: "delegationWalletId required when status is active",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -82,7 +82,7 @@ export const createStrategyHandler = async (c: Context<Env>) => {
           success: false,
           message: "User not found",
           data: null,
-        } as ApiResponse,
+        },
         404,
       );
     }
@@ -112,7 +112,7 @@ export const createStrategyHandler = async (c: Context<Env>) => {
         success: false,
         message: error instanceof Error ? error.message : "Internal error",
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }
@@ -128,7 +128,7 @@ export const getMyStrategies = async (c: Context<Env>) => {
           success: false,
           message: "wallet param required",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -150,7 +150,7 @@ export const getMyStrategies = async (c: Context<Env>) => {
         success: false,
         message: error instanceof Error ? error.message : "Internal error",
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }
@@ -175,7 +175,7 @@ export const getMarketplaceStrategies = async (c: Context<Env>) => {
         success: false,
         message: error instanceof Error ? error.message : "Internal error",
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }
@@ -198,7 +198,7 @@ export const getStrategyDetailsHandler = async (c: Context<Env>) => {
           success: false,
           message: "id param required",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -217,7 +217,7 @@ export const getStrategyDetailsHandler = async (c: Context<Env>) => {
           success: false,
           message: "Strategy not found",
           data: null,
-        } as ApiResponse,
+        },
         404,
       );
     }
@@ -238,7 +238,7 @@ export const getStrategyDetailsHandler = async (c: Context<Env>) => {
         success: false,
         message: error instanceof Error ? error.message : "Internal error",
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }
@@ -255,7 +255,7 @@ export const updateStrategyHandler = async (c: Context<Env>) => {
           success: false,
           message: "id param required",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -288,7 +288,7 @@ export const updateStrategyHandler = async (c: Context<Env>) => {
         success: false,
         message: error instanceof Error ? error.message : "Internal error",
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }
@@ -301,21 +301,21 @@ export const activateStrategyHandler = async (c: Context<Env>) => {
 
     if (!id) {
       return c.json(
-        { success: false, message: "id param required", data: null } as ApiResponse,
+        { success: false, message: "id param required", data: null },
         400,
       );
     }
 
     if (!body.wallet) {
       return c.json(
-        { success: false, message: "wallet required", data: null } as ApiResponse,
+        { success: false, message: "wallet required", data: null },
         400,
       );
     }
 
     if (!body.delegationWalletId) {
       return c.json(
-        { success: false, message: "delegationWalletId required", data: null } as ApiResponse,
+        { success: false, message: "delegationWalletId required", data: null },
         400,
       );
     }
@@ -325,7 +325,7 @@ export const activateStrategyHandler = async (c: Context<Env>) => {
     const user = await getUserByWallet(database, body.wallet);
     if (!user) {
       return c.json(
-        { success: false, message: "User not found", data: null } as ApiResponse,
+        { success: false, message: "User not found", data: null },
         404,
       );
     }
@@ -334,7 +334,7 @@ export const activateStrategyHandler = async (c: Context<Env>) => {
 
     if (!strategy) {
       return c.json(
-        { success: false, message: "Strategy not found", data: null } as ApiResponse,
+        { success: false, message: "Strategy not found", data: null },
         404,
       );
     }
@@ -349,7 +349,7 @@ export const activateStrategyHandler = async (c: Context<Env>) => {
         success: false,
         message: error instanceof Error ? error.message : "Internal error",
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }
@@ -362,14 +362,14 @@ export const publishStrategyHandler = async (c: Context<Env>) => {
 
     if (!id) {
       return c.json(
-        { success: false, message: "id param required", data: null } as ApiResponse,
+        { success: false, message: "id param required", data: null },
         400,
       );
     }
 
     if (!body.wallet) {
       return c.json(
-        { success: false, message: "wallet required", data: null } as ApiResponse,
+        { success: false, message: "wallet required", data: null },
         400,
       );
     }
@@ -380,7 +380,7 @@ export const publishStrategyHandler = async (c: Context<Env>) => {
     const user = await getUserByWallet(database, body.wallet);
     if (!user) {
       return c.json(
-        { success: false, message: "User not found", data: null } as ApiResponse,
+        { success: false, message: "User not found", data: null },
         404,
       );
     }
@@ -389,7 +389,7 @@ export const publishStrategyHandler = async (c: Context<Env>) => {
 
     if (!strategy) {
       return c.json(
-        { success: false, message: "Strategy not found", data: null } as ApiResponse,
+        { success: false, message: "Strategy not found", data: null },
         404,
       );
     }
@@ -404,7 +404,7 @@ export const publishStrategyHandler = async (c: Context<Env>) => {
         success: false,
         message: error instanceof Error ? error.message : "Internal error",
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }

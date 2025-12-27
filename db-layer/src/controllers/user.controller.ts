@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { Env, ApiResponse } from "../types";
+import { Env } from "../types";
 import db from "../db";
 import { upsertUser, createDelegation, getUserByWallet } from "../db/actions";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
@@ -22,7 +22,7 @@ export const createDelegationWallet = async (c: Context<Env>) => {
           success: false,
           message: "wallet field is required",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -33,7 +33,7 @@ export const createDelegationWallet = async (c: Context<Env>) => {
           success: false,
           message: "signature field is required",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -44,7 +44,7 @@ export const createDelegationWallet = async (c: Context<Env>) => {
           success: false,
           message: "name field is required",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -64,7 +64,7 @@ export const createDelegationWallet = async (c: Context<Env>) => {
             success: false,
             message: "Invalid signature",
             data: null,
-          } as ApiResponse,
+          },
           401,
         );
       }
@@ -74,7 +74,7 @@ export const createDelegationWallet = async (c: Context<Env>) => {
           success: false,
           message: "Signature verification failed",
           data: null,
-        } as ApiResponse,
+        },
         401,
       );
     }
@@ -123,7 +123,7 @@ export const createDelegationWallet = async (c: Context<Env>) => {
         success: false,
         message: error instanceof Error ? error.message : "Internal error",
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }
@@ -139,7 +139,7 @@ export const getUser = async (c: Context<Env>) => {
           success: false,
           message: "wallet param required",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -153,7 +153,7 @@ export const getUser = async (c: Context<Env>) => {
           success: false,
           message: "User not found",
           data: null,
-        } as ApiResponse,
+        },
         404,
       );
     }
@@ -172,7 +172,7 @@ export const getUser = async (c: Context<Env>) => {
         success: false,
         message: error instanceof Error ? error.message : "Internal error",
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }
@@ -188,7 +188,7 @@ export const upsertUserHandler = async (c: Context<Env>) => {
           success: false,
           message: "wallet required",
           data: null,
-        } as ApiResponse,
+        },
         400,
       );
     }
@@ -210,7 +210,7 @@ export const upsertUserHandler = async (c: Context<Env>) => {
         success: false,
         message: error instanceof Error ? error.message : "Internal error",
         data: null,
-      } as ApiResponse,
+      },
       500,
     );
   }

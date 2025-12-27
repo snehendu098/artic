@@ -1,5 +1,5 @@
 import { Context, Next } from "hono";
-import { Env, ApiResponse } from "../types";
+import { Env } from "../types";
 
 export const requireApiKey = async (c: Context<Env>, next: Next) => {
   const apiKey = c.req.header("X-API-Key");
@@ -13,7 +13,7 @@ export const requireApiKey = async (c: Context<Env>, next: Next) => {
         success: false,
         message: "Unauthorized: Invalid or missing API key",
         data: null,
-      } as ApiResponse,
+      },
       401,
     );
   }
