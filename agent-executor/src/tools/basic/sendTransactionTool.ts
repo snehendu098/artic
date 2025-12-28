@@ -7,19 +7,26 @@ import { getTransactionReceipt } from "viem/actions";
 export const createSendTransactionTool = (deps: ToolDependencies) => {
   return tool(
     async ({ to, amount, tokenAddress }) => {
-      const { walletClient } = deps;
+      const { walletClient, eventLogger } = deps;
+      const tokenType = tokenAddress ? "ERC20" : "MNT";
+
+      await eventLogger.emit({
+        type: "tool_call",
+        data: {
+          tool: "send_transaction",
+          args: { to, amount, tokenAddress },
+        },
+      });
 
       try {
         let txHash: `0x${string}`;
 
         if (!tokenAddress) {
-          // Native MNT transfer
           txHash = await walletClient.sendTransaction({
             to: to as `0x${string}`,
             value: parseEther(amount),
           });
         } else {
-          // ERC20 token transfer
           txHash = await walletClient.writeContract({
             address: tokenAddress as `0x${string}`,
             abi: erc20Abi,
@@ -32,16 +39,39 @@ export const createSendTransactionTool = (deps: ToolDependencies) => {
           hash: txHash,
         });
 
+        const success = receipt.status === "success";
+        const shortTo = `${to.slice(0, 6)}...${to.slice(-4)}`;
+
+        await eventLogger.emit({
+          type: "tool_result",
+          data: {
+            tool: "send_transaction",
+            result: `Sent ${amount} ${tokenType} to ${shortTo}`,
+            note: success
+              ? `Transaction confirmed in block ${receipt.blockNumber}`
+              : "Transaction failed",
+          },
+        });
+
         return {
-          success: receipt.status === "success",
+          success,
           txHash,
           blockNumber: receipt.blockNumber.toString(),
         };
       } catch (error) {
-        return {
-          success: false,
-          error: error instanceof Error ? error.message : "Transaction failed",
-        };
+        const errorMsg =
+          error instanceof Error ? error.message : "Transaction failed";
+
+        await eventLogger.emit({
+          type: "tool_result",
+          data: {
+            tool: "send_transaction",
+            result: `Failed to send ${amount} ${tokenType}`,
+            note: errorMsg,
+          },
+        });
+
+        return { success: false, error: errorMsg };
       }
     },
     {
@@ -51,7 +81,7 @@ export const createSendTransactionTool = (deps: ToolDependencies) => {
         to: z
           .string()
           .describe(
-            "The recipient address. Must be a valid ethereum address starting with 0x",
+            "The recipient address. Must be a valid ethereum address starting with 0x"
           ),
         amount: z
           .string()
@@ -60,9 +90,9 @@ export const createSendTransactionTool = (deps: ToolDependencies) => {
           .string()
           .optional()
           .describe(
-            "The ERC20 token contract address. Leave empty for native MNT transfer",
+            "The ERC20 token contract address. Leave empty for native MNT transfer"
           ),
       }),
-    },
+    }
   );
 };

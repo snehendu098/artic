@@ -13,6 +13,7 @@ import {
   updateStrategyHandler,
   activateStrategyHandler,
   publishStrategyHandler,
+  editStrategyHandler,
 } from "./controllers/strategy.controller";
 import {
   createSubscriptionHandler,
@@ -24,7 +25,7 @@ import {
 } from "./controllers/subscription.controller";
 import { createPurchaseHandler, getPurchasesHandler } from "./controllers/purchase.controller";
 import { getEarningsHandler, claimEarningHandler } from "./controllers/earnings.controller";
-import { createActionHandler, getActionsHandler } from "./controllers/action.controller";
+import { createActionHandler, getActionsHandler, createBatchActionsHandler } from "./controllers/action.controller";
 
 const app = new Hono<Env>();
 
@@ -50,6 +51,7 @@ app.get("/strategies", getMarketplaceStrategies);
 app.get("/strategies/mine/:wallet", getMyStrategies);
 app.get("/strategies/:id", getStrategyDetailsHandler);
 app.patch("/strategies/:id", updateStrategyHandler);
+app.patch("/strategies/:id/edit", editStrategyHandler);
 app.patch("/strategies/:id/activate", activateStrategyHandler);
 app.patch("/strategies/:id/publish", publishStrategyHandler);
 
@@ -76,6 +78,7 @@ app.get("/subscribers/:wallet", getSubscribersHandler);
 // ACTION ROUTES
 // ============================================
 app.post("/actions", createActionHandler);
+app.post("/actions/batch", createBatchActionsHandler);
 app.get("/actions/:wallet", getActionsHandler);
 
 // ============================================

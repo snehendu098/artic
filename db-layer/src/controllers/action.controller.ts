@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import { Env } from "../types";
 import db from "../db";
-import { createWalletAction, getActionsByWallet } from "../db/actions";
+import { createWalletAction, createWalletActions, getActionsByWallet } from "../db/actions";
 
 interface CreateActionRequest {
   subscriptionId?: string;
@@ -15,6 +15,7 @@ interface CreateActionRequest {
   description: string;
   note?: string;
   status?: "pending" | "completed" | "failed";
+  createdAt?: string;
 }
 
 export const createActionHandler = async (c: Context<Env>) => {
@@ -67,7 +68,7 @@ export const getActionsHandler = async (c: Context<Env>) => {
           message: "wallet param required",
           data: null,
         },
-        400,
+        400
       );
     }
 
@@ -80,7 +81,7 @@ export const getActionsHandler = async (c: Context<Env>) => {
         message: "Actions retrieved",
         data: actions,
       },
-      200,
+      200
     );
   } catch (error) {
     return c.json(
@@ -89,7 +90,47 @@ export const getActionsHandler = async (c: Context<Env>) => {
         message: error instanceof Error ? error.message : "Internal error",
         data: null,
       },
-      500,
+      500
+    );
+  }
+};
+
+export const createBatchActionsHandler = async (c: Context<Env>) => {
+  try {
+    const { actions } = (await c.req.json()) as {
+      actions: CreateActionRequest[];
+    };
+
+    if (!actions?.length) {
+      return c.json(
+        {
+          success: false,
+          message: "actions array required",
+          data: null,
+        },
+        400
+      );
+    }
+
+    const database = db(c.env.DATABASE_URL);
+    const results = await createWalletActions(database, actions);
+
+    return c.json(
+      {
+        success: true,
+        message: `${results.length} action(s) created`,
+        data: results,
+      },
+      201
+    );
+  } catch (error) {
+    return c.json(
+      {
+        success: false,
+        message: error instanceof Error ? error.message : "Internal error",
+        data: null,
+      },
+      500
     );
   }
 };

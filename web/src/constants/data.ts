@@ -222,8 +222,6 @@ export const dummyStrategies: Strategy[] = [
   {
     id: "1",
     name: "ETH Yield Maximizer",
-    description:
-      "Automated ETH staking across multiple protocols for optimal yields",
     subscriberCount: 24,
     status: "active",
     createdAt: "2024-11-15",
@@ -232,7 +230,6 @@ export const dummyStrategies: Strategy[] = [
   {
     id: "2",
     name: "Stable Coin Arbitrage",
-    description: "Low-risk arbitrage strategy across stablecoin pools",
     subscriberCount: 18,
     status: "active",
     createdAt: "2024-10-28",
@@ -241,7 +238,6 @@ export const dummyStrategies: Strategy[] = [
   {
     id: "3",
     name: "Blue Chip NFT Floor Sweeper",
-    description: "Automated floor price monitoring and acquisition strategy",
     subscriberCount: 12,
     status: "paused",
     createdAt: "2024-09-10",
@@ -250,7 +246,6 @@ export const dummyStrategies: Strategy[] = [
   {
     id: "4",
     name: "Multi-Chain Liquidity Provider",
-    description: "Provide liquidity across multiple chains for optimal returns",
     subscriberCount: 28,
     status: "active",
     createdAt: "2024-11-20",
@@ -259,7 +254,6 @@ export const dummyStrategies: Strategy[] = [
   {
     id: "5",
     name: "Smart DCA Strategy",
-    description: "Automated dollar-cost averaging with market timing",
     subscriberCount: 22,
     status: "active",
     createdAt: "2024-10-05",

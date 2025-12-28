@@ -6,13 +6,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { useWallets, useAssets } from "@/hooks";
-import type { Asset } from "@/types";
-
-interface CombinedAssetCardProps {
-  walletAddress?: string;
-  chainId: number;
-}
+import { useDashboardData } from "@/contexts/DashboardDataContext";
 
 const CombinedAssetCardSkeleton = () => (
   <CardLayout>
@@ -42,11 +36,10 @@ const CombinedAssetCardSkeleton = () => (
   </CardLayout>
 );
 
-const CombinedAssetCard = ({ walletAddress, chainId }: CombinedAssetCardProps) => {
-  const { data: wallets, isLoading: walletsLoading } = useWallets(walletAddress);
-  const walletAddresses = wallets.map((w) => w.address);
-  const { data: assets, isLoading: assetsLoading } = useAssets(walletAddresses, chainId);
-  const isLoading = walletsLoading || assetsLoading;
+const CombinedAssetCard = () => {
+  const { data, loading } = useDashboardData();
+  const { assets } = data;
+  const isLoading = loading.wallets || loading.assets;
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -117,14 +110,12 @@ const AssetRow = ({
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
-  // Calculate total asset amount across all wallets
   const totalAmount = asset.wallets.reduce(
     (sum: number, wallet: { amount: string }) =>
       sum + parseFloat(wallet.amount),
     0,
   );
 
-  // Format the asset amount with appropriate decimals
   const formatAssetAmount = (amount: number) => {
     return new Intl.NumberFormat("en-US", {
       minimumFractionDigits: 0,

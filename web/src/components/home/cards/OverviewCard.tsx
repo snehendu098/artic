@@ -2,12 +2,7 @@
 
 import CardLayout from "@/components/layouts/card-layout";
 import Link from "next/link";
-import { useWallets, useStrategies, useSubscribers, useAssets } from "@/hooks";
-
-interface OverviewCardProps {
-  walletAddress?: string;
-  chainId: number;
-}
+import { useDashboardData } from "@/contexts/DashboardDataContext";
 
 const SubCard = ({
   heading,
@@ -47,14 +42,11 @@ const SubCard = ({
   </Link>
 );
 
-const OverviewCard = ({ walletAddress, chainId }: OverviewCardProps) => {
-  const { data: wallets, isLoading: walletsLoading } = useWallets(walletAddress);
-  const { data: strategies, isLoading: strategiesLoading } = useStrategies(walletAddress);
-  const { data: subscribers, isLoading: subscribersLoading } = useSubscribers(walletAddress);
-  const walletAddresses = wallets.map((w) => w.address);
-  const { data: assets, isLoading: assetsLoading } = useAssets(walletAddresses, chainId);
+const OverviewCard = () => {
+  const { data, loading } = useDashboardData();
+  const { wallets, strategies, subscribers, assets } = data;
 
-  const isLoading = walletsLoading || strategiesLoading || subscribersLoading || assetsLoading;
+  const isLoading = loading.wallets || loading.strategies || loading.subscribers || loading.assets;
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {

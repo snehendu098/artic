@@ -3,11 +3,7 @@
 import CardLayout from "@/components/layouts/card-layout";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useSubscriptions } from "@/hooks";
-
-interface SubscriptionsCardProps {
-  walletAddress?: string;
-}
+import { useDashboardData } from "@/contexts/DashboardDataContext";
 
 const SubscriptionsCardSkeleton = () => (
   <CardLayout>
@@ -28,8 +24,10 @@ const SubscriptionsCardSkeleton = () => (
   </CardLayout>
 );
 
-const SubscriptionsCard = ({ walletAddress }: SubscriptionsCardProps) => {
-  const { data: subscriptions, isLoading } = useSubscriptions(walletAddress);
+const SubscriptionsCard = () => {
+  const { data, loading } = useDashboardData();
+  const { subscriptions } = data;
+  const isLoading = loading.subscriptions;
 
   if (isLoading) return <SubscriptionsCardSkeleton />;
 

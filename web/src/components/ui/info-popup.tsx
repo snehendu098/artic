@@ -60,10 +60,11 @@ export const InfoPopupTrigger = ({
   const { setOpen } = useInfoPopup();
 
   if (asChild && typeof children === "object" && children !== null) {
-    const child = children as React.ReactElement;
+    const child = children as React.ReactElement<{ onClick?: (e: React.MouseEvent) => void }>;
+    const childProps = child.props as Record<string, unknown>;
     return (
       <child.type
-        {...child.props}
+        {...childProps}
         onClick={(e: React.MouseEvent) => {
           child.props.onClick?.(e);
           setOpen(true);

@@ -6,12 +6,8 @@ import CreateWalletDialog from "@/components/dialog/CreateWalletDialog";
 import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useWallets } from "@/hooks";
+import { useDashboardData } from "@/contexts/DashboardDataContext";
 import type { DelegationWallet } from "@/types";
-
-interface WalletsCardProps {
-  walletAddress?: string;
-}
 
 const WalletsCardSkeleton = () => (
   <CardLayout>
@@ -104,8 +100,10 @@ const WalletItem = ({ wallet }: { wallet: DelegationWallet }) => {
   );
 };
 
-const WalletsCard = ({ walletAddress }: WalletsCardProps) => {
-  const { data: wallets, isLoading, refetch } = useWallets(walletAddress);
+const WalletsCard = () => {
+  const { data, loading, refetchGroup } = useDashboardData();
+  const { wallets } = data;
+  const isLoading = loading.wallets;
 
   if (isLoading) return <WalletsCardSkeleton />;
 
@@ -128,7 +126,7 @@ const WalletsCard = ({ walletAddress }: WalletsCardProps) => {
               </button>
             </Link>
           )}
-          <CreateWalletDialog mode="icon" onSuccess={refetch} />
+          <CreateWalletDialog mode="icon" onSuccess={refetchGroup.wallets} />
         </div>
       </div>
       {hasData ? (

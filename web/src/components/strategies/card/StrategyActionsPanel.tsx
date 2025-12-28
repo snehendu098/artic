@@ -23,6 +23,7 @@ interface StrategyActionsPanelProps {
   onActivate: (walletId: string) => Promise<void>;
   onPublish: (price?: string) => Promise<void>;
   onWalletCreated?: () => void;
+  hasSubscription?: boolean;
 }
 
 const StrategyActionsPanel = ({
@@ -32,6 +33,7 @@ const StrategyActionsPanel = ({
   onActivate,
   onPublish,
   onWalletCreated,
+  hasSubscription,
 }: StrategyActionsPanelProps) => {
   const [expandedSection, setExpandedSection] = useState<
     "activate" | "publish" | null
@@ -69,7 +71,8 @@ const StrategyActionsPanel = ({
         <p className="text-xs text-white/50 uppercase">Actions</p>
 
         {/* Activate Section */}
-        <div className="border border-neutral-700">
+        {!hasSubscription && (
+          <div className="border border-neutral-700">
             <button
               onClick={() => toggleSection("activate")}
               className="w-full p-3 flex items-center justify-between hover:bg-neutral-800 transition-colors"
@@ -138,6 +141,7 @@ const StrategyActionsPanel = ({
               )}
             </AnimatePresence>
           </div>
+        )}
 
         {/* Publish Section - Only for creators who haven't published yet */}
         {isCreator && !isPublic && (

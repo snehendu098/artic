@@ -3,11 +3,8 @@
 import CardLayout from "@/components/layouts/card-layout";
 import { Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useSubscribers } from "@/hooks";
-
-interface SubscribersCardProps {
-  walletAddress?: string;
-}
+import { useDashboardData } from "@/contexts/DashboardDataContext";
+import { usePrivy } from "@privy-io/react-auth";
 
 const SubscribersCardSkeleton = () => (
   <CardLayout>
@@ -33,8 +30,12 @@ const SubscribersCardSkeleton = () => (
   </CardLayout>
 );
 
-const SubscribersCard = ({ walletAddress }: SubscribersCardProps) => {
-  const { data: subscribers, isLoading } = useSubscribers(walletAddress);
+const SubscribersCard = () => {
+  const { user } = usePrivy();
+  const walletAddress = user?.wallet?.address;
+  const { data, loading } = useDashboardData();
+  const { subscribers } = data;
+  const isLoading = loading.subscribers;
 
   if (isLoading) return <SubscribersCardSkeleton />;
 

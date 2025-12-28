@@ -82,7 +82,7 @@ export default function ViewAllStrategiesDialog() {
                             {strategy.name}
                           </h3>
                           <p className="text-sm text-white/50 mb-3">
-                            {strategy.description}
+                            {strategy.strategyCode ? `${strategy.strategyCode.slice(0, 100)}...` : "No description"}
                           </p>
                           <div className="flex flex-wrap gap-2 mb-3">
                             {strategy.protocols.map((protocol) => (

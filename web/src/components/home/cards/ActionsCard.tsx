@@ -3,11 +3,7 @@
 import CardLayout from "@/components/layouts/card-layout";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { useActions } from "@/hooks";
-
-interface ActionsCardProps {
-  walletAddress?: string;
-}
+import { useDashboardData } from "@/contexts/DashboardDataContext";
 
 const ActionsCardSkeleton = () => (
   <CardLayout>
@@ -30,8 +26,10 @@ const ActionsCardSkeleton = () => (
   </CardLayout>
 );
 
-const ActionsCard = ({ walletAddress }: ActionsCardProps) => {
-  const { data: actions, isLoading } = useActions(walletAddress);
+const ActionsCard = () => {
+  const { data, loading } = useDashboardData();
+  const { actions } = data;
+  const isLoading = loading.actions;
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp);

@@ -1,5 +1,5 @@
 import { strategies, subscriptions, users, delegationWallets, walletActions, strategyPurchases } from "../schema";
-import { eq, count, and, sql } from "drizzle-orm";
+import { eq, count, and, sql, desc } from "drizzle-orm";
 import { validateDelegationOwnership } from "./delegation.actions";
 
 export interface Strategy {
@@ -244,20 +244,22 @@ export const getStrategyDetails = async (
     .innerJoin(users, eq(subscriptions.userId, users.id))
     .where(eq(subscriptions.strategyId, strategyId));
 
-  // Get recent actions for this strategy's subscriptions
-  const actionResults = await database
-    .select({
-      id: walletActions.id,
-      actionType: walletActions.actionType,
-      description: walletActions.description,
-      note: walletActions.note,
-      status: walletActions.status,
-      createdAt: walletActions.createdAt,
-    })
-    .from(walletActions)
-    .innerJoin(subscriptions, eq(walletActions.subscriptionId, subscriptions.id))
-    .where(eq(subscriptions.strategyId, strategyId))
-    .limit(5);
+  // Get recent actions - filter by user's subscription if they have one
+  const actionResults = subscription
+    ? await database
+        .select({
+          id: walletActions.id,
+          actionType: walletActions.actionType,
+          description: walletActions.description,
+          note: walletActions.note,
+          status: walletActions.status,
+          createdAt: walletActions.createdAt,
+        })
+        .from(walletActions)
+        .where(eq(walletActions.subscriptionId, subscription.id))
+        .orderBy(desc(walletActions.createdAt))
+        .limit(5)
+    : [];
 
   return {
     strategy,
@@ -359,4 +361,74 @@ export const publishStrategy = async (
     .returning();
 
   return result.length > 0 ? result[0] : null;
+};
+
+export interface EditStrategyParams {
+  name?: string;
+  strategyCode?: string;
+  protocols?: string[];
+  priceMnt?: string;
+}
+
+export const editStrategy = async (
+  database: any,
+  strategyId: string,
+  userId: string,
+  updates: EditStrategyParams
+): Promise<Strategy> => {
+  // Fetch strategy
+  const existing = await database
+    .select()
+    .from(strategies)
+    .where(eq(strategies.id, strategyId))
+    .limit(1);
+
+  if (!existing || existing.length === 0) {
+    throw new Error("Strategy not found");
+  }
+
+  const strategy = existing[0];
+
+  // Check ownership
+  if (strategy.creatorId !== userId) {
+    throw new Error("Forbidden: not the creator");
+  }
+
+  // Check if public
+  if (strategy.isPublic) {
+    throw new Error("Cannot edit public strategy");
+  }
+
+  // Check unique constraint if name changed
+  if (updates.name && updates.name !== strategy.name) {
+    const conflict = await database
+      .select()
+      .from(strategies)
+      .where(
+        and(
+          eq(strategies.creatorId, userId),
+          eq(strategies.name, updates.name)
+        )
+      )
+      .limit(1);
+
+    if (conflict && conflict.length > 0) {
+      throw new Error("Strategy name already exists");
+    }
+  }
+
+  // Build update object
+  const updateData: any = { updatedAt: new Date() };
+  if (updates.name !== undefined) updateData.name = updates.name;
+  if (updates.strategyCode !== undefined) updateData.strategyCode = updates.strategyCode;
+  if (updates.protocols !== undefined) updateData.protocols = updates.protocols;
+  if (updates.priceMnt !== undefined) updateData.priceMnt = updates.priceMnt;
+
+  const result = await database
+    .update(strategies)
+    .set(updateData)
+    .where(eq(strategies.id, strategyId))
+    .returning();
+
+  return result[0];
 };

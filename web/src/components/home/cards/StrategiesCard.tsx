@@ -3,11 +3,7 @@
 import CardLayout from "@/components/layouts/card-layout";
 import { Plus, Users, ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { useStrategies, usePurchases } from "@/hooks";
-
-interface StrategiesCardProps {
-  walletAddress?: string;
-}
+import { useDashboardData } from "@/contexts/DashboardDataContext";
 
 const StrategiesCardSkeleton = () => (
   <CardLayout>
@@ -31,10 +27,10 @@ const StrategiesCardSkeleton = () => (
   </CardLayout>
 );
 
-const StrategiesCard = ({ walletAddress }: StrategiesCardProps) => {
-  const { data: created, isLoading: loadingCreated } = useStrategies(walletAddress);
-  const { data: purchases, isLoading: loadingPurchases } = usePurchases(walletAddress);
-  const isLoading = loadingCreated || loadingPurchases;
+const StrategiesCard = () => {
+  const { data, loading } = useDashboardData();
+  const { strategies: created, purchases } = data;
+  const isLoading = loading.strategies || loading.purchases;
 
   const purchasedAsStrategies = purchases.map(p => ({
     id: p.strategyId,

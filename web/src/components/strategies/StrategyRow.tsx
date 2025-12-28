@@ -31,7 +31,7 @@ const StrategyRow = ({
           <div className="flex-1">
             <p className="text-sm font-medium truncate">{strategy.name}</p>
             <p className="text-xs text-white/40 mt-0.5 truncate">
-              {strategy.description}
+              {strategy.protocols.join(", ") || "No protocols"}
             </p>
           </div>
         </div>

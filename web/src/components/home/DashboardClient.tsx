@@ -10,6 +10,36 @@ import SubscriptionsCard from "@/components/home/cards/SubscriptionsCard";
 import WalletsCard from "@/components/home/cards/WalletsCard";
 import ActionsCard from "@/components/home/cards/ActionsCard";
 import SubscribersCard from "@/components/home/cards/SubscribersCard";
+import DashboardSkeleton from "@/components/home/DashboardSkeleton";
+import { DashboardDataProvider, useDashboardData } from "@/contexts/DashboardDataContext";
+
+const DashboardContent = () => {
+  const { isInitialLoading } = useDashboardData();
+
+  if (isInitialLoading) {
+    return <DashboardSkeleton />;
+  }
+
+  return (
+    <div className="w-full grid gap-4 grid-cols-6">
+      <div className="col-span-4 space-y-4">
+        <OverviewCard />
+        <div className="w-full">
+          <CombinedAssetCard />
+        </div>
+        <div className="w-full space-x-4 grid grid-cols-2 gap-4">
+          <SubscriptionsCard />
+          <SubscribersCard />
+        </div>
+      </div>
+      <div className="col-span-2 space-y-4">
+        <WalletsCard />
+        <StrategiesCard />
+        <ActionsCard />
+      </div>
+    </div>
+  );
+};
 
 const DashboardClient = () => {
   const { authenticated, user } = usePrivy();
@@ -38,22 +68,10 @@ const DashboardClient = () => {
   return (
     <div className="w-full">
       <Header url="/app/dashboard" showActions={true} />
-      <div className="mt-6 w-full grid gap-4 grid-cols-6">
-        <div className="col-span-4 space-y-4">
-          <OverviewCard walletAddress={walletAddress} chainId={chainId} />
-          <div className="w-full">
-            <CombinedAssetCard walletAddress={walletAddress} chainId={chainId} />
-          </div>
-          <div className="w-full space-x-4 grid grid-cols-2 gap-4">
-            <SubscriptionsCard walletAddress={walletAddress} />
-            <SubscribersCard walletAddress={walletAddress} />
-          </div>
-        </div>
-        <div className="col-span-2 space-y-4">
-          <WalletsCard walletAddress={walletAddress} />
-          <StrategiesCard walletAddress={walletAddress} />
-          <ActionsCard walletAddress={walletAddress} />
-        </div>
+      <div className="mt-6">
+        <DashboardDataProvider walletAddress={walletAddress} chainId={chainId}>
+          <DashboardContent />
+        </DashboardDataProvider>
       </div>
     </div>
   );

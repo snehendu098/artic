@@ -1,5 +1,5 @@
 import { walletActions, subscriptions, strategies, delegationWallets, users } from "../schema";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, inArray } from "drizzle-orm";
 
 export type ActionType = "execution" | "deposit" | "withdrawal" | "subscription" | "strategy_created";
 export type ActionStatus = "pending" | "completed" | "failed";
@@ -22,12 +22,17 @@ export interface CreateWalletActionParams {
   description: string;
   note?: string;
   status?: ActionStatus;
+  createdAt?: Date | string;
 }
 
 export const createWalletAction = async (
   database: any,
   params: CreateWalletActionParams
 ): Promise<WalletAction> => {
+  const createdAt = params.createdAt
+    ? new Date(params.createdAt)
+    : new Date();
+
   const inserted = await database
     .insert(walletActions)
     .values({
@@ -37,6 +42,7 @@ export const createWalletAction = async (
       description: params.description,
       note: params.note,
       status: params.status ?? "completed",
+      createdAt,
     })
     .returning();
 
@@ -105,7 +111,7 @@ export const getActionsByWallet = async (
     .innerJoin(delegationWallets, eq(walletActions.delegationWalletId, delegationWallets.id))
     .leftJoin(subscriptions, eq(walletActions.subscriptionId, subscriptions.id))
     .leftJoin(strategies, eq(subscriptions.strategyId, strategies.id))
-    .where(eq(walletActions.delegationWalletId, delegationIds[0])) // Simplified
+    .where(inArray(walletActions.delegationWalletId, delegationIds))
     .orderBy(desc(walletActions.createdAt))
     .limit(limit);
 

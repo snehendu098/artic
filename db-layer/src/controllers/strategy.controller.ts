@@ -11,6 +11,7 @@ import {
   getUserByWallet,
   activateStrategy,
   publishStrategy,
+  editStrategy,
 } from "../db/actions";
 
 interface CreateStrategyRequest {
@@ -407,5 +408,73 @@ export const publishStrategyHandler = async (c: Context<Env>) => {
       },
       500,
     );
+  }
+};
+
+interface EditStrategyRequest {
+  wallet: string;
+  name?: string;
+  strategyCode?: string;
+  protocols?: string[];
+  priceMnt?: string;
+}
+
+export const editStrategyHandler = async (c: Context<Env>) => {
+  try {
+    const id = c.req.param("id");
+    const body = (await c.req.json()) as EditStrategyRequest;
+
+    if (!id) {
+      return c.json(
+        { success: false, message: "id param required", data: null },
+        400,
+      );
+    }
+
+    if (!body.wallet) {
+      return c.json(
+        { success: false, message: "wallet required", data: null },
+        400,
+      );
+    }
+
+    const database = db(c.env.DATABASE_URL);
+
+    const user = await getUserByWallet(database, body.wallet);
+    if (!user) {
+      return c.json(
+        { success: false, message: "User not found", data: null },
+        404,
+      );
+    }
+
+    const strategy = await editStrategy(database, id, user.id, {
+      name: body.name,
+      strategyCode: body.strategyCode,
+      protocols: body.protocols,
+      priceMnt: body.priceMnt,
+    });
+
+    return c.json(
+      { success: true, message: "Strategy updated", data: strategy },
+      200,
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Internal error";
+
+    if (message === "Strategy not found") {
+      return c.json({ success: false, message, data: null }, 404);
+    }
+    if (message === "Forbidden: not the creator") {
+      return c.json({ success: false, message, data: null }, 403);
+    }
+    if (message === "Cannot edit public strategy") {
+      return c.json({ success: false, message, data: null }, 400);
+    }
+    if (message === "Strategy name already exists") {
+      return c.json({ success: false, message, data: null }, 409);
+    }
+
+    return c.json({ success: false, message, data: null }, 500);
   }
 };

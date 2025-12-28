@@ -223,7 +223,7 @@ const StrategyDetailPage = ({
             <StrategyCodeCard code={strategy.strategyCode} />
           )}
 
-          {(data.isCreator || data.isPurchased) && !data.subscription && (
+          {((data.isCreator && !isPublic) || ((data.isCreator || data.isPurchased) && !data.subscription)) && (
             <StrategyActionsPanel
               strategy={{ ...strategy, isPublic }}
               isCreator={data.isCreator}
@@ -231,6 +231,7 @@ const StrategyDetailPage = ({
               onActivate={handleActivate}
               onPublish={handlePublish}
               onWalletCreated={refetchWallets}
+              hasSubscription={hasSubscription}
             />
           )}
 

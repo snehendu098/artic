@@ -52,7 +52,7 @@ const animationDeltas = {
 const sharedTransition = {
   duration: 20,
   repeat: Infinity,
-  ease: "easeInOut",
+  ease: "easeInOut" as const,
 };
 
 // Define which nodes are connected - sparse network to avoid congestion

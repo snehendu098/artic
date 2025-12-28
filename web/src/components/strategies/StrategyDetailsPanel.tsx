@@ -38,8 +38,8 @@ const StrategyDetailsPanel = ({
 
         <div className="mt-4 space-y-3">
           <div className="p-3 bg-neutral-800 border border-neutral-700">
-            <p className="text-xs text-white/50 mb-2">Description</p>
-            <p className="text-sm text-white/90">{selectedStrategy.description}</p>
+            <p className="text-xs text-white/50 mb-2">Strategy Code</p>
+            <p className="text-sm text-white/90">{selectedStrategy.strategyCode || "No strategy code"}</p>
           </div>
 
           <div className="p-3 bg-neutral-800 border border-neutral-700">

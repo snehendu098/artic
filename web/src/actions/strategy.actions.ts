@@ -33,7 +33,7 @@ function mapSubscriber(db: DBSubscriber): Subscriber {
     wallet: db.wallet,
     strategyId: db.strategyId,
     strategyName: db.strategyName,
-    subscribedAt: db.subscribedAt ?? new Date().toISOString(),
+    purchasedAt: db.purchasedAt ?? new Date().toISOString(),
   };
 }
 
@@ -177,7 +177,7 @@ export async function getStrategyDetails(
       wallet: s.wallet,
       strategyId: id,
       strategyName: data.strategy.name,
-      subscribedAt: s.subscribedAt ?? new Date().toISOString(),
+      purchasedAt: s.subscribedAt ?? new Date().toISOString(),
     }));
 
     // Map API actions to frontend Action type

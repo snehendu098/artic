@@ -33,7 +33,6 @@ function mapStrategy(dbStrategy: DBStrategy): Strategy {
   return {
     id: dbStrategy.id,
     name: dbStrategy.name,
-    description: dbStrategy.description ?? "",
     subscriberCount: dbStrategy.subscriberCount,
     status: dbStrategy.status,
     createdAt: dbStrategy.createdAt ?? new Date().toISOString(),
