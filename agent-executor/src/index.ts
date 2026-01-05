@@ -67,8 +67,8 @@ app.post("/send", async (c) => {
           privateKey as `0x${string}`,
           c.env.GROQ_API_KEY,
           eventLogger,
-          c.env.ACCOUNT_ID,
-          c.env.GATEWAY_NAME,
+          // c.env.ACCOUNT_ID,
+          // c.env.GATEWAY_NAME,
         );
         await agent.execute(strategy, formatActions(recentActions));
         await eventLogger.setStatus("completed");

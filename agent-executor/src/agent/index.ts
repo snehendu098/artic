@@ -7,6 +7,7 @@ import {
 } from "viem";
 import { initAccount } from "../helpers/initAccount";
 import { initClients } from "../helpers/initClients";
+import { initAgentKit } from "../helpers/initMNTAgentKit";
 import {
   filterToolsByNames,
   getAllTools,
@@ -22,6 +23,7 @@ import {
 import { OrchestratorOutput } from "../types";
 import { EventLogger } from "../helpers/EventLogger";
 import { ChatGroq } from "@langchain/groq";
+import { MNTAgentKit } from "mantle-agent-kit-sdk";
 
 export class Agent {
   public account: PrivateKeyAccount;
@@ -29,16 +31,19 @@ export class Agent {
   public model: ChatGroq;
   private deps: ToolDependencies;
   private eventLogger: EventLogger;
+  public mntAgentKit: MNTAgentKit;
 
   constructor(pk: Address, apiKey: string, eventLogger: EventLogger) {
     this.account = initAccount(pk);
     const { walletClient } = initClients(this.account);
     this.walletClient = walletClient;
     this.eventLogger = eventLogger;
+    this.mntAgentKit = initAgentKit(pk);
     this.deps = {
       account: this.account,
       walletClient: this.walletClient,
       eventLogger: this.eventLogger,
+      mntAgentKit: this.mntAgentKit,
     };
 
     this.model = new ChatGroq({

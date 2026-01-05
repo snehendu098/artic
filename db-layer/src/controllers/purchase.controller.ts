@@ -6,7 +6,9 @@ import {
   getPurchasesByWallet,
   hasPurchasedStrategy,
   upsertUser,
+  getStrategyById,
 } from "../db/actions";
+import { cached, cacheDelete, CacheKeys, TTL } from "../utils/cache";
 
 interface CreatePurchaseRequest {
   wallet: string;
@@ -41,6 +43,20 @@ export const createPurchaseHandler = async (c: Context<Env>) => {
       txHash: body.txHash,
       blockNumber: body.blockNumber,
     });
+
+    // Get strategy creator for cache invalidation
+    const strategy = await getStrategyById(database, body.strategyId);
+    const creatorWallet = strategy?.creatorWallet;
+
+    // Invalidate caches
+    const keysToInvalidate = [
+      CacheKeys.purchases(body.wallet),
+      CacheKeys.user(body.wallet),
+    ];
+    if (creatorWallet) {
+      keysToInvalidate.push(CacheKeys.earnings(creatorWallet));
+    }
+    await cacheDelete(c.env.ARTIC, keysToInvalidate);
 
     return c.json(
       {
@@ -77,8 +93,15 @@ export const getPurchasesHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
-    const purchases = await getPurchasesByWallet(database, wallet);
+    const purchases = await cached(
+      c.env.ARTIC,
+      CacheKeys.purchases(wallet),
+      TTL.PURCHASES,
+      async () => {
+        const database = db(c.env.DATABASE_URL);
+        return getPurchasesByWallet(database, wallet);
+      }
+    );
 
     return c.json(
       {

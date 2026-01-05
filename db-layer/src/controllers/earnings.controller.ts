@@ -6,6 +6,9 @@ import {
   getEarningsSummary,
   markEarningClaimed,
 } from "../db/actions";
+import { users } from "../db/schema";
+import { eq } from "drizzle-orm";
+import { cached, cacheDelete, CacheKeys, TTL } from "../utils/cache";
 
 export const getEarningsHandler = async (c: Context<Env>) => {
   try {
@@ -19,14 +22,22 @@ export const getEarningsHandler = async (c: Context<Env>) => {
       }, 400);
     }
 
-    const database = db(c.env.DATABASE_URL);
-    const earnings = await getEarningsByWallet(database, wallet);
-    const summary = await getEarningsSummary(database, wallet);
+    const data = await cached(
+      c.env.ARTIC,
+      CacheKeys.earnings(wallet),
+      TTL.EARNINGS,
+      async () => {
+        const database = db(c.env.DATABASE_URL);
+        const earnings = await getEarningsByWallet(database, wallet);
+        const summary = await getEarningsSummary(database, wallet);
+        return { earnings, summary };
+      }
+    );
 
     return c.json({
       success: true,
       message: "Earnings retrieved",
-      data: { earnings, summary },
+      data,
     }, 200);
   } catch (error) {
     return c.json({
@@ -71,6 +82,16 @@ export const claimEarningHandler = async (c: Context<Env>) => {
         message: "Earning not found",
         data: null,
       }, 404);
+    }
+
+    // Get creator wallet for cache invalidation
+    const userResult = await database
+      .select({ wallet: users.wallet })
+      .from(users)
+      .where(eq(users.id, earning.creatorId))
+      .limit(1);
+    if (userResult.length > 0) {
+      await cacheDelete(c.env.ARTIC, [CacheKeys.earnings(userResult[0].wallet)]);
     }
 
     return c.json({

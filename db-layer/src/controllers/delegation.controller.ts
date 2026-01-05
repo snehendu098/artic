@@ -2,6 +2,7 @@ import { Context } from "hono";
 import { Env } from "../types";
 import db from "../db";
 import { getDelegationsByWallet } from "../db/actions";
+import { cached, CacheKeys, TTL } from "../utils/cache";
 
 export const getDelegationsHandler = async (c: Context<Env>) => {
   try {
@@ -15,8 +16,15 @@ export const getDelegationsHandler = async (c: Context<Env>) => {
       }, 400);
     }
 
-    const database = db(c.env.DATABASE_URL);
-    const delegations = await getDelegationsByWallet(database, wallet);
+    const delegations = await cached(
+      c.env.ARTIC,
+      CacheKeys.delegations(wallet),
+      TTL.DELEGATIONS,
+      async () => {
+        const database = db(c.env.DATABASE_URL);
+        return getDelegationsByWallet(database, wallet);
+      }
+    );
 
     return c.json({
       success: true,

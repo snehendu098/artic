@@ -9,7 +9,9 @@ import {
   getActiveSubscriptionsForBot,
   getSubscribersForStrategy,
   getUserByWallet,
+  getStrategyById,
 } from "../db/actions";
+import { cached, cacheDelete, CacheKeys, TTL } from "../utils/cache";
 
 interface CreateSubscriptionRequest {
   wallet: string;
@@ -52,6 +54,20 @@ export const createSubscriptionHandler = async (c: Context<Env>) => {
       delegationWalletId: body.delegationWalletId,
     });
 
+    // Get strategy creator for cache invalidation
+    const strategy = await getStrategyById(database, body.strategyId);
+    const creatorWallet = strategy?.creatorWallet;
+
+    // Invalidate caches
+    const keysToInvalidate = [
+      CacheKeys.subscriptions(body.wallet),
+      CacheKeys.botActive(),
+    ];
+    if (creatorWallet) {
+      keysToInvalidate.push(CacheKeys.subscribers(creatorWallet));
+    }
+    await cacheDelete(c.env.ARTIC, keysToInvalidate);
+
     return c.json(
       {
         success: true,
@@ -87,8 +103,15 @@ export const getSubscriptionsHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
-    const subscriptions = await getSubscriptionsByWallet(database, wallet);
+    const subscriptions = await cached(
+      c.env.ARTIC,
+      CacheKeys.subscriptions(wallet),
+      TTL.SUBSCRIPTIONS,
+      async () => {
+        const database = db(c.env.DATABASE_URL);
+        return getSubscriptionsByWallet(database, wallet);
+      }
+    );
 
     return c.json(
       {
@@ -139,6 +162,9 @@ export const pauseSubscriptionHandler = async (c: Context<Env>) => {
       );
     }
 
+    // Invalidate caches
+    await cacheDelete(c.env.ARTIC, [CacheKeys.botActive()]);
+
     return c.json(
       {
         success: true,
@@ -188,6 +214,9 @@ export const activateSubscriptionHandler = async (c: Context<Env>) => {
       );
     }
 
+    // Invalidate caches
+    await cacheDelete(c.env.ARTIC, [CacheKeys.botActive()]);
+
     return c.json(
       {
         success: true,
@@ -223,26 +252,33 @@ export const getSubscribersHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const allSubscribers = await cached(
+      c.env.ARTIC,
+      CacheKeys.subscribers(wallet),
+      TTL.SUBSCRIBERS,
+      async () => {
+        const database = db(c.env.DATABASE_URL);
+        const { getStrategiesByCreator } = await import("../db/actions");
+        const strategies = await getStrategiesByCreator(database, wallet);
 
-    // Get user's strategies and their subscribers
-    const { getStrategiesByCreator } = await import("../db/actions");
-    const strategies = await getStrategiesByCreator(database, wallet);
-
-    const allSubscribers = [];
-    for (const strategy of strategies) {
-      const subscribers = await getSubscribersForStrategy(
-        database,
-        strategy.id,
-      );
-      for (const sub of subscribers) {
-        allSubscribers.push({
-          ...sub,
-          strategyId: strategy.id,
-          strategyName: strategy.name,
-        });
+        const subscribers: Array<{
+          strategyId: string;
+          strategyName: string;
+          [key: string]: unknown;
+        }> = [];
+        for (const strategy of strategies) {
+          const subs = await getSubscribersForStrategy(database, strategy.id);
+          for (const sub of subs) {
+            subscribers.push({
+              ...sub,
+              strategyId: strategy.id,
+              strategyName: strategy.name,
+            });
+          }
+        }
+        return subscribers;
       }
-    }
+    );
 
     return c.json(
       {

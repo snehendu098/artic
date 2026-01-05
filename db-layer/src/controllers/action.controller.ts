@@ -1,7 +1,15 @@
 import { Context } from "hono";
 import { Env } from "../types";
 import db from "../db";
-import { createWalletAction, createWalletActions, getActionsByWallet } from "../db/actions";
+import {
+  createWalletAction,
+  createWalletActions,
+  getActionsByWallet,
+  getDelegationById,
+} from "../db/actions";
+import { users } from "../db/schema";
+import { eq } from "drizzle-orm";
+import { cached, cacheDelete, CacheKeys, TTL } from "../utils/cache";
 
 interface CreateActionRequest {
   subscriptionId?: string;
@@ -35,6 +43,19 @@ export const createActionHandler = async (c: Context<Env>) => {
 
     const database = db(c.env.DATABASE_URL);
     const action = await createWalletAction(database, body);
+
+    // Get user wallet for cache invalidation
+    const delegation = await getDelegationById(database, body.delegationWalletId);
+    if (delegation) {
+      const userResult = await database
+        .select({ wallet: users.wallet })
+        .from(users)
+        .where(eq(users.id, delegation.userId))
+        .limit(1);
+      if (userResult.length > 0) {
+        await cacheDelete(c.env.ARTIC, [CacheKeys.actions(userResult[0].wallet)]);
+      }
+    }
 
     return c.json(
       {
@@ -72,8 +93,15 @@ export const getActionsHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
-    const actions = await getActionsByWallet(database, wallet, limit);
+    const actions = await cached(
+      c.env.ARTIC,
+      CacheKeys.actions(wallet, limit),
+      TTL.ACTIONS,
+      async () => {
+        const database = db(c.env.DATABASE_URL);
+        return getActionsByWallet(database, wallet, limit);
+      }
+    );
 
     return c.json(
       {
@@ -114,6 +142,31 @@ export const createBatchActionsHandler = async (c: Context<Env>) => {
 
     const database = db(c.env.DATABASE_URL);
     const results = await createWalletActions(database, actions);
+
+    // Get unique delegation wallet IDs and invalidate caches
+    const delegationIds = [...new Set(actions.map((a) => a.delegationWalletId))];
+    const walletsToInvalidate = new Set<string>();
+
+    for (const delegationId of delegationIds) {
+      const delegation = await getDelegationById(database, delegationId);
+      if (delegation) {
+        const userResult = await database
+          .select({ wallet: users.wallet })
+          .from(users)
+          .where(eq(users.id, delegation.userId))
+          .limit(1);
+        if (userResult.length > 0) {
+          walletsToInvalidate.add(userResult[0].wallet);
+        }
+      }
+    }
+
+    if (walletsToInvalidate.size > 0) {
+      const keysToInvalidate = Array.from(walletsToInvalidate).map((w) =>
+        CacheKeys.actions(w)
+      );
+      await cacheDelete(c.env.ARTIC, keysToInvalidate);
+    }
 
     return c.json(
       {

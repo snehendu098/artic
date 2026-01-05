@@ -5,6 +5,7 @@ import { upsertUser, createDelegation, getUserByWallet } from "../db/actions";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { verifyMessage } from "viem";
 import { encrypt } from "../utils/crypto";
+import { cached, cacheDelete, CacheKeys, TTL } from "../utils/cache";
 
 interface CreateDelegationRequest {
   wallet: string;
@@ -107,6 +108,12 @@ export const createDelegationWallet = async (c: Context<Env>) => {
       };
     });
 
+    // Invalidate caches
+    await cacheDelete(c.env.ARTIC, [
+      CacheKeys.user(body.wallet),
+      CacheKeys.delegations(body.wallet),
+    ]);
+
     return c.json(
       {
         success: true,
@@ -144,8 +151,15 @@ export const getUser = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
-    const user = await getUserByWallet(database, wallet);
+    const user = await cached(
+      c.env.ARTIC,
+      CacheKeys.user(wallet),
+      TTL.USER,
+      async () => {
+        const database = db(c.env.DATABASE_URL);
+        return getUserByWallet(database, wallet);
+      }
+    );
 
     if (!user) {
       return c.json(
@@ -195,6 +209,9 @@ export const upsertUserHandler = async (c: Context<Env>) => {
 
     const database = db(c.env.DATABASE_URL);
     const user = await upsertUser(database, body.wallet, body.username);
+
+    // Invalidate cache
+    await cacheDelete(c.env.ARTIC, [CacheKeys.user(body.wallet)]);
 
     return c.json(
       {

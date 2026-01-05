@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Plus, X, Wallet, Globe, Save, Zap, Loader2 } from "lucide-react";
+import { ArrowLeft, Wallet, Globe, Save, Zap, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
@@ -21,31 +21,11 @@ const CreateStrategyPage = () => {
 
   const [name, setName] = useState("");
   const [strategyCode, setStrategyCode] = useState("");
-  const [protocols, setProtocols] = useState<string[]>([]);
-  const [protocolInput, setProtocolInput] = useState("");
   const [actionMode, setActionMode] = useState<ActionMode>(null);
   const [selectedWalletId, setSelectedWalletId] = useState<string | null>(null);
   const [price, setPrice] = useState("");
   const [alsoActivate, setAlsoActivate] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleAddProtocol = () => {
-    if (protocolInput.trim() && !protocols.includes(protocolInput.trim())) {
-      setProtocols([...protocols, protocolInput.trim()]);
-      setProtocolInput("");
-    }
-  };
-
-  const handleRemoveProtocol = (protocol: string) => {
-    setProtocols(protocols.filter((p) => p !== protocol));
-  };
-
-  const handleProtocolKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddProtocol();
-    }
-  };
 
   const handleCodeKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Tab") {
@@ -72,7 +52,7 @@ const CreateStrategyPage = () => {
       const result = await createStrategy(walletAddress, {
         name,
         strategyCode,
-        protocols,
+        protocols: [],
         status: actionMode === "draft" ? "draft" : "active",
         isPublic: actionMode === "list",
         priceMnt: actionMode === "list" && price ? price : null,
@@ -168,52 +148,6 @@ const CreateStrategyPage = () => {
                 main steps and indent with spaces for sub-steps.
               </span>
             </div>
-          </div>
-        </CardLayout>
-
-        {/* Protocols */}
-        <CardLayout>
-          <div className="space-y-3">
-            <label className="text-xs text-white/50 uppercase">
-              Protocols Used
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={protocolInput}
-                onChange={(e) => setProtocolInput(e.target.value)}
-                onKeyDown={handleProtocolKeyDown}
-                placeholder="Add protocol (e.g. Uniswap, Aave)"
-                className="flex-1 bg-neutral-800 border border-neutral-700 focus:border-primary/50 outline-none px-4 py-2 text-sm placeholder:text-white/30 transition-colors"
-              />
-              <button
-                onClick={handleAddProtocol}
-                disabled={!protocolInput.trim()}
-                className="px-3 py-2 bg-neutral-700 border border-neutral-600 hover:border-primary/50 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Plus className="w-4 h-4" />
-              </button>
-            </div>
-            {protocols.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {protocols.map((protocol) => (
-                  <motion.span
-                    key={protocol}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-neutral-700 text-xs"
-                  >
-                    {protocol}
-                    <button
-                      onClick={() => handleRemoveProtocol(protocol)}
-                      className="hover:text-red-400 transition-colors"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </motion.span>
-                ))}
-              </div>
-            )}
           </div>
         </CardLayout>
 

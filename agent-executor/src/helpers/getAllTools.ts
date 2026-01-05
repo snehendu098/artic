@@ -1,18 +1,45 @@
 import { StructuredToolInterface } from "@langchain/core/tools";
 import { ToolDependencies } from "../types/tools";
 import {
-  createSendTransactionTool,
-  createSwapTool,
   createGetBalanceTool,
-  createGetTokenListTool,
-} from "../tools";
+  createTransferTool,
+  createOkxSwapTool,
+  createOneInchSwapTool,
+  createOpenOceanSwapTool,
+  createUniswapSwapTool,
+  createAgniSwapTool,
+  createMerchantMoeSwapTool,
+  createLendleSupplyTool,
+  createLendleWithdrawTool,
+  createLendleBorrowTool,
+  createLendleRepayTool,
+  createCrossChainSwapTool,
+  createApproveTokenTool,
+  createCheckAllowanceTool,
+} from "../tools/mantle";
 
 export const getAllTools = (deps: ToolDependencies) => {
   return [
-    createSendTransactionTool(deps),
-    createSwapTool(deps),
+    // Utility
     createGetBalanceTool(deps),
-    createGetTokenListTool(deps),
+    createApproveTokenTool(deps),
+    createCheckAllowanceTool(deps),
+    // Transfer
+    createTransferTool(deps),
+    // Swaps
+    createOkxSwapTool(deps),
+    createOneInchSwapTool(deps),
+    createOpenOceanSwapTool(deps),
+    createUniswapSwapTool(deps),
+    createAgniSwapTool(deps),
+    createMerchantMoeSwapTool(deps),
+    // Lendle
+    createLendleSupplyTool(deps),
+    createLendleWithdrawTool(deps),
+    createLendleBorrowTool(deps),
+    createLendleRepayTool(deps),
+    // Cross-chain
+    createCrossChainSwapTool(deps),
   ];
 };
 

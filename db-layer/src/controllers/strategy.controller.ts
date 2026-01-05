@@ -13,6 +13,7 @@ import {
   publishStrategy,
   editStrategy,
 } from "../db/actions";
+import { cached, cacheDelete, CacheKeys, TTL } from "../utils/cache";
 
 interface CreateStrategyRequest {
   wallet: string;
@@ -99,6 +100,14 @@ export const createStrategyHandler = async (c: Context<Env>) => {
       delegationWalletId: body.delegationWalletId,
     });
 
+    // Invalidate caches
+    await cacheDelete(c.env.ARTIC, [
+      CacheKeys.myStrategies(body.wallet),
+      CacheKeys.marketplace(),
+      CacheKeys.subscriptions(body.wallet),
+      CacheKeys.botActive(),
+    ]);
+
     return c.json(
       {
         success: true,
@@ -134,8 +143,15 @@ export const getMyStrategies = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
-    const strategies = await getStrategiesByCreator(database, wallet);
+    const strategies = await cached(
+      c.env.ARTIC,
+      CacheKeys.myStrategies(wallet),
+      TTL.MY_STRATEGIES,
+      async () => {
+        const database = db(c.env.DATABASE_URL);
+        return getStrategiesByCreator(database, wallet);
+      }
+    );
 
     return c.json(
       {
@@ -159,8 +175,15 @@ export const getMyStrategies = async (c: Context<Env>) => {
 
 export const getMarketplaceStrategies = async (c: Context<Env>) => {
   try {
-    const database = db(c.env.DATABASE_URL);
-    const strategies = await getPublicStrategies(database);
+    const strategies = await cached(
+      c.env.ARTIC,
+      CacheKeys.marketplace(),
+      TTL.MARKETPLACE,
+      async () => {
+        const database = db(c.env.DATABASE_URL);
+        return getPublicStrategies(database);
+      }
+    );
 
     return c.json(
       {
@@ -182,16 +205,10 @@ export const getMarketplaceStrategies = async (c: Context<Env>) => {
   }
 };
 
-// UUID validation regex
-
 export const getStrategyDetailsHandler = async (c: Context<Env>) => {
   try {
-    console.log("1");
-
     const id = c.req.param("id");
     const userWallet = c.req.header("X-User-Wallet");
-
-    console.log("2", id, userWallet);
 
     if (!id) {
       return c.json(
@@ -204,13 +221,9 @@ export const getStrategyDetailsHandler = async (c: Context<Env>) => {
       );
     }
 
+    // No caching - response is user-specific (isCreator, isOwned, isPurchased, subscription)
     const database = db(c.env.DATABASE_URL);
-
-    console.log("3");
-
     const details = await getStrategyDetails(database, id, userWallet);
-
-    console.log(details);
 
     if (!details) {
       return c.json(
@@ -274,6 +287,9 @@ export const updateStrategyHandler = async (c: Context<Env>) => {
         404,
       );
     }
+
+    // Invalidate caches
+    await cacheDelete(c.env.ARTIC, [CacheKeys.marketplace()]);
 
     return c.json(
       {
@@ -340,6 +356,12 @@ export const activateStrategyHandler = async (c: Context<Env>) => {
       );
     }
 
+    // Invalidate caches
+    await cacheDelete(c.env.ARTIC, [
+      CacheKeys.subscriptions(body.wallet),
+      CacheKeys.botActive(),
+    ]);
+
     return c.json(
       { success: true, message: "Strategy activated", data: strategy },
       200,
@@ -394,6 +416,9 @@ export const publishStrategyHandler = async (c: Context<Env>) => {
         404,
       );
     }
+
+    // Invalidate caches
+    await cacheDelete(c.env.ARTIC, [CacheKeys.marketplace()]);
 
     return c.json(
       { success: true, message: "Strategy published", data: strategy },
@@ -454,6 +479,12 @@ export const editStrategyHandler = async (c: Context<Env>) => {
       protocols: body.protocols,
       priceMnt: body.priceMnt,
     });
+
+    // Invalidate caches
+    await cacheDelete(c.env.ARTIC, [
+      CacheKeys.marketplace(),
+      CacheKeys.myStrategies(body.wallet),
+    ]);
 
     return c.json(
       { success: true, message: "Strategy updated", data: strategy },
