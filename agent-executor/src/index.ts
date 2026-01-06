@@ -12,6 +12,14 @@ interface Env {
   ACCOUNT_ID: string;
 }
 
+interface ExecutionMetadata {
+  subscriptionId: string;
+  strategyId: string;
+  strategyName: string;
+  walletAddress: string;
+  startedAt: string;
+}
+
 const app = new Hono<{ Bindings: Env }>();
 
 app.get("/", (c) => {
@@ -25,12 +33,18 @@ app.post("/send", async (c) => {
     subscriptionId,
     delegationWalletId,
     recentActions,
+    strategyId,
+    strategyName,
+    walletAddress,
   } = (await c.req.json()) as {
     privateKey: string;
     strategy: string;
     subscriptionId: string;
     delegationWalletId: string;
     recentActions: RecentAction[];
+    strategyId?: string;
+    strategyName?: string;
+    walletAddress?: string;
   };
 
   // Check if subscription is already running
@@ -51,6 +65,21 @@ app.post("/send", async (c) => {
     `events:${subscriptionId}`,
     JSON.stringify({ status: "running", events: [] }),
   );
+
+  // Store wallet-indexed execution metadata for terminal tracking
+  if (walletAddress) {
+    const metadata: ExecutionMetadata = {
+      subscriptionId,
+      strategyId: strategyId || "",
+      strategyName: strategyName || "Unknown Strategy",
+      walletAddress,
+      startedAt: new Date().toISOString(),
+    };
+    await c.env.EVENTS.put(
+      `execution:${walletAddress}`,
+      JSON.stringify(metadata),
+    );
+  }
 
   // Fire and forget - execute in background
   c.executionCtx.waitUntil(
@@ -83,6 +112,11 @@ app.post("/send", async (c) => {
       }
 
       await eventLogger.flush();
+
+      // Clear wallet execution tracking
+      if (walletAddress) {
+        await c.env.EVENTS.delete(`execution:${walletAddress}`);
+      }
     })(),
   );
 
@@ -97,6 +131,34 @@ app.get("/events/:subscriptionId", async (c) => {
   )) as EventsState | null;
 
   return c.json(data || { events: [], status: "idle" });
+});
+
+// Get current execution for a wallet (for terminal monitoring)
+app.get("/current-execution/:wallet", async (c) => {
+  const wallet = c.req.param("wallet");
+  const metadata = (await c.env.EVENTS.get(
+    `execution:${wallet}`,
+    "json",
+  )) as ExecutionMetadata | null;
+
+  if (!metadata) {
+    return c.json({ executing: false, data: null });
+  }
+
+  // Also get the events for this execution
+  const events = (await c.env.EVENTS.get(
+    `events:${metadata.subscriptionId}`,
+    "json",
+  )) as EventsState | null;
+
+  return c.json({
+    executing: true,
+    data: {
+      ...metadata,
+      status: events?.status || "running",
+      events: events?.events || [],
+    },
+  });
 });
 
 export default app;

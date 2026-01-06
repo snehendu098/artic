@@ -6,12 +6,13 @@ import Link from "next/link";
 import { ReactNode } from "react";
 
 interface SplitPanelLayoutProps {
-  backUrl: string;
-  title: string;
-  subtitle: string;
+  backUrl?: string;
+  title?: string;
+  subtitle?: string;
   children: ReactNode;
   sidePanel?: ReactNode;
   isPanelOpen: boolean;
+  showHeader?: boolean;
 }
 
 const SplitPanelLayout = ({
@@ -21,6 +22,7 @@ const SplitPanelLayout = ({
   children,
   sidePanel,
   isPanelOpen,
+  showHeader = true,
 }: SplitPanelLayoutProps) => {
   return (
     <div className="w-full h-full relative">
@@ -30,21 +32,25 @@ const SplitPanelLayout = ({
             x: isPanelOpen ? 0 : "33.33%",
           }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          className="w-[60%] flex-shrink-0"
+          className="w-[60%] shrink-0"
         >
-          <div className="flex items-center gap-3">
-            <Link href={backUrl}>
-              <button className="p-1.5 bg-neutral-700 border border-neutral-600 hover:border-primary/50 transition-all duration-200 group">
-                <ArrowLeft className="w-4 h-4 group-hover:text-primary transition-colors" />
-              </button>
-            </Link>
-            <div>
-              <p className="text-xs text-white/50">{subtitle}</p>
-              <p className="uppercase">{title}</p>
+          {showHeader && backUrl && (
+            <div className="flex items-center gap-3">
+              <Link href={backUrl}>
+                <button className="p-1.5 bg-neutral-700 border border-neutral-600 hover:border-primary/50 transition-all duration-200 group">
+                  <ArrowLeft className="w-4 h-4 group-hover:text-primary transition-colors" />
+                </button>
+              </Link>
+              <div>
+                <p className="text-xs text-white/50">{subtitle}</p>
+                <p className="uppercase">{title}</p>
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="w-full mt-4">{children}</div>
+          <div className={showHeader && backUrl ? "w-full mt-4" : "w-full"}>
+            {children}
+          </div>
         </motion.div>
 
         <AnimatePresence>{sidePanel}</AnimatePresence>

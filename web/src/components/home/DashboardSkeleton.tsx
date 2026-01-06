@@ -115,27 +115,6 @@ const StrategiesSkeleton = () => (
   </CardLayout>
 );
 
-const ActionsSkeleton = () => (
-  <CardLayout>
-    <div>
-      <p className="text-xs text-white/50">// recent activity</p>
-      <p className="uppercase">Actions</p>
-    </div>
-    <div className="w-full space-y-3 mt-4">
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="p-3 bg-neutral-800 border border-neutral-700">
-          <div className="flex items-start gap-3">
-            <div className="flex-1 min-w-0">
-              <div className="h-3 bg-neutral-700 animate-pulse w-full mb-2" />
-              <div className="h-3 bg-neutral-700 animate-pulse w-16" />
-            </div>
-          </div>
-        </div>
-      ))}
-    </div>
-  </CardLayout>
-);
-
 const DashboardSkeleton = () => {
   return (
     <div className="w-full grid gap-4 grid-cols-6">
@@ -150,7 +129,6 @@ const DashboardSkeleton = () => {
       <div className="col-span-2 space-y-4">
         <WalletsSkeleton />
         <StrategiesSkeleton />
-        <ActionsSkeleton />
       </div>
     </div>
   );

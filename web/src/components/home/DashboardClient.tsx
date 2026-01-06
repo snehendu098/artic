@@ -8,10 +8,12 @@ import StrategiesCard from "@/components/home/cards/StrategiesCard";
 import CombinedAssetCard from "@/components/home/cards/CombinedAssetCard";
 import SubscriptionsCard from "@/components/home/cards/SubscriptionsCard";
 import WalletsCard from "@/components/home/cards/WalletsCard";
-import ActionsCard from "@/components/home/cards/ActionsCard";
 import SubscribersCard from "@/components/home/cards/SubscribersCard";
 import DashboardSkeleton from "@/components/home/DashboardSkeleton";
-import { DashboardDataProvider, useDashboardData } from "@/contexts/DashboardDataContext";
+import {
+  DashboardDataProvider,
+  useDashboardData,
+} from "@/contexts/DashboardDataContext";
 
 const DashboardContent = () => {
   const { isInitialLoading } = useDashboardData();
@@ -35,7 +37,6 @@ const DashboardContent = () => {
       <div className="col-span-2 space-y-4">
         <WalletsCard />
         <StrategiesCard />
-        <ActionsCard />
       </div>
     </div>
   );
@@ -58,7 +59,9 @@ const DashboardClient = () => {
         <Header url="/app/dashboard" showActions={true} />
         <div className="mt-6 flex items-center justify-center min-h-[400px]">
           <div className="text-center">
-            <p className="text-white/50 mb-2">Connect your wallet to view dashboard</p>
+            <p className="text-white/50 mb-2">
+              Connect your wallet to view dashboard
+            </p>
           </div>
         </div>
       </div>

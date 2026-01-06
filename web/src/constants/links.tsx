@@ -1,5 +1,5 @@
 import { LayoutDashboard } from "lucide-react";
-import { IconShoppingCart, IconTrendingUp } from "@tabler/icons-react";
+import { IconShoppingCart, IconTrendingUp, IconActivity } from "@tabler/icons-react";
 import { ReactNode } from "react";
 
 export interface NavLink {
@@ -30,6 +30,12 @@ export const NAV_LINKS: NavLink[] = [
     href: "/app/strategies",
     icon: <IconTrendingUp className="h-5 w-5 shrink-0" />,
     description: "Manage your active strategies",
+  },
+  {
+    label: "Actions",
+    href: "/app/actions",
+    icon: <IconActivity className="h-5 w-5 shrink-0" />,
+    description: "View all wallet actions",
   },
 ];
 

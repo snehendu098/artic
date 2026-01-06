@@ -201,7 +201,7 @@ export default function Home() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
                   whileHover={{ x: 8 }}
-                  className="group grid lg:grid-cols-12 gap-4 sm:gap-8 py-6 sm:py-8 border-b border-border/50 hover:border-primary/30 transition-colors duration-500 cursor-pointer"
+                  className="group grid lg:grid-cols-12 gap-2 sm:gap-8 py-6 sm:py-8 border-b border-border/50 hover:border-primary/30 transition-colors duration-500 cursor-pointer"
                 >
                   <div className="lg:col-span-2">
                     <motion.div
@@ -251,9 +251,11 @@ export default function Home() {
           className="min-h-screen py-20 sm:py-32 opacity-0 snap-start"
         >
           <div className="space-y-12 sm:space-y-16">
-            <h2 className="text-3xl sm:text-4xl font-light">How It Works</h2>
+            <h2 className="text-3xl sm:text-4xl font-light uppercase">
+              How It Works
+            </h2>
 
-            <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
+            <div className="grid gap-2 sm:gap-8 lg:grid-cols-2">
               {[
                 {
                   step: "01",
