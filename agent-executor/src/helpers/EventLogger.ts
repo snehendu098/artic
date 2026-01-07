@@ -14,6 +14,8 @@ export interface EventData {
   args?: Record<string, any>;
   result?: string;
   note?: string;
+  txHash?: string;
+  blockNumber?: string;
   error?: string;
 }
 
@@ -81,6 +83,8 @@ export class EventLogger {
         actionType: "execution" as const,
         description: e.type === "error" ? e.data.error || "Unknown error" : e.data.result || "",
         note: e.data.note || "",
+        txHash: e.data.txHash,
+        blockNumber: e.data.blockNumber,
         status: e.type === "error" ? "failed" : "completed",
         createdAt: new Date(e.timestamp).toISOString(),
       }));

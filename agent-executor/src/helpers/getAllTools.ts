@@ -1,45 +1,39 @@
 import { StructuredToolInterface } from "@langchain/core/tools";
 import { ToolDependencies } from "../types/tools";
 import {
-  createGetBalanceTool,
-  createTransferTool,
-  createOkxSwapTool,
-  createOneInchSwapTool,
-  createOpenOceanSwapTool,
-  createUniswapSwapTool,
-  createAgniSwapTool,
-  createMerchantMoeSwapTool,
-  createLendleSupplyTool,
-  createLendleWithdrawTool,
-  createLendleBorrowTool,
-  createLendleRepayTool,
-  createCrossChainSwapTool,
-  createApproveTokenTool,
-  createCheckAllowanceTool,
-} from "../tools/mantle";
+  createLendleBorrow,
+  createLendleGetPositions,
+  createLendleGetUserAccountData,
+  createLendleRepay,
+  createLendleSupply,
+  createLendleWithdraw,
+  createGetSwapQuote,
+  createExecuteSwap,
+  createGetMethTokenAddress,
+  createMethGetPosition,
+  createSwapToMeth,
+  createSwapFromMeth,
+} from "../tools";
 
 export const getAllTools = (deps: ToolDependencies) => {
   return [
-    // Utility
-    createGetBalanceTool(deps),
-    createApproveTokenTool(deps),
-    createCheckAllowanceTool(deps),
-    // Transfer
-    createTransferTool(deps),
-    // Swaps
-    createOkxSwapTool(deps),
-    createOneInchSwapTool(deps),
-    createOpenOceanSwapTool(deps),
-    createUniswapSwapTool(deps),
-    createAgniSwapTool(deps),
-    createMerchantMoeSwapTool(deps),
-    // Lendle
-    createLendleSupplyTool(deps),
-    createLendleWithdrawTool(deps),
-    createLendleBorrowTool(deps),
-    createLendleRepayTool(deps),
-    // Cross-chain
-    createCrossChainSwapTool(deps),
+    // Lendle: lending protocol
+    createLendleBorrow(deps),
+    createLendleGetPositions(deps),
+    createLendleGetUserAccountData(deps),
+    createLendleRepay(deps),
+    createLendleSupply(deps),
+    createLendleWithdraw(deps),
+
+    // OKX: DEX aggregator
+    createGetSwapQuote(deps),
+    createExecuteSwap(deps),
+
+    // mETH: liquid staking
+    createGetMethTokenAddress(deps),
+    createMethGetPosition(deps),
+    createSwapToMeth(deps),
+    createSwapFromMeth(deps),
   ];
 };
 

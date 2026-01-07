@@ -22,6 +22,8 @@ interface CreateActionRequest {
     | "strategy_created";
   description: string;
   note?: string;
+  txHash?: string;
+  blockNumber?: string;
   status?: "pending" | "completed" | "failed";
   createdAt?: string;
 }

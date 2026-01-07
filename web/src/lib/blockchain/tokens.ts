@@ -40,6 +40,12 @@ const MAINNET_TOKENS: TokenConfig[] = [
     name: "Wrapped Ether",
     decimals: 18,
   },
+  {
+    address: "0x25356aeca4210eF7553140edb9b8026089E49396",
+    symbol: "LEND",
+    name: "Lendle Protocol Token",
+    decimals: 18,
+  },
 ];
 
 // Testnet tokens (Chain ID: 5003)

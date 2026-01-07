@@ -3,6 +3,7 @@ import { Agent } from "./agent";
 import { EventLogger, EventsState } from "./helpers/EventLogger";
 import { formatActions, RecentAction } from "./helpers/formatActions";
 import { KVNamespace } from "@cloudflare/workers-types";
+import { buildProtocolsList } from "./helpers/listProtocols";
 
 interface Env {
   EVENTS: KVNamespace;
@@ -159,6 +160,33 @@ app.get("/current-execution/:wallet", async (c) => {
       events: events?.events || [],
     },
   });
+});
+
+app.get("/protocols/list", async (c) => {
+  try {
+    const protocols = buildProtocolsList();
+    const toolCount = protocols.reduce((sum, p) => sum + p.tools.length, 0);
+
+    return c.json({
+      success: true,
+      data: {
+        protocolCount: protocols.length,
+        toolCount,
+        protocols,
+      },
+    });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to list protocols";
+
+    return c.json(
+      {
+        success: false,
+        error: errorMessage,
+      },
+      500
+    );
+  }
 });
 
 export default app;

@@ -9,6 +9,7 @@ import {
   integer,
   jsonb,
   unique,
+  index,
 } from "drizzle-orm/pg-core";
 
 // ============================================
@@ -152,6 +153,8 @@ export const walletActions = pgTable(
       .notNull(),
     description: text().notNull(),
     note: text(),
+    txHash: text(),
+    blockNumber: text(),
     status: text()
       .$type<"pending" | "completed" | "failed">()
       .default("pending"),
@@ -168,6 +171,7 @@ export const walletActions = pgTable(
       foreignColumns: [delegationWallets.id],
       name: "wallet_actions_delegation_wallet_fk",
     }),
+    index("wallet_actions_tx_hash_idx").on(table.txHash),
   ],
 );
 

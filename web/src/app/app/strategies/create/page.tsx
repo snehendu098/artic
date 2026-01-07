@@ -2,14 +2,25 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, Wallet, Globe, Save, Zap, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  Wallet,
+  Globe,
+  Save,
+  Zap,
+  Loader2,
+  Wrench,
+  ChevronRight,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import CardLayout from "@/components/layouts/card-layout";
+import SplitPanelLayout from "@/components/layouts/split-panel-layout";
 import { useWallets } from "@/hooks/useWallets";
 import { createStrategy } from "@/actions/strategy.actions";
 import { Button } from "@/components/ui/button";
+import { ToolsSelectionPanel } from "@/components/strategies/tools-selection-panel";
 
 type ActionMode = "draft" | "activate" | "list" | null;
 
@@ -17,7 +28,8 @@ const CreateStrategyPage = () => {
   const router = useRouter();
   const { user } = usePrivy();
   const walletAddress = user?.wallet?.address;
-  const { data: wallets, isLoading: walletsLoading } = useWallets(walletAddress);
+  const { data: wallets, isLoading: walletsLoading } =
+    useWallets(walletAddress);
 
   const [name, setName] = useState("");
   const [strategyCode, setStrategyCode] = useState("");
@@ -26,6 +38,17 @@ const CreateStrategyPage = () => {
   const [price, setPrice] = useState("");
   const [alsoActivate, setAlsoActivate] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedTools, setSelectedTools] = useState<string[]>([]);
+  const [isToolsPanelOpen, setIsToolsPanelOpen] = useState(true);
+
+  const extractProtocolsFromTools = (tools: string[]): string[] => {
+    const protocols = new Set<string>();
+    tools.forEach((tool) => {
+      const protocol = tool.split("_")[0];
+      protocols.add(protocol);
+    });
+    return Array.from(protocols);
+  };
 
   const handleCodeKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Tab") {
@@ -52,7 +75,7 @@ const CreateStrategyPage = () => {
       const result = await createStrategy(walletAddress, {
         name,
         strategyCode,
-        protocols: [],
+        protocols: extractProtocolsFromTools(selectedTools),
         status: actionMode === "draft" ? "draft" : "active",
         isPublic: actionMode === "list",
         priceMnt: actionMode === "list" && price ? price : null,
@@ -75,7 +98,19 @@ const CreateStrategyPage = () => {
   const canSubmit = name.trim() && strategyCode.trim();
 
   return (
-    <div className="w-full h-full">
+    <SplitPanelLayout
+      isPanelOpen={isToolsPanelOpen}
+      showHeader={false}
+      sidePanel={
+        isToolsPanelOpen && (
+          <ToolsSelectionPanel
+            onClose={() => setIsToolsPanelOpen(false)}
+            selectedTools={selectedTools}
+            onToolsChange={setSelectedTools}
+          />
+        )
+      }
+    >
       <div className="w-full max-w-5xl mx-auto space-y-4">
         {/* Header */}
         <div className="flex items-center gap-3">
@@ -105,6 +140,24 @@ const CreateStrategyPage = () => {
             />
           </div>
         </CardLayout>
+
+        {/* Select Tools Button */}
+        <button
+          onClick={() => setIsToolsPanelOpen(!isToolsPanelOpen)}
+          className="flex items-center gap-2 px-4 py-2 bg-neutral-900 border border-neutral-700 hover:border-primary/50 transition-all w-full"
+        >
+          <Wrench className="w-4 h-4" />
+          <span className="text-sm">
+            {selectedTools.length > 0
+              ? `${selectedTools.length} tools selected`
+              : "Select Tools"}
+          </span>
+          <ChevronRight
+            className={`w-4 h-4 transition-transform ml-auto ${
+              isToolsPanelOpen ? "rotate-90" : ""
+            }`}
+          />
+        </button>
 
         {/* Strategy Code Editor */}
         <CardLayout>
@@ -342,7 +395,7 @@ const CreateStrategyPage = () => {
           </Button>
         </div>
       </div>
-    </div>
+    </SplitPanelLayout>
   );
 };
 

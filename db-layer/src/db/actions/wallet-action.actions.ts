@@ -11,6 +11,8 @@ export interface WalletAction {
   actionType: ActionType;
   description: string;
   note: string | null;
+  txHash: string | null;
+  blockNumber: string | null;
   status: ActionStatus;
   createdAt: Date | null;
 }
@@ -21,6 +23,8 @@ export interface CreateWalletActionParams {
   actionType: ActionType;
   description: string;
   note?: string;
+  txHash?: string;
+  blockNumber?: string;
   status?: ActionStatus;
   createdAt?: Date | string;
 }
@@ -41,6 +45,8 @@ export const createWalletAction = async (
       actionType: params.actionType,
       description: params.description,
       note: params.note,
+      txHash: params.txHash,
+      blockNumber: params.blockNumber,
       status: params.status ?? "completed",
       createdAt,
     })
@@ -66,6 +72,8 @@ export interface WalletActionWithDetails {
   actionType: ActionType;
   description: string;
   note: string | null;
+  txHash: string | null;
+  blockNumber: string | null;
   status: ActionStatus;
   createdAt: Date | null;
   strategyName: string | null;
@@ -102,6 +110,8 @@ export const getActionsByWallet = async (
       actionType: walletActions.actionType,
       description: walletActions.description,
       note: walletActions.note,
+      txHash: walletActions.txHash,
+      blockNumber: walletActions.blockNumber,
       status: walletActions.status,
       createdAt: walletActions.createdAt,
       strategyName: strategies.name,

@@ -1,1 +1,1 @@
-export * from "./mantle";
+export * from "./kit";
