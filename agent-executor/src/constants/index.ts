@@ -8,7 +8,7 @@ interface TokenConfig {
 // Mainnet tokens (Chain ID: 5000)
 const MAINNET_TOKENS: TokenConfig[] = [
   {
-    address: "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
+    address: "0x09Bc4E0D10C81b3a3766c49F0f98a8aaa7adA8D2",
     symbol: "USDC",
     name: "USD Coin",
     decimals: 6,
@@ -43,6 +43,24 @@ const MAINNET_TOKENS: TokenConfig[] = [
     name: "Lendle Protocol Token",
     decimals: 18,
   },
+  {
+    address: "0xCAbAE6f6Ea1ecaB08Ad02fE02ce9A44F09aebfA2",
+    symbol: "WBTC",
+    name: "Wrapped Bitcoin",
+    decimals: 8,
+  },
+  {
+    address: "0xc96de26018a54d51c097160568752c4e3bd6c364",
+    symbol: "FBTC",
+    name: "Fractal Bitcoin",
+    decimals: 8,
+  },
+  {
+    address: "0xf83bcc06D6A4A5682adeCA11CF9500f67bFe61AE",
+    symbol: "PENDLE",
+    name: "Pendle",
+    decimals: 18,
+  },
 ];
 
 // Testnet tokens (Chain ID: 5003)
@@ -74,6 +92,47 @@ interface ProtocolMetadata {
 }
 
 const PROTOCOL_METADATA: Record<string, ProtocolMetadata> = {
+  pyth: {
+    name: "Pyth Network",
+    description: "Oracle protocol providing real-time price feeds for token pairs with confidence intervals",
+    tools: [
+      {
+        name: "pyth_get_price",
+        shortDesc: "Get current price for token pair/feed",
+        longDesc: "Pyth Network is an oracle protocol providing price feeds. This tool retrieves current price for specific token pair or price feed ID with confidence interval and metadata.",
+      },
+      {
+        name: "pyth_get_ema_price",
+        shortDesc: "Get exponential moving average price",
+        longDesc: "Pyth Network is an oracle protocol providing price feeds. This tool retrieves EMA price for token pair with confidence data.",
+      },
+      {
+        name: "pyth_get_token_price",
+        shortDesc: "Get price data for token address",
+        longDesc: "Pyth Network is an oracle protocol providing price feeds. This tool retrieves price data for token by contract address with USD valuation.",
+      },
+      {
+        name: "pyth_get_multiple_prices",
+        shortDesc: "Get prices for multiple identifiers",
+        longDesc: "Pyth Network is an oracle protocol providing price feeds. This tool retrieves price data for multiple token pairs/feeds in single call.",
+      },
+      {
+        name: "pyth_get_supported_feeds",
+        shortDesc: "List all supported price feeds",
+        longDesc: "Pyth Network is an oracle protocol providing price feeds. This tool returns mapping of all available price feed identifiers and pair names.",
+      },
+      {
+        name: "pyth_get_supported_tokens",
+        shortDesc: "List all supported token addresses",
+        longDesc: "Pyth Network is an oracle protocol providing price feeds. This tool returns mapping of token contract addresses to Pyth feed information.",
+      },
+      {
+        name: "pyth_feed_exists",
+        shortDesc: "Check if price feed exists",
+        longDesc: "Pyth Network is an oracle protocol providing price feeds. This tool checks whether specific price feed identifier or token address is supported.",
+      },
+    ],
+  },
   lendle: {
     name: "Lendle",
     description: "Lending protocol on Mantle for supplying collateral, borrowing assets, earning yield",

@@ -11,7 +11,7 @@
         "@langchain/langgraph": "^1.0.7",
         "hono": "^4.11.3",
         "langchain": "^1.2.3",
-        "mantle-agent-kit-sdk": "^1.0.4",
+        "mantle-agent-kit-sdk": "^1.1.2",
         "viem": "^2.43.3",
         "zod": "^4.2.1",
       },
@@ -340,7 +340,7 @@
 
     "langsmith": ["langsmith@0.4.2", "", { "dependencies": { "@types/uuid": "^10.0.0", "chalk": "^4.1.2", "console-table-printer": "^2.12.1", "p-queue": "^6.6.2", "semver": "^7.6.3", "uuid": "^10.0.0" }, "peerDependencies": { "@opentelemetry/api": "*", "@opentelemetry/exporter-trace-otlp-proto": "*", "@opentelemetry/sdk-trace-base": "*", "openai": "*" }, "optionalPeers": ["@opentelemetry/api", "@opentelemetry/exporter-trace-otlp-proto", "@opentelemetry/sdk-trace-base", "openai"] }, "sha512-BvBeFgSmR9esl8x5wsiDlALiHKKPybw2wE2Hh6x1tgSZki46H9c9KI9/06LARbPhyyDu/TZU7exfg6fnhdj1Qg=="],
 
-    "mantle-agent-kit-sdk": ["mantle-agent-kit-sdk@1.0.4", "", { "dependencies": { "axios": "^1.13.2", "crypto-js": "^4.2.0", "viem": "^2.43.3", "web3": "^4.16.0" }, "peerDependencies": { "typescript": "^5" } }, "sha512-FBTSuoy1WNPR1mEkZK6F74KWWCAa4FmT3o+lAol9WlciNnhdBZl4MMZ6PC3m/QtXt5PZoheicc1WxjuNZnGy9A=="],
+    "mantle-agent-kit-sdk": ["mantle-agent-kit-sdk@1.1.2", "", { "dependencies": { "axios": "^1.13.2", "crypto-js": "^4.2.0", "viem": "^2.43.3", "web3": "^4.16.0" }, "peerDependencies": { "typescript": "^5" } }, "sha512-XtoPz7dIRcmJSvIv1EYK7el+8PgEkhKUy+LkXMAPSHWK8omsw10VpKtwM6IBJn6lhS1yrkvez2MRUI1Kd6dtvQ=="],
 
     "math-intrinsics": ["math-intrinsics@1.1.0", "", {}, "sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g=="],
 

@@ -1,6 +1,13 @@
 import { StructuredToolInterface } from "@langchain/core/tools";
 import { ToolDependencies } from "../types/tools";
 import {
+  createPythGetPrice,
+  createPythGetEmaPrice,
+  createPythGetTokenPrice,
+  createPythGetMultiplePrices,
+  createPythGetSupportedFeeds,
+  createPythGetSupportedTokens,
+  createPythFeedExists,
   createLendleBorrow,
   createLendleGetPositions,
   createLendleGetUserAccountData,
@@ -17,6 +24,15 @@ import {
 
 export const getAllTools = (deps: ToolDependencies) => {
   return [
+    // Pyth: price oracles
+    createPythGetPrice(deps),
+    createPythGetEmaPrice(deps),
+    createPythGetTokenPrice(deps),
+    createPythGetMultiplePrices(deps),
+    createPythGetSupportedFeeds(deps),
+    createPythGetSupportedTokens(deps),
+    createPythFeedExists(deps),
+
     // Lendle: lending protocol
     createLendleBorrow(deps),
     createLendleGetPositions(deps),

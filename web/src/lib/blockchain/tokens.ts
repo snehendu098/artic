@@ -11,7 +11,7 @@ export interface TokenConfig {
 // Mainnet tokens (Chain ID: 5000)
 const MAINNET_TOKENS: TokenConfig[] = [
   {
-    address: "0x09Bc4E0D864854c6aFB6eB9A9cdF58aC190D0dF9",
+    address: "0x09Bc4E0D10C81b3a3766c49F0f98a8aaa7adA8D2",
     symbol: "USDC",
     name: "USD Coin",
     decimals: 6,
@@ -44,6 +44,24 @@ const MAINNET_TOKENS: TokenConfig[] = [
     address: "0x25356aeca4210eF7553140edb9b8026089E49396",
     symbol: "LEND",
     name: "Lendle Protocol Token",
+    decimals: 18,
+  },
+  {
+    address: "0xCAbAE6f6Ea1ecaB08Ad02fE02ce9A44F09aebfA2",
+    symbol: "WBTC",
+    name: "Wrapped Bitcoin",
+    decimals: 8,
+  },
+  {
+    address: "0xc96de26018a54d51c097160568752c4e3bd6c364",
+    symbol: "FBTC",
+    name: "Fractal Bitcoin",
+    decimals: 8,
+  },
+  {
+    address: "0xf83bcc06D6A4A5682adeCA11CF9500f67bFe61AE",
+    symbol: "PENDLE",
+    name: "Pendle",
     decimals: 18,
   },
 ];

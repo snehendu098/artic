@@ -13,6 +13,7 @@ const protocols = [
   { name: "Lendle", logo: "/protocols/lendle.jpg" },
   { name: "mETH", logo: "/protocols/meth.png" },
   { name: "OKX", logo: "/protocols/okx.png" },
+  { name: "Pyth", logo: "/protocols/pyth.png" },
 ];
 
 const features = [
@@ -43,7 +44,6 @@ export default function Home() {
         <div className="w-full flex items-center justify-between py-10">
           <div className="flex items-center space-x-2">
             <Image src={"/logo.png"} height={30} width={30} alt="logo" />
-            <p className="text-2xl uppercase">rtic</p>
           </div>
 
           <div>
