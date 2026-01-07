@@ -4,12 +4,12 @@ import {
   PrivateKeyAccount,
   publicActions,
 } from "viem";
-import { mantle } from "viem/chains";
+import { mantle, mantleSepoliaTestnet } from "viem/chains";
 
 export const initClients = (account: PrivateKeyAccount) => {
   const walletClient = createWalletClient({
     account,
-    chain: mantle,
+    chain: mantleSepoliaTestnet,
     transport: http(),
   }).extend(publicActions);
 

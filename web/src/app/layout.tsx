@@ -3,7 +3,6 @@ import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import PrivyProviderMain from "@/components/providers/privy-provider";
-import CoreLayout from "@/components/layouts/core-layout";
 
 const jetbrainsmono = JetBrains_Mono({
   variable: "--font-geist-sans",

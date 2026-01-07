@@ -107,10 +107,6 @@ ${tokenData}
 
 `;
 
-      console.log(systemPrompt);
-
-      console.log(this.walletClient.chain.id);
-
       const toolInputs = tools
         .map(
           (item) => `
@@ -130,6 +126,8 @@ PREVIOUS ACTIONS WITH NOTES:
 ${actions}
 `;
 
+      console.log(toolInputs);
+
       const mainAgent = createAgent({
         model: this.model,
         tools,
@@ -138,6 +136,8 @@ ${actions}
       const result = await mainAgent.invoke({
         messages: [new SystemMessage(systemPrompt), new HumanMessage(prompt)],
       });
+
+      console.log(result);
 
       return result;
     } catch (err: any) {
@@ -148,31 +148,31 @@ ${actions}
 
   async execute(strategy: string, actions: string) {
     try {
-      // await this.eventLogger.emit({
-      //   type: "orchestrating",
-      //   data: { note: "Analyzing strategy and selecting tools" },
-      // });
+      await this.eventLogger.emit({
+        type: "orchestrating",
+        data: { note: "Analyzing strategy and selecting tools" },
+      });
 
       const { toolNames } = await this.orchestrate(strategy);
 
       console.log(toolNames);
 
-      // await this.eventLogger.emit({
-      //   type: "tools_selected",
-      //   data: {
-      //     tools: toolNames,
-      //     note: `Selected ${toolNames.length} tool(s)`,
-      //   },
-      // });
+      await this.eventLogger.emit({
+        type: "tools_selected",
+        data: {
+          tools: toolNames,
+          note: `Selected ${toolNames.length} tool(s)`,
+        },
+      });
 
-      // const result = await this.messageAgent(strategy, actions, toolNames);
+      const result = await this.messageAgent(strategy, actions, toolNames);
 
-      // await this.eventLogger.emit({
-      //   type: "completed",
-      //   data: { note: "Strategy execution completed" },
-      // });
+      await this.eventLogger.emit({
+        type: "completed",
+        data: { note: "Strategy execution completed" },
+      });
 
-      return toolNames.join("");
+      return result;
     } catch (err: any) {
       console.log("execute error:", err);
       throw err;
@@ -230,6 +230,8 @@ ${strategy}
           new HumanMessage(orchestratorInput),
         ],
       });
+
+      console.log("orch", result);
 
       // Runtime validate with zod
       const parsed = OrchestratorOutput.parse(result.structuredResponse);

@@ -289,21 +289,18 @@ export const createLendleRepay = (deps: ToolDependencies) => {
 export const createLendleGetUserAccountData = (deps: ToolDependencies) => {
   const meta = getToolMetadata("lendle_get_user_account_data");
   return tool(
-    async ({ userAddress }) => {
+    async () => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
         type: "tools_selected",
         data: {
           tool: "lendle_get_user_account_data",
-          args: { userAddress },
         },
       });
 
       try {
-        const accountData = await mntAgentKit.lendleGetUserAccountData(
-          userAddress as Address | undefined,
-        );
+        const accountData = await mntAgentKit.lendleGetUserAccountData();
 
         await eventLogger.emit({
           type: "tool_result",
@@ -332,14 +329,7 @@ export const createLendleGetUserAccountData = (deps: ToolDependencies) => {
     {
       name: meta.name,
       description: meta.longDesc,
-      schema: z.object({
-        userAddress: z
-          .string()
-          .optional()
-          .describe(
-            "optional user address to query, defaults to agent account",
-          ),
-      }),
+      schema: z.object({}),
     },
   );
 };
@@ -347,21 +337,18 @@ export const createLendleGetUserAccountData = (deps: ToolDependencies) => {
 export const createLendleGetPositions = (deps: ToolDependencies) => {
   const meta = getToolMetadata("lendle_get_positions");
   return tool(
-    async ({ userAddress }) => {
+    async () => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
         type: "tools_selected",
         data: {
           tool: "lendle_get_positions",
-          args: { userAddress },
         },
       });
 
       try {
-        const positions = await mntAgentKit.lendleGetPositions(
-          userAddress as Address | undefined,
-        );
+        const positions = await mntAgentKit.lendleGetPositions();
 
         await eventLogger.emit({
           type: "tool_result",
@@ -390,14 +377,7 @@ export const createLendleGetPositions = (deps: ToolDependencies) => {
     {
       name: meta.name,
       description: meta.longDesc,
-      schema: z.object({
-        userAddress: z
-          .string()
-          .optional()
-          .describe(
-            "optional user address to query, defaults to agent account",
-          ),
-      }),
+      schema: z.object({}),
     },
   );
 };

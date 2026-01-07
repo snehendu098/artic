@@ -14,7 +14,7 @@
     "@langchain/langgraph": "^1.0.7",
     "hono": "^4.11.3",
     "langchain": "^1.2.3",
-    "mantle-agent-kit-sdk": "^1.0.4",
+    "mantle-agent-kit-sdk": "^1.1.0",
     "viem": "^2.43.3",
     "zod": "^4.2.1"
   },
