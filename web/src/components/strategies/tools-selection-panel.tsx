@@ -62,7 +62,7 @@ export const ToolsSelectionPanel = ({
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className="w-[40%] mt-[52px]"
     >
-      <CardLayout>
+      <CardLayout className="max-h-[78vh] overflow-y-auto flex flex-col">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div>

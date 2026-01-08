@@ -184,7 +184,7 @@ app.get("/protocols/list", async (c) => {
         success: false,
         error: errorMessage,
       },
-      500
+      500,
     );
   }
 });

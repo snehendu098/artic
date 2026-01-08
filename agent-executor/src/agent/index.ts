@@ -75,7 +75,6 @@ Your INPUTS:
 
 STRATEGY: The main strategy which you have to execute with a given set of tools
 TOOLS: A list of tools with metadata of each which will include the name, parameters to invoke that tools
-PREVIOUS ACTIONS WITH NOTES: A set of previous actions that has been implemented for execution that strategy with their corresponding notes which indicate any additional information about the executed action
 
 IMPORTANT NOTES:
 - Strategies will be in plaintext
@@ -105,6 +104,7 @@ ${tokenData}
 
 2. In mantle network if the user stategy specifies to monitor ETH for price or something else, you should consider WETH
 
+
 `;
 
       const toolInputs = tools
@@ -122,11 +122,8 @@ STRATEGY: ${strategy}
 TOOLS:
 ${toolInputs}
 
-PREVIOUS ACTIONS WITH NOTES:
-${actions}
+CURRENT TIME: ${new Date().toLocaleDateString()}
 `;
-
-      console.log(toolInputs);
 
       const mainAgent = createAgent({
         model: this.model,
@@ -136,8 +133,6 @@ ${actions}
       const result = await mainAgent.invoke({
         messages: [new SystemMessage(systemPrompt), new HumanMessage(prompt)],
       });
-
-      console.log(result);
 
       return result;
     } catch (err: any) {
@@ -154,8 +149,6 @@ ${actions}
       });
 
       const { toolNames } = await this.orchestrate(strategy);
-
-      console.log(toolNames);
 
       await this.eventLogger.emit({
         type: "tools_selected",
@@ -230,8 +223,6 @@ ${strategy}
           new HumanMessage(orchestratorInput),
         ],
       });
-
-      console.log("orch", result);
 
       // Runtime validate with zod
       const parsed = OrchestratorOutput.parse(result.structuredResponse);

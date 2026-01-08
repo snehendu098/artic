@@ -211,6 +211,22 @@ const PROTOCOL_METADATA: Record<string, ProtocolMetadata> = {
       },
     ],
   },
+  oneinch: {
+    name: "1inch",
+    description: "DEX aggregator providing optimal swap routes and quotes across multiple DeFi protocols",
+    tools: [
+      {
+        name: "oneinch_get_quote",
+        shortDesc: "Get swap quote for token pair",
+        longDesc: "1inch is a DEX aggregator that finds optimal swap routes across multiple DEXs. This tool retrieves a swap quote for the specified token pair and amount, showing the best route and expected output amount.",
+      },
+      {
+        name: "oneinch_swap",
+        shortDesc: "Execute token swap on 1inch",
+        longDesc: "Execute a token swap on 1inch protocol with optional slippage protection (default 0.5%). Aggregates liquidity across multiple DEXs to find the best execution route.",
+      },
+    ],
+  },
 };
 
 export { PROTOCOL_METADATA, TokenConfig };

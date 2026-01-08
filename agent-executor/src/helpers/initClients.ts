@@ -4,7 +4,7 @@ import {
   PrivateKeyAccount,
   publicActions,
 } from "viem";
-import { mantle, mantleSepoliaTestnet } from "viem/chains";
+import { mantleSepoliaTestnet } from "viem/chains";
 
 export const initClients = (account: PrivateKeyAccount) => {
   const walletClient = createWalletClient({

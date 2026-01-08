@@ -20,6 +20,8 @@ import {
   createMethGetPosition,
   createSwapToMeth,
   createSwapFromMeth,
+  createOneinchGetQuote,
+  createOneinchSwap,
 } from "../tools";
 
 export const getAllTools = (deps: ToolDependencies) => {
@@ -50,6 +52,10 @@ export const getAllTools = (deps: ToolDependencies) => {
     createMethGetPosition(deps),
     createSwapToMeth(deps),
     createSwapFromMeth(deps),
+
+    // 1inch: DEX aggregator
+    createOneinchGetQuote(deps),
+    createOneinchSwap(deps),
   ];
 };
 

@@ -10,6 +10,7 @@
 		{
 			"binding": "EVENTS",
 			"id": "a950d3f6b3b54a5b9a5b5ee5636d2f72",
+			"remote": true
 		}
 	],
 	// "vars": {
