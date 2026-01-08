@@ -227,6 +227,55 @@ const PROTOCOL_METADATA: Record<string, ProtocolMetadata> = {
       },
     ],
   },
+  openocean: {
+    name: "OpenOcean",
+    description: "DEX aggregator providing optimal swap routes across multiple DEXs on Mantle",
+    tools: [
+      {
+        name: "openocean_get_quote",
+        shortDesc: "Get swap quote from OpenOcean",
+        longDesc: "OpenOcean is a DEX aggregator that finds optimal swap routes across multiple DEXs. Get a swap quote for the specified token pair and amount.",
+      },
+      {
+        name: "openocean_swap",
+        shortDesc: "Execute token swap via OpenOcean",
+        longDesc: "OpenOcean is a DEX aggregator that finds optimal swap routes across multiple DEXs. Execute a token swap with slippage protection (default 0.5%).",
+      },
+    ],
+  },
+  merchantmoe: {
+    name: "Merchant Moe",
+    description: "Liquidity Book DEX on Mantle with concentrated liquidity (TraderJoe V2.1 architecture)",
+    tools: [
+      {
+        name: "merchantmoe_swap",
+        shortDesc: "Execute token swap on Merchant Moe",
+        longDesc: "Merchant Moe is a Liquidity Book DEX on Mantle using TraderJoe V2.1 architecture. Execute a token swap with concentrated liquidity routing.",
+      },
+    ],
+  },
+  agni: {
+    name: "Agni Finance",
+    description: "Uniswap V3 style DEX on Mantle with concentrated liquidity pools",
+    tools: [
+      {
+        name: "agni_swap",
+        shortDesc: "Execute token swap on Agni Finance",
+        longDesc: "Agni Finance is a Uniswap V3 fork on Mantle. Execute a token swap with fee tier selection (500, 3000, 10000) and slippage protection.",
+      },
+    ],
+  },
+  uniswap: {
+    name: "Uniswap",
+    description: "Uniswap V3 DEX on Mantle with concentrated liquidity pools",
+    tools: [
+      {
+        name: "uniswap_swap",
+        shortDesc: "Execute token swap on Uniswap V3",
+        longDesc: "Uniswap V3 DEX on Mantle. Execute a token swap with fee tier selection (100, 500, 3000, 10000) and slippage protection.",
+      },
+    ],
+  },
 };
 
 export { PROTOCOL_METADATA, TokenConfig };

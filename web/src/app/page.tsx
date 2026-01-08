@@ -15,6 +15,10 @@ const protocols = [
   { name: "OKX", logo: "/protocols/okx.png" },
   { name: "Pyth", logo: "/protocols/pyth.png" },
   { name: "1inch", logo: "/protocols/1inch.png" },
+  { name: "OpenOcean", logo: "/protocols/openocean.jpeg" },
+  { name: "Merchant Moe", logo: "/protocols/merchantmoe.png" },
+  { name: "Agni", logo: "/protocols/agni.jpg" },
+  { name: "Uniswap", logo: "/protocols/uniswap.jpg" },
 ];
 
 const features = [

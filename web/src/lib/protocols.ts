@@ -1,5 +1,24 @@
 export const getProtocolLogoPath = (protocol: string): string => {
-  const normalized = protocol.toLowerCase().split(" ")[0];
-  const extension = normalized === "lendle" ? "jpg" : "png";
-  return `/protocols/${normalized}.${extension}`;
+  const logoMap: Record<string, string> = {
+    lendle: "lendle.jpg",
+    meth: "meth.png",
+    okx: "okx.png",
+    "pyth network": "pyth.png",
+    "1inch": "1inch.png",
+    openocean: "openocean.jpeg",
+    "merchant moe": "merchantmoe.png",
+    "agni finance": "agni.jpg",
+    uniswap: "uniswap.jpg",
+  };
+
+  const normalized = protocol.toLowerCase();
+  const filename = logoMap[normalized];
+
+  if (filename) {
+    return `/protocols/${filename}`;
+  }
+
+  // Fallback: first word + .png
+  const fallback = normalized.split(" ")[0];
+  return `/protocols/${fallback}.png`;
 };

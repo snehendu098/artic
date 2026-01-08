@@ -22,6 +22,11 @@ import {
   createSwapFromMeth,
   createOneinchGetQuote,
   createOneinchSwap,
+  createOpenoceanGetQuote,
+  createOpenoceanSwap,
+  createMerchantmoeSwap,
+  createAgniSwap,
+  createUniswapSwap,
 } from "../tools";
 
 export const getAllTools = (deps: ToolDependencies) => {
@@ -56,6 +61,19 @@ export const getAllTools = (deps: ToolDependencies) => {
     // 1inch: DEX aggregator
     createOneinchGetQuote(deps),
     createOneinchSwap(deps),
+
+    // OpenOcean: DEX aggregator
+    createOpenoceanGetQuote(deps),
+    createOpenoceanSwap(deps),
+
+    // Merchant Moe: Liquidity Book DEX
+    createMerchantmoeSwap(deps),
+
+    // Agni Finance: Uniswap V3 fork
+    createAgniSwap(deps),
+
+    // Uniswap V3: DEX
+    createUniswapSwap(deps),
   ];
 };
 
