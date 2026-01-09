@@ -2,7 +2,7 @@ import { keccak256, toBytes } from "viem";
 
 // Deployed on Mantle Sepolia Testnet
 export const ARTIC_MARKETPLACE_ADDRESS =
-  "0xdD996e8419Ce81Be3D60bF8490D9C3a6C590eb92" as const;
+  "0x18452c228e66BEaD6990Be6E2387cEE3dE441dCA" as const;
 
 // Convert UUID string to bytes32 for contract calls
 export function uuidToBytes32(uuid: string): `0x${string}` {
@@ -46,8 +46,18 @@ export const ARTIC_MARKETPLACE_ABI = [
   {
     anonymous: false,
     inputs: [
-      { indexed: true, internalType: "address", name: "creator", type: "address" },
-      { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "creator",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
     ],
     name: "CreatorWithdraw",
     type: "event",
@@ -55,30 +65,69 @@ export const ARTIC_MARKETPLACE_ABI = [
   {
     anonymous: false,
     inputs: [
-      { indexed: true, internalType: "address", name: "previousOwner", type: "address" },
-      { indexed: true, internalType: "address", name: "newOwner", type: "address" },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "previousOwner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "newOwner",
+        type: "address",
+      },
     ],
     name: "OwnershipTransferred",
     type: "event",
   },
   {
     anonymous: false,
-    inputs: [{ indexed: false, internalType: "uint256", name: "newFeeBps", type: "uint256" }],
+    inputs: [
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "newFeeBps",
+        type: "uint256",
+      },
+    ],
     name: "ProtocolFeeUpdated",
     type: "event",
   },
   {
     anonymous: false,
-    inputs: [{ indexed: true, internalType: "bytes32", name: "strategyId", type: "bytes32" }],
+    inputs: [
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "strategyId",
+        type: "bytes32",
+      },
+    ],
     name: "StrategyDelisted",
     type: "event",
   },
   {
     anonymous: false,
     inputs: [
-      { indexed: true, internalType: "bytes32", name: "strategyId", type: "bytes32" },
-      { indexed: true, internalType: "address", name: "creator", type: "address" },
-      { indexed: false, internalType: "uint256", name: "priceMnt", type: "uint256" },
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "strategyId",
+        type: "bytes32",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "creator",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "priceMnt",
+        type: "uint256",
+      },
     ],
     name: "StrategyListed",
     type: "event",
@@ -86,10 +135,30 @@ export const ARTIC_MARKETPLACE_ABI = [
   {
     anonymous: false,
     inputs: [
-      { indexed: true, internalType: "bytes32", name: "strategyId", type: "bytes32" },
-      { indexed: true, internalType: "address", name: "buyer", type: "address" },
-      { indexed: true, internalType: "address", name: "creator", type: "address" },
-      { indexed: false, internalType: "uint256", name: "priceMnt", type: "uint256" },
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "strategyId",
+        type: "bytes32",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "buyer",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "creator",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "priceMnt",
+        type: "uint256",
+      },
       { indexed: false, internalType: "uint256", name: "fee", type: "uint256" },
     ],
     name: "StrategyPurchased",
@@ -98,8 +167,18 @@ export const ARTIC_MARKETPLACE_ABI = [
   {
     anonymous: false,
     inputs: [
-      { indexed: true, internalType: "bytes32", name: "strategyId", type: "bytes32" },
-      { indexed: false, internalType: "uint256", name: "newPrice", type: "uint256" },
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "strategyId",
+        type: "bytes32",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "newPrice",
+        type: "uint256",
+      },
     ],
     name: "StrategyUpdated",
     type: "event",
@@ -107,10 +186,30 @@ export const ARTIC_MARKETPLACE_ABI = [
   {
     anonymous: false,
     inputs: [
-      { indexed: true, internalType: "bytes32", name: "strategyId", type: "bytes32" },
-      { indexed: true, internalType: "address", name: "owner", type: "address" },
-      { indexed: true, internalType: "address", name: "delegationWallet", type: "address" },
-      { indexed: false, internalType: "uint256", name: "timestamp", type: "uint256" },
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "strategyId",
+        type: "bytes32",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "owner",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "delegationWallet",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
     ],
     name: "Subscribed",
     type: "event",
@@ -118,9 +217,24 @@ export const ARTIC_MARKETPLACE_ABI = [
   {
     anonymous: false,
     inputs: [
-      { indexed: true, internalType: "bytes32", name: "strategyId", type: "bytes32" },
-      { indexed: true, internalType: "address", name: "delegationWallet", type: "address" },
-      { indexed: false, internalType: "uint256", name: "timestamp", type: "uint256" },
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "strategyId",
+        type: "bytes32",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "delegationWallet",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
     ],
     name: "SubscriptionActivated",
     type: "event",
@@ -128,9 +242,24 @@ export const ARTIC_MARKETPLACE_ABI = [
   {
     anonymous: false,
     inputs: [
-      { indexed: true, internalType: "bytes32", name: "strategyId", type: "bytes32" },
-      { indexed: true, internalType: "address", name: "delegationWallet", type: "address" },
-      { indexed: false, internalType: "uint256", name: "timestamp", type: "uint256" },
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "strategyId",
+        type: "bytes32",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "delegationWallet",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
     ],
     name: "SubscriptionPaused",
     type: "event",
@@ -138,25 +267,62 @@ export const ARTIC_MARKETPLACE_ABI = [
   {
     anonymous: false,
     inputs: [
-      { indexed: true, internalType: "bytes32", name: "strategyId", type: "bytes32" },
-      { indexed: true, internalType: "address", name: "oldWallet", type: "address" },
-      { indexed: true, internalType: "address", name: "newWallet", type: "address" },
-      { indexed: false, internalType: "uint256", name: "timestamp", type: "uint256" },
+      {
+        indexed: true,
+        internalType: "bytes32",
+        name: "strategyId",
+        type: "bytes32",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "oldWallet",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "newWallet",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "timestamp",
+        type: "uint256",
+      },
     ],
     name: "SubscriptionWalletUpdated",
     type: "event",
   },
   {
     anonymous: false,
-    inputs: [{ indexed: false, internalType: "address", name: "newTreasury", type: "address" }],
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "newTreasury",
+        type: "address",
+      },
+    ],
     name: "TreasuryUpdated",
     type: "event",
   },
   {
     anonymous: false,
     inputs: [
-      { indexed: true, internalType: "address", name: "treasury", type: "address" },
-      { indexed: false, internalType: "uint256", name: "amount", type: "uint256" },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "treasury",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "amount",
+        type: "uint256",
+      },
     ],
     name: "TreasuryWithdraw",
     type: "event",

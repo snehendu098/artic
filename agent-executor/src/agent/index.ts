@@ -134,6 +134,8 @@ CURRENT TIME: ${new Date().toLocaleDateString()}
         messages: [new SystemMessage(systemPrompt), new HumanMessage(prompt)],
       });
 
+      console.log(result.messages.map((item) => item).join("\n\n"));
+
       return result;
     } catch (err: any) {
       console.log(err);
@@ -226,6 +228,9 @@ ${strategy}
 
       // Runtime validate with zod
       const parsed = OrchestratorOutput.parse(result.structuredResponse);
+
+      console.log("orchestrator response: ", parsed.tools);
+
       return { toolNames: parsed.tools };
     } catch (err: any) {
       console.log("orchestrate error:", err);

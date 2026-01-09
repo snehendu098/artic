@@ -145,6 +145,10 @@ export const walletActions = pgTable(
     actionType: text()
       .$type<
         | "execution"
+        | "orchestration"
+        | "tool_selection"
+        | "tool_call"
+        | "completion"
         | "deposit"
         | "withdrawal"
         | "subscription"

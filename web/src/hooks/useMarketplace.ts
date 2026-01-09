@@ -9,7 +9,7 @@ import {
   type Address,
   parseEther,
 } from "viem";
-import { mantleSepoliaTestnet } from "viem/chains";
+import { mantle } from "viem/chains";
 import {
   ARTIC_MARKETPLACE_ADDRESS,
   ARTIC_MARKETPLACE_ABI,
@@ -39,7 +39,7 @@ export function useMarketplace() {
 
     const provider = await wallet.getEthereumProvider();
     return createWalletClient({
-      chain: mantleSepoliaTestnet,
+      chain: mantle,
       transport: custom(provider),
       account: wallet.address as Address,
     });

@@ -1,5 +1,5 @@
 import { formatUnits, type Address } from "viem";
-import { mantleSepoliaTestnet } from "viem/chains";
+import { mantle } from "viem/chains";
 import { getWalletAssets } from "./assets";
 import { getTokenPrices } from "./prices";
 import { getNativeToken } from "./config";
@@ -11,7 +11,7 @@ import type { Asset, Wallet } from "@/types";
  */
 export async function getWalletBalances(
   addresses: string[],
-  chainId: number = mantleSepoliaTestnet.id,
+  chainId: number = mantle.id,
 ): Promise<WalletBalance[]> {
   const results: WalletBalance[] = [];
 
@@ -41,7 +41,7 @@ export async function getWalletBalances(
  */
 export async function aggregateBalancesToAssets(
   walletAddresses: string[],
-  chainId: number = mantleSepoliaTestnet.id,
+  chainId: number = mantle.id,
 ): Promise<Asset[]> {
   const assetMap = new Map<string, Asset>();
 
@@ -79,9 +79,9 @@ export async function aggregateBalancesToAssets(
 export async function transformWalletBalance(
   delegation: { id: string; name: string; address: string },
   balance: WalletBalance,
-  chainId: number = mantleSepoliaTestnet.id,
+  chainId: number = mantle.id,
 ): Promise<Wallet> {
-  const nativeToken = getNativeToken(chainId);
+  const nativeToken = getNativeToken();
   const symbols = [nativeToken.symbol, ...balance.tokenBalances.map((t) => t.symbol)];
   const prices = await getTokenPrices(symbols);
 

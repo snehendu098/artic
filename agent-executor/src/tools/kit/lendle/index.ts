@@ -11,7 +11,7 @@ export const createLendleSupply = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: {
           tool: "lendle_supply",
           args: { tokenAddress, amount },
@@ -78,7 +78,7 @@ export const createLendleWithdraw = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: {
           tool: "lendle_withdraw",
           args: { tokenAddress, amount, to },
@@ -148,7 +148,7 @@ export const createLendleBorrow = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: {
           tool: "lendle_borrow",
           args: { tokenAddress, amount, interestRateMode, onBehalfOf },
@@ -223,7 +223,7 @@ export const createLendleRepay = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: {
           tool: "lendle_repay",
           args: { tokenAddress, amount, rateMode },
@@ -293,7 +293,7 @@ export const createLendleGetUserAccountData = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: {
           tool: "lendle_get_user_account_data",
         },
@@ -341,7 +341,7 @@ export const createLendleGetPositions = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: {
           tool: "lendle_get_positions",
         },

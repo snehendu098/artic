@@ -10,7 +10,7 @@ export const createGetSwapQuote = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: {
           tool: "okx_get_swap_quote",
           args: { fromTokenAddress, toTokenAddress, amount, slippagePercentage },
@@ -80,7 +80,7 @@ export const createExecuteSwap = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: {
           tool: "okx_execute_swap",
           args: { fromTokenAddress, toTokenAddress, amount, slippagePercentage },

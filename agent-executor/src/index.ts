@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { Agent } from "./agent";
 import { EventLogger, EventsState } from "./helpers/EventLogger";
 import { formatActions, RecentAction } from "./helpers/formatActions";
@@ -22,6 +23,7 @@ interface ExecutionMetadata {
 }
 
 const app = new Hono<{ Bindings: Env }>();
+app.use("/*", cors());
 
 app.get("/", (c) => {
   return c.text("Artic Agent Executor");
@@ -124,6 +126,30 @@ app.post("/send", async (c) => {
   return c.json({ success: true, message: "Execution started" });
 });
 
+// Batch endpoint must come before :subscriptionId to avoid matching "batch" as param
+app.get("/events/batch", async (c) => {
+  const idsParam = c.req.query("subscriptionIds") || "";
+  const ids = idsParam.split(",").filter(Boolean);
+
+  if (!ids.length) {
+    return c.json({ events: [] });
+  }
+
+  const results = await Promise.all(
+    ids.map(async (id) => {
+      const data = (await c.env.EVENTS.get(
+        `events:${id}`,
+        "json",
+      )) as EventsState | null;
+      return data ? { subscriptionId: id, ...data } : null;
+    }),
+  );
+
+  return c.json({
+    events: results.filter((r): r is NonNullable<typeof r> => r !== null),
+  });
+});
+
 app.get("/events/:subscriptionId", async (c) => {
   const subscriptionId = c.req.param("subscriptionId");
   const data = (await c.env.EVENTS.get(
@@ -134,7 +160,6 @@ app.get("/events/:subscriptionId", async (c) => {
   return c.json(data || { events: [], status: "idle" });
 });
 
-// Get current execution for a wallet (for terminal monitoring)
 app.get("/current-execution/:wallet", async (c) => {
   const wallet = c.req.param("wallet");
   const metadata = (await c.env.EVENTS.get(

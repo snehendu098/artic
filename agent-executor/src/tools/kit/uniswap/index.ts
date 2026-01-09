@@ -2,6 +2,7 @@ import { tool } from "langchain";
 import { ToolDependencies } from "../../../types";
 import z from "zod";
 import { getToolMetadata } from "../../../helpers/getToolMetadata";
+import { Address } from "viem";
 
 export const createUniswapSwap = (deps: ToolDependencies) => {
   const meta = getToolMetadata("uniswap_swap");
@@ -10,7 +11,7 @@ export const createUniswapSwap = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: {
           tool: "uniswap_swap",
           args: { tokenIn, tokenOut, amount, slippage, fee },
@@ -18,16 +19,15 @@ export const createUniswapSwap = (deps: ToolDependencies) => {
       });
 
       try {
-        const txHash = await mntAgentKit.uniswapSwap(
-          tokenIn,
-          tokenOut,
+        const txHash = await mntAgentKit.swapOnUniswap(
+          tokenIn as Address,
+          tokenOut as Address,
           amount,
           slippage,
-          fee,
         );
 
         const receipt = await mntAgentKit.client.waitForTransactionReceipt({
-          hash: txHash,
+          hash: txHash.txHash as Address,
         });
 
         await eventLogger.emit({
@@ -60,12 +60,8 @@ export const createUniswapSwap = (deps: ToolDependencies) => {
       name: meta.name,
       description: meta.longDesc,
       schema: z.object({
-        tokenIn: z
-          .string()
-          .describe("Address of the token to swap from"),
-        tokenOut: z
-          .string()
-          .describe("Address of the token to swap to"),
+        tokenIn: z.string().describe("Address of the token to swap from"),
+        tokenOut: z.string().describe("Address of the token to swap to"),
         amount: z
           .string()
           .describe(
@@ -78,7 +74,9 @@ export const createUniswapSwap = (deps: ToolDependencies) => {
         fee: z
           .number()
           .optional()
-          .describe("Pool fee tier: 100 (0.01%), 500 (0.05%), 3000 (0.3%), 10000 (1%). Default: 3000"),
+          .describe(
+            "Pool fee tier: 100 (0.01%), 500 (0.05%), 3000 (0.3%), 10000 (1%). Default: 3000",
+          ),
       }),
     },
   );

@@ -3,6 +3,7 @@
 import CardLayout from "@/components/layouts/card-layout";
 import { Wallet, ArrowRight, Copy, Check } from "lucide-react";
 import CreateWalletDialog from "@/components/dialog/CreateWalletDialog";
+import ViewPrivateKeyDialog from "@/components/dialog/ViewPrivateKeyDialog";
 import Link from "next/link";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -52,7 +53,7 @@ const WalletItem = ({ wallet }: { wallet: DelegationWallet }) => {
 
   return (
     <div className="p-3 bg-neutral-800 border border-neutral-700 hover:border-neutral-600 transition-all duration-200 group cursor-pointer">
-      <div className="flex items-start justify-between">
+      <div className="flex items-center justify-between">
         <div className="flex items-start gap-3">
           <div className="p-2 bg-neutral-700 group-hover:bg-neutral-600 transition-colors">
             <Wallet className="w-4 h-4 text-primary" />
@@ -95,6 +96,10 @@ const WalletItem = ({ wallet }: { wallet: DelegationWallet }) => {
             </div>
           </div>
         </div>
+        <ViewPrivateKeyDialog
+          delegationId={wallet.id}
+          walletName={wallet.name}
+        />
       </div>
     </div>
   );

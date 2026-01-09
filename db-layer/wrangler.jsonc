@@ -6,7 +6,8 @@
 	"kv_namespaces": [
 		{
 			"binding": "ARTIC",
-			"id": "67d36f839ca04174b166b86461a26d87"
+			"id": "67d36f839ca04174b166b86461a26d87",
+			"remote": true
 		}
 	],
 	"compatibility_flags": [

@@ -12,7 +12,7 @@ async function getERC20Balances(
   account: Address,
   chainId: number,
 ): Promise<{ address: Address; symbol: string; name: string; decimals: number; balance: bigint }[]> {
-  const publicClient = getPublicClient(chainId);
+  const publicClient = getPublicClient();
   const tokens = getTokensByChain(chainId);
 
   if (tokens.length === 0) return [];
@@ -44,8 +44,8 @@ export async function getWalletAssets(
   account: Address,
   chainId: number,
 ): Promise<WalletAssetsResult> {
-  const publicClient = getPublicClient(chainId);
-  const nativeToken = getNativeToken(chainId);
+  const publicClient = getPublicClient();
+  const nativeToken = getNativeToken();
   const assets: AssetResult[] = [];
 
   // Fetch native + ERC20 balances in parallel
@@ -103,8 +103,8 @@ export async function getRawWalletBalances(
   account: Address,
   chainId: number,
 ): Promise<RawWalletBalances> {
-  const publicClient = getPublicClient(chainId);
-  const nativeToken = getNativeToken(chainId);
+  const publicClient = getPublicClient();
+  const nativeToken = getNativeToken();
   const assets: RawAsset[] = [];
 
   // Fetch native + ERC20 balances in parallel

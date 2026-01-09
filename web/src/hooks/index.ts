@@ -6,3 +6,5 @@ export { useSubscribers } from "./useSubscribers";
 export { useActions } from "./useActions";
 export { useAssets } from "./useAssets";
 export { usePurchases } from "./usePurchases";
+export { useLiveEvents } from "./useLiveEvents";
+export type { LiveEvent, LiveEventType, LiveEventData } from "./useLiveEvents";

@@ -2,6 +2,7 @@ import { tool } from "langchain";
 import { ToolDependencies } from "../../../types";
 import z from "zod";
 import { getToolMetadata } from "../../../helpers/getToolMetadata";
+import { Address } from "viem";
 
 export const createMerchantmoeSwap = (deps: ToolDependencies) => {
   const meta = getToolMetadata("merchantmoe_swap");
@@ -10,7 +11,7 @@ export const createMerchantmoeSwap = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: {
           tool: "merchantmoe_swap",
           args: { tokenIn, tokenOut, amountIn, slippage },
@@ -19,8 +20,8 @@ export const createMerchantmoeSwap = (deps: ToolDependencies) => {
 
       try {
         const txHash = await mntAgentKit.merchantMoeSwap(
-          tokenIn,
-          tokenOut,
+          tokenIn as Address,
+          tokenOut as Address,
           amountIn,
           slippage,
         );
@@ -59,12 +60,8 @@ export const createMerchantmoeSwap = (deps: ToolDependencies) => {
       name: meta.name,
       description: meta.longDesc,
       schema: z.object({
-        tokenIn: z
-          .string()
-          .describe("Address of the token to swap from"),
-        tokenOut: z
-          .string()
-          .describe("Address of the token to swap to"),
+        tokenIn: z.string().describe("Address of the token to swap from"),
+        tokenOut: z.string().describe("Address of the token to swap to"),
         amountIn: z
           .string()
           .describe(

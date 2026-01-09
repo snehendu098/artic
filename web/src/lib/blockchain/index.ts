@@ -2,7 +2,7 @@
 export { getPublicClient } from "./client";
 
 // Config
-export { SUPPORTED_CHAINS, DEFAULT_CHAIN_ID } from "./config";
+export { SUPPORTED_CHAIN, DEFAULT_CHAIN_ID } from "./config";
 
 // Assets
 export { getRawWalletBalances } from "./assets";

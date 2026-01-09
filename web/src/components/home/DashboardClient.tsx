@@ -1,7 +1,7 @@
 "use client";
 
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { mantleSepoliaTestnet } from "viem/chains";
+import { mantle } from "viem/chains";
 import Header from "@/components/common/Header";
 import OverviewCard from "@/components/home/cards/OverviewCard";
 import StrategiesCard from "@/components/home/cards/StrategiesCard";
@@ -9,19 +9,9 @@ import CombinedAssetCard from "@/components/home/cards/CombinedAssetCard";
 import SubscriptionsCard from "@/components/home/cards/SubscriptionsCard";
 import WalletsCard from "@/components/home/cards/WalletsCard";
 import SubscribersCard from "@/components/home/cards/SubscribersCard";
-import DashboardSkeleton from "@/components/home/DashboardSkeleton";
-import {
-  DashboardDataProvider,
-  useDashboardData,
-} from "@/contexts/DashboardDataContext";
+import { DashboardDataProvider } from "@/contexts/DashboardDataContext";
 
 const DashboardContent = () => {
-  const { isInitialLoading } = useDashboardData();
-
-  if (isInitialLoading) {
-    return <DashboardSkeleton />;
-  }
-
   return (
     <div className="w-full grid gap-4 grid-cols-6">
       <div className="col-span-4 space-y-4">
@@ -51,7 +41,7 @@ const DashboardClient = () => {
   const walletChainId = activeWallet?.chainId;
   const chainId = walletChainId
     ? parseInt(walletChainId.split(":")[1])
-    : mantleSepoliaTestnet.id;
+    : mantle.id;
 
   if (!authenticated) {
     return (

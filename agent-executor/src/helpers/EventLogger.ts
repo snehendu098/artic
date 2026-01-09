@@ -63,6 +63,38 @@ export class EventLogger {
     await this.kv.put(this.key, JSON.stringify(data));
   }
 
+  private mapEventTypeToActionType(type: EventType): string {
+    switch (type) {
+      case "orchestrating": return "orchestration";
+      case "tools_selected": return "tool_selection";
+      case "tool_call": return "tool_call";
+      case "tool_result": return "execution";
+      case "completed": return "completion";
+      case "error": return "execution";
+    }
+  }
+
+  private mapEventTypeToStatus(type: EventType): string {
+    switch (type) {
+      case "error": return "failed";
+      case "completed":
+      case "tool_result": return "completed";
+      default: return "completed";
+    }
+  }
+
+  private getDescription(e: Event): string {
+    switch (e.type) {
+      case "error": return e.data.error || "Unknown error";
+      case "tool_result": return e.data.result || "";
+      case "tools_selected": return `Selected: ${e.data.tools?.join(", ") || ""}`;
+      case "orchestrating": return e.data.note || "Analyzing strategy";
+      case "tool_call": return `Calling ${e.data.tool || "unknown"}`;
+      case "completed": return e.data.note || "Execution completed";
+      default: return "";
+    }
+  }
+
   async flush() {
     const data = await this.kv.get(this.key, "json") as EventsState | null;
 
@@ -74,22 +106,30 @@ export class EventLogger {
       return;
     }
 
-    // Only persist tool_result and error events
-    const actions = data.events
-      .filter((e) => e.type === "tool_result" || e.type === "error")
-      .map((e) => ({
-        subscriptionId: this.subscriptionId,
-        delegationWalletId: this.delegationWalletId,
-        actionType: "execution" as const,
-        description: e.type === "error" ? e.data.error || "Unknown error" : e.data.result || "",
-        note: e.data.note || "",
-        txHash: e.data.txHash,
-        blockNumber: e.data.blockNumber,
-        status: e.type === "error" ? "failed" : "completed",
-        createdAt: new Date(e.timestamp).toISOString(),
-      }));
+    // Only persist tool_result and error to DB
+    const persistableEvents = data.events.filter(
+      (e) => e.type === "tool_result" || e.type === "error"
+    );
 
-    console.log(`[${this.subscriptionId}] Actions after filter: ${actions.length}`);
+    if (!persistableEvents.length) {
+      console.log(`[${this.subscriptionId}] No persistable events (tool_result/error)`);
+      await this.kv.delete(this.key);
+      return;
+    }
+
+    const actions = persistableEvents.map((e) => ({
+      subscriptionId: this.subscriptionId,
+      delegationWalletId: this.delegationWalletId,
+      actionType: this.mapEventTypeToActionType(e.type),
+      description: this.getDescription(e),
+      note: e.data.note || e.data.tools?.join(", ") || "",
+      txHash: e.data.txHash,
+      blockNumber: e.data.blockNumber,
+      status: this.mapEventTypeToStatus(e.type),
+      createdAt: new Date(e.timestamp).toISOString(),
+    }));
+
+    console.log(`[${this.subscriptionId}] Actions to save: ${actions.length}`);
 
     if (actions.length) {
       try {
@@ -102,8 +142,6 @@ export class EventLogger {
       } catch (e) {
         console.error("Failed to flush actions to db-layer:", e);
       }
-    } else {
-      console.log(`[${this.subscriptionId}] No tool_result or error events to save`);
     }
 
     // Clear KV

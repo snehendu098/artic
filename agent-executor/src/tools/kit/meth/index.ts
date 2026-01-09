@@ -11,7 +11,7 @@ export const createGetMethTokenAddress = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: {
           tool: "meth_get_token_address",
           args: {},
@@ -60,7 +60,7 @@ export const createMethGetPosition = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: {
           tool: "meth_get_position",
           args: { userAddress },
@@ -118,7 +118,7 @@ export const createSwapToMeth = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: {
           tool: "meth_swap_to_meth",
           args: { amount, slippage },
@@ -181,7 +181,7 @@ export const createSwapFromMeth = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: {
           tool: "meth_swap_from_meth",
           args: { amount, slippage },

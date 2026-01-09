@@ -10,7 +10,7 @@ export const createPythGetPrice = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: { tool: "pyth_get_price", args: { identifier } },
       });
 
@@ -62,7 +62,7 @@ export const createPythGetEmaPrice = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: { tool: "pyth_get_ema_price", args: { identifier } },
       });
 
@@ -112,7 +112,7 @@ export const createPythGetTokenPrice = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: { tool: "pyth_get_token_price", args: { tokenAddress } },
       });
 
@@ -164,7 +164,7 @@ export const createPythGetMultiplePrices = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: { tool: "pyth_get_multiple_prices", args: { identifiers } },
       });
 
@@ -216,7 +216,7 @@ export const createPythGetSupportedFeeds = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: { tool: "pyth_get_supported_feeds", args: {} },
       });
 
@@ -264,7 +264,7 @@ export const createPythGetSupportedTokens = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: { tool: "pyth_get_supported_tokens", args: {} },
       });
 
@@ -312,7 +312,7 @@ export const createPythFeedExists = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: { tool: "pyth_feed_exists", args: { identifier } },
       });
 

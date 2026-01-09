@@ -1,11 +1,12 @@
 "use client";
 
 import { usePrivy, useWallets } from "@privy-io/react-auth";
-import { mantleSepoliaTestnet } from "viem/chains";
+import { mantle } from "viem/chains";
 import Header from "@/components/common/Header";
 import ActionsTimelineChart from "@/components/actions/ActionsTimelineChart";
 import ActiveStrategyCard from "@/components/actions/ActiveStrategyCard";
 import ActionsListCard from "@/components/actions/ActionsListCard";
+import LiveExecutionFeedCard from "@/components/actions/LiveExecutionFeedCard";
 import { DashboardDataProvider } from "@/contexts/DashboardDataContext";
 
 const ActionsContent = () => {
@@ -14,6 +15,7 @@ const ActionsContent = () => {
       <div className="w-full col-span-3 space-y-6">
         <ActionsTimelineChart />
         <ActiveStrategyCard />
+        <LiveExecutionFeedCard />
       </div>
       <div className="w-full col-span-2 h-full self-stretch">
         <ActionsListCard />
@@ -31,7 +33,7 @@ const ActionsPage = () => {
   const walletChainId = activeWallet?.chainId;
   const chainId = walletChainId
     ? parseInt(walletChainId.split(":")[1])
-    : mantleSepoliaTestnet.id;
+    : mantle.id;
 
   if (!authenticated) {
     return (

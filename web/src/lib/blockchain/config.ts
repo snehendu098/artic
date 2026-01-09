@@ -1,22 +1,16 @@
 import { type Chain } from "viem";
-import { mantle, mantleSepoliaTestnet } from "viem/chains";
+import { mantle } from "viem/chains";
 
-// Supported chains
-export const SUPPORTED_CHAINS: Record<number, Chain> = {
-  [mantle.id]: mantle,
-  [mantleSepoliaTestnet.id]: mantleSepoliaTestnet,
-};
+// Supported chain
+export const SUPPORTED_CHAIN: Chain = mantle;
 
 // Default chain
-export const DEFAULT_CHAIN_ID = mantleSepoliaTestnet.id;
+export const DEFAULT_CHAIN_ID = mantle.id;
 
-// Native token info per chain
-export const NATIVE_TOKENS: Record<number, { symbol: string; name: string; decimals: number }> = {
-  [mantle.id]: { symbol: "MNT", name: "Mantle", decimals: 18 },
-  [mantleSepoliaTestnet.id]: { symbol: "MNT", name: "Mantle", decimals: 18 },
-};
+// Native token info
+export const NATIVE_TOKEN = { symbol: "MNT", name: "Mantle", decimals: 18 };
 
-// Get native token for a chain
-export function getNativeToken(chainId: number) {
-  return NATIVE_TOKENS[chainId] || NATIVE_TOKENS[DEFAULT_CHAIN_ID];
+// Get native token
+export function getNativeToken() {
+  return NATIVE_TOKEN;
 }

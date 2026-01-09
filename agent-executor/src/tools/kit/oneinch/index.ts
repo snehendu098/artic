@@ -2,6 +2,7 @@ import { tool } from "langchain";
 import { ToolDependencies } from "../../../types";
 import z from "zod";
 import { getToolMetadata } from "../../../helpers/getToolMetadata";
+import { Address } from "viem";
 
 export const createOneinchGetQuote = (deps: ToolDependencies) => {
   const meta = getToolMetadata("oneinch_get_quote");
@@ -10,7 +11,7 @@ export const createOneinchGetQuote = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: {
           tool: "oneinch_get_quote",
           args: { fromToken, toToken, amount },
@@ -19,8 +20,8 @@ export const createOneinchGetQuote = (deps: ToolDependencies) => {
 
       try {
         const quote = await mntAgentKit.get1inchQuote(
-          fromToken,
-          toToken,
+          fromToken as Address,
+          toToken as Address,
           amount,
         );
 
@@ -52,12 +53,8 @@ export const createOneinchGetQuote = (deps: ToolDependencies) => {
       name: meta.name,
       description: meta.longDesc,
       schema: z.object({
-        fromToken: z
-          .string()
-          .describe("Address of the token to swap from"),
-        toToken: z
-          .string()
-          .describe("Address of the token to swap to"),
+        fromToken: z.string().describe("Address of the token to swap from"),
+        toToken: z.string().describe("Address of the token to swap to"),
         amount: z
           .string()
           .describe(
@@ -75,7 +72,7 @@ export const createOneinchSwap = (deps: ToolDependencies) => {
       const { mntAgentKit, eventLogger } = deps;
 
       await eventLogger.emit({
-        type: "tools_selected",
+        type: "tool_call",
         data: {
           tool: "oneinch_swap",
           args: { fromToken, toToken, amount, slippage },
@@ -84,14 +81,14 @@ export const createOneinchSwap = (deps: ToolDependencies) => {
 
       try {
         const txHash = await mntAgentKit.swapOn1inch(
-          fromToken,
-          toToken,
+          fromToken as Address,
+          toToken as Address,
           amount,
           slippage,
         );
 
         const receipt = await mntAgentKit.client.waitForTransactionReceipt({
-          hash: txHash,
+          hash: txHash.txHash as Address,
         });
 
         await eventLogger.emit({
@@ -124,12 +121,8 @@ export const createOneinchSwap = (deps: ToolDependencies) => {
       name: meta.name,
       description: meta.longDesc,
       schema: z.object({
-        fromToken: z
-          .string()
-          .describe("Address of the token to swap from"),
-        toToken: z
-          .string()
-          .describe("Address of the token to swap to"),
+        fromToken: z.string().describe("Address of the token to swap from"),
+        toToken: z.string().describe("Address of the token to swap to"),
         amount: z
           .string()
           .describe(

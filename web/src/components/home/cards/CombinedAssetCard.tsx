@@ -1,7 +1,7 @@
 "use client";
 
 import CardLayout from "@/components/layouts/card-layout";
-import { ArrowRight, Wallet } from "lucide-react";
+import { ArrowRight, Wallet, RefreshCw } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -37,9 +37,16 @@ const CombinedAssetCardSkeleton = () => (
 );
 
 const CombinedAssetCard = () => {
-  const { data, loading } = useDashboardData();
+  const { data, loading, refetchGroup } = useDashboardData();
   const { assets } = data;
   const isLoading = loading.wallets || loading.assets;
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    await refetchGroup.assets();
+    setIsRefreshing(false);
+  };
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat("en-US", {
@@ -63,13 +70,24 @@ const CombinedAssetCard = () => {
           <p className="text-xs text-white/50">// combined assets</p>
           <p className="uppercase">Assets</p>
         </div>
-        {hasData && !hasMore && (
-          <Link href="/app/dashboard/assets">
-            <button className="p-1.5 bg-neutral-700 border border-neutral-600 transition-all duration-300 ease-out group hover:scale-110 hover:border-primary/50 hover:shadow-[0_0_15px_rgba(var(--primary-rgb),0.2)]">
-              <ArrowRight className="w-4 h-4 group-hover:text-primary transition-colors duration-300" />
-            </button>
-          </Link>
-        )}
+        <div className="flex items-center gap-2">
+          <motion.button
+            onClick={handleRefresh}
+            disabled={isRefreshing}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            className="p-1.5 bg-neutral-700 border border-neutral-600 transition-all duration-300 ease-out group hover:border-primary/50 hover:shadow-[0_0_15px_rgba(var(--primary-rgb),0.2)] disabled:opacity-50"
+          >
+            <RefreshCw className={`w-4 h-4 group-hover:text-primary transition-colors duration-300 ${isRefreshing ? "animate-spin" : ""}`} />
+          </motion.button>
+          {hasData && !hasMore && (
+            <Link href="/app/dashboard/assets">
+              <button className="p-1.5 bg-neutral-700 border border-neutral-600 transition-all duration-300 ease-out group hover:scale-110 hover:border-primary/50 hover:shadow-[0_0_15px_rgba(var(--primary-rgb),0.2)]">
+                <ArrowRight className="w-4 h-4 group-hover:text-primary transition-colors duration-300" />
+              </button>
+            </Link>
+          )}
+        </div>
       </div>
       {hasData ? (
         <div className="w-full space-y-2 mt-4">

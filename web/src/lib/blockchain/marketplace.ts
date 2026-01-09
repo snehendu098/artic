@@ -18,7 +18,7 @@ export async function getListing(
   strategyId: string,
   chainId = DEFAULT_CHAIN_ID,
 ) {
-  const client = getPublicClient(chainId);
+  const client = getPublicClient();
   const strategyBytes = uuidToBytes32(strategyId);
 
   const [creator, priceMnt, isActive] = await client.readContract({
@@ -44,7 +44,7 @@ export async function hasPurchased(
   buyerAddress: Address,
   chainId = DEFAULT_CHAIN_ID,
 ) {
-  const client = getPublicClient(chainId);
+  const client = getPublicClient();
   const strategyBytes = uuidToBytes32(strategyId);
 
   return client.readContract({
@@ -62,7 +62,7 @@ export async function getSubscriberCount(
   strategyId: string,
   chainId = DEFAULT_CHAIN_ID,
 ) {
-  const client = getPublicClient(chainId);
+  const client = getPublicClient();
   const strategyBytes = uuidToBytes32(strategyId);
 
   const count = await client.readContract({
@@ -83,7 +83,7 @@ export async function isSubscribed(
   delegationWallet: Address,
   chainId = DEFAULT_CHAIN_ID,
 ) {
-  const client = getPublicClient(chainId);
+  const client = getPublicClient();
   const strategyBytes = uuidToBytes32(strategyId);
 
   return client.readContract({
@@ -102,7 +102,7 @@ export async function getSubscription(
   delegationWallet: Address,
   chainId = DEFAULT_CHAIN_ID,
 ) {
-  const client = getPublicClient(chainId);
+  const client = getPublicClient();
   const strategyBytes = uuidToBytes32(strategyId);
 
   const [owner, isActive, subscribedAt, pausedAt] = await client.readContract({
@@ -128,7 +128,7 @@ export async function getUserSubscriptions(
   ownerAddress: Address,
   chainId = DEFAULT_CHAIN_ID,
 ) {
-  const client = getPublicClient(chainId);
+  const client = getPublicClient();
   const strategyBytes = uuidToBytes32(strategyId);
 
   return client.readContract({
@@ -146,7 +146,7 @@ export async function getCreatorBalance(
   creatorAddress: Address,
   chainId = DEFAULT_CHAIN_ID,
 ) {
-  const client = getPublicClient(chainId);
+  const client = getPublicClient();
 
   const balance = await client.readContract({
     address: ARTIC_MARKETPLACE_ADDRESS,
@@ -271,6 +271,6 @@ export async function waitForTransaction(
   hash: `0x${string}`,
   chainId = DEFAULT_CHAIN_ID,
 ) {
-  const client = getPublicClient(chainId);
+  const client = getPublicClient();
   return await client.waitForTransactionReceipt({ hash });
 }

@@ -82,7 +82,8 @@ export const createActionHandler = async (c: Context<Env>) => {
 export const getActionsHandler = async (c: Context<Env>) => {
   try {
     const wallet = c.req.param("wallet");
-    const limit = parseInt(c.req.query("limit") || "20");
+    const limitParam = c.req.query("limit");
+    const limit = limitParam ? parseInt(limitParam) : undefined;
 
     if (!wallet) {
       return c.json(

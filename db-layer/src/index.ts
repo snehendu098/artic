@@ -4,7 +4,7 @@ import { requireApiKey } from "./middleware/auth.middleware";
 
 // Controllers
 import { createDelegationWallet, getUser, upsertUserHandler } from "./controllers/user.controller";
-import { getDelegationsHandler } from "./controllers/delegation.controller";
+import { getDelegationsHandler, revealPrivateKeyHandler } from "./controllers/delegation.controller";
 import {
   createStrategyHandler,
   getMyStrategies,
@@ -42,6 +42,7 @@ app.get("/users/:wallet", getUser);
 // ============================================
 app.post("/delegations", createDelegationWallet);
 app.get("/delegations/:wallet", getDelegationsHandler);
+app.post("/delegations/:id/reveal-key", revealPrivateKeyHandler);
 
 // ============================================
 // STRATEGY ROUTES

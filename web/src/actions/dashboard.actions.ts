@@ -111,8 +111,9 @@ export async function getDelegationWallets(wallet: string): Promise<DelegationWa
   return data ?? [];
 }
 
-export async function getWalletActions(wallet: string, limit: number = 10): Promise<Action[]> {
-  const data = await api<DBAction[]>(`/actions/${wallet}?limit=${limit}`);
+export async function getWalletActions(wallet: string, limit?: number): Promise<Action[]> {
+  const url = limit ? `/actions/${wallet}?limit=${limit}` : `/actions/${wallet}`;
+  const data = await api<DBAction[]>(url);
   return data ? data.map(mapAction) : [];
 }
 

@@ -46,3 +46,28 @@ export async function createDelegationWallet(
     return { success: false, message: "Failed to create wallet", data: null };
   }
 }
+
+export async function revealPrivateKey(
+  wallet: string,
+  delegationId: string,
+  signature: string
+): Promise<{ success: boolean; message: string; privateKey: string | null }> {
+  try {
+    const res = await fetch(`${API_URL}/delegations/${delegationId}/reveal-key`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ wallet, signature }),
+    });
+
+    const json: ApiResponse<{ privateKey: string }> = await res.json();
+
+    if (!json.success || !json.data) {
+      return { success: false, message: json.message, privateKey: null };
+    }
+
+    return { success: true, message: json.message, privateKey: json.data.privateKey };
+  } catch (error) {
+    console.error("Reveal private key error:", error);
+    return { success: false, message: "Failed to reveal private key", privateKey: null };
+  }
+}

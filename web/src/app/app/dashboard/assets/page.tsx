@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { usePrivy, useWallets as usePrivyWallets } from "@privy-io/react-auth";
-import { mantleSepoliaTestnet } from "viem/chains";
+import { mantle } from "viem/chains";
 import type { Asset } from "@/types";
 import SplitPanelLayout from "@/components/layouts/split-panel-layout";
 import AssetRow from "@/components/assets/AssetRow";
@@ -19,7 +19,7 @@ const AssetsPage = () => {
   const walletChainId = activeWallet?.chainId;
   const chainId = walletChainId
     ? parseInt(walletChainId.split(":")[1])
-    : mantleSepoliaTestnet.id;
+    : mantle.id;
 
   const { data: delegationWallets, isLoading: walletsLoading } = useWallets(walletAddress);
   const walletAddresses = delegationWallets.map((w) => w.address);

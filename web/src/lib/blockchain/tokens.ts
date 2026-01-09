@@ -1,5 +1,5 @@
 import type { Address } from "viem";
-import { mantle, mantleSepoliaTestnet } from "viem/chains";
+import { mantle } from "viem/chains";
 
 export interface TokenConfig {
   address: Address;
@@ -82,12 +82,7 @@ const TESTNET_TOKENS: TokenConfig[] = [
   },
 ];
 
-// Token list by chain
-const TOKENS_BY_CHAIN: Record<number, TokenConfig[]> = {
-  [mantle.id]: MAINNET_TOKENS,
-  [mantleSepoliaTestnet.id]: TESTNET_TOKENS,
-};
-
+// Token list (mainnet only)
 export function getTokensByChain(chainId: number): TokenConfig[] {
-  return TOKENS_BY_CHAIN[chainId] ?? [];
+  return chainId === mantle.id ? MAINNET_TOKENS : [];
 }

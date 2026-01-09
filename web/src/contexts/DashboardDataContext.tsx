@@ -150,16 +150,16 @@ export function DashboardDataProvider({ children, walletAddress, chainId }: Dash
     }
   }, [walletAddress]);
 
-  const fetchActions = useCallback(async () => {
+  const fetchActions = useCallback(async (showLoading = true) => {
     if (!walletAddress) return;
-    setLoading(prev => ({ ...prev, actions: true }));
+    if (showLoading) setLoading(prev => ({ ...prev, actions: true }));
     try {
-      const result = await getWalletActions(walletAddress, 10);
+      const result = await getWalletActions(walletAddress);
       setData(prev => ({ ...prev, actions: result }));
     } catch (error) {
       console.error("Failed to fetch actions:", error);
     } finally {
-      setLoading(prev => ({ ...prev, actions: false }));
+      if (showLoading) setLoading(prev => ({ ...prev, actions: false }));
     }
   }, [walletAddress]);
 
@@ -199,19 +199,30 @@ export function DashboardDataProvider({ children, walletAddress, chainId }: Dash
     }
 
     try {
-      // Fetch wallets first since assets depend on them
-      const wallets = await fetchWallets();
+      // Fetch wallets first (assets depend on wallet addresses)
+      const walletsPromise = fetchWallets();
 
-      // Fetch everything else in parallel
+      // Start all independent fetches in parallel
+      const strategiesPromise = fetchStrategies();
+      const subscriptionsPromise = fetchSubscriptions();
+      const subscribersPromise = fetchSubscribers();
+      const actionsPromise = fetchActions();
+      const purchasesPromise = fetchPurchases();
+
+      // Wait for wallets then fetch assets
+      const wallets = await walletsPromise;
+      const assetsPromise = wallets && wallets.length > 0
+        ? fetchAssets(wallets.map(w => w.address))
+        : Promise.resolve();
+
+      // Wait for all to complete
       await Promise.all([
-        fetchStrategies(),
-        fetchSubscriptions(),
-        fetchSubscribers(),
-        fetchActions(),
-        fetchPurchases(),
-        wallets && wallets.length > 0
-          ? fetchAssets(wallets.map(w => w.address))
-          : Promise.resolve(),
+        strategiesPromise,
+        subscriptionsPromise,
+        subscribersPromise,
+        actionsPromise,
+        purchasesPromise,
+        assetsPromise,
       ]);
     } finally {
       setIsInitialLoading(false);
@@ -222,6 +233,15 @@ export function DashboardDataProvider({ children, walletAddress, chainId }: Dash
   useEffect(() => {
     fetchAll();
   }, [fetchAll]);
+
+  // Poll actions every 5 seconds (silent refresh, no loading state)
+  useEffect(() => {
+    if (!walletAddress) return;
+    const interval = setInterval(() => {
+      fetchActions(false);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [walletAddress, fetchActions]);
 
   // Group refetch functions - update related cards together
   const refetchGroup = useMemo(() => ({

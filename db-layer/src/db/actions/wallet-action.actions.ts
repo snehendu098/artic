@@ -83,7 +83,7 @@ export interface WalletActionWithDetails {
 export const getActionsByWallet = async (
   database: any,
   userWallet: string,
-  limit: number = 20
+  limit?: number
 ): Promise<WalletActionWithDetails[]> => {
   const user = await database
     .select()
@@ -104,7 +104,7 @@ export const getActionsByWallet = async (
   const delegationIds = userDelegations.map((d: any) => d.id);
 
   // Get actions with strategy and delegation wallet names
-  const results = await database
+  let query = database
     .select({
       id: walletActions.id,
       actionType: walletActions.actionType,
@@ -122,10 +122,13 @@ export const getActionsByWallet = async (
     .leftJoin(subscriptions, eq(walletActions.subscriptionId, subscriptions.id))
     .leftJoin(strategies, eq(subscriptions.strategyId, strategies.id))
     .where(inArray(walletActions.delegationWalletId, delegationIds))
-    .orderBy(desc(walletActions.createdAt))
-    .limit(limit);
+    .orderBy(desc(walletActions.createdAt));
 
-  return results;
+  if (limit) {
+    query = query.limit(limit);
+  }
+
+  return query;
 };
 
 export const updateActionStatus = async (
