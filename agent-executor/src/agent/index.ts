@@ -25,6 +25,7 @@ import { EventLogger } from "../helpers/EventLogger";
 import { ChatGroq } from "@langchain/groq";
 import { MNTAgentKit } from "mantle-agent-kit-sdk";
 import { MAINNET_TOKENS, TokenConfig } from "../constants";
+import { createOpenoceanGetTokens } from "../tools";
 
 export class Agent {
   public account: PrivateKeyAccount;
@@ -56,7 +57,10 @@ export class Agent {
   async messageAgent(strategy: string, actions: string, toolNames: string[]) {
     try {
       const allTools = getAllTools(this.deps);
-      const tools = filterToolsByNames(allTools, toolNames);
+      // Always include openocean_get_tokens for token address lookups
+      const requiredTools = ["openocean_get_tokens"];
+      const mergedToolNames = [...new Set([...toolNames, ...requiredTools])];
+      const tools = filterToolsByNames(allTools, mergedToolNames);
 
       const tokenData = MAINNET_TOKENS.map(
         (item: TokenConfig) => `
@@ -81,6 +85,7 @@ IMPORTANT NOTES:
 - Be extremely concise but accurate in your final response
 - If the strategy doesn't make sense or the strategy is not something that can be executed, just simply ignore it and return a blank response
 - When you are swapping or getting quotes, if one tool is giving you error responses then make sure that you use other tools
+- You are given with a set of erc20 tokens with their addresses but since MNT is the native token, you must use openocean_get_tokens tool for getting the address
 
 STRATEGY FORMAT:
 In the strategy the user will state what the user's intent is, from the available tools, you'll have to understand the users intent properly and execute the strategy according to the order that user has mentioned
@@ -95,13 +100,8 @@ address: contains token address
 
 Token Data:
 
-name: "mantle" or "native"
-symbol: MNT
-address: 0xdeaddeaddeaddeaddeaddeaddeaddeaddead0000
-decimals: 18
------------------------
-
 ${tokenData}
+- To get more info about tokens, use the openocean_get_tokens tool
 
 2. In mantle network if the user stategy specifies to monitor ETH for price or something else, you should consider WETH
 
@@ -190,6 +190,7 @@ Rules:
 - Only return a list of tools names
 - Only return tools from the available list
 - If tools for getting swap quotes, or swapping is required don't return tool from one protocol only, return tools from different protocols
+- If swapping is required return all the tools from all the swapping protocol
 
 Input:
 - Your will be given a list of tools and a strategy

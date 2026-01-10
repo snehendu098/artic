@@ -20,8 +20,7 @@ import {
   createMethGetPosition,
   createSwapToMeth,
   createSwapFromMeth,
-  createOneinchGetQuote,
-  createOneinchSwap,
+  createOpenoceanGetTokens,
   createOpenoceanGetQuote,
   createOpenoceanSwap,
   createMerchantmoeSwap,
@@ -49,20 +48,17 @@ export const getAllTools = (deps: ToolDependencies) => {
     createLendleWithdraw(deps),
 
     // OKX: DEX aggregator
-    createGetSwapQuote(deps),
-    createExecuteSwap(deps),
-
+    // createGetSwapQuote(deps),
+    // createExecuteSwap(deps),
+    //
     // mETH: liquid staking
     createGetMethTokenAddress(deps),
     createMethGetPosition(deps),
     createSwapToMeth(deps),
     createSwapFromMeth(deps),
 
-    // 1inch: DEX aggregator
-    createOneinchGetQuote(deps),
-    createOneinchSwap(deps),
-
     // OpenOcean: DEX aggregator
+    createOpenoceanGetTokens(deps),
     createOpenoceanGetQuote(deps),
     createOpenoceanSwap(deps),
 

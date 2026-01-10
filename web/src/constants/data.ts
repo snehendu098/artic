@@ -257,7 +257,7 @@ export const dummyStrategies: Strategy[] = [
     subscriberCount: 22,
     status: "active",
     createdAt: "2024-10-05",
-    protocols: ["1inch", "Paraswap"],
+    protocols: ["OpenOcean", "Paraswap"],
   },
 ];
 
@@ -472,7 +472,7 @@ export const dummyActions: Action[] = [
   {
     id: "12",
     type: "execution",
-    description: "Smart DCA purchased 0.2 ETH on 1inch",
+    description: "Smart DCA purchased 0.2 ETH on OpenOcean",
     timestamp: "2024-12-20T18:45:00Z",
     status: "completed",
     strategyName: "Smart DCA Strategy",

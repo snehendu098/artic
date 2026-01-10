@@ -57,10 +57,7 @@ const ActionsListCard = () => {
 
   const sortedActions = useMemo(() => {
     if (!actions || actions.length === 0) return [];
-    const statusOrder = { pending: 0, completed: 1, failed: 2 };
     return [...actions].sort((a, b) => {
-      const statusDiff = statusOrder[a.status] - statusOrder[b.status];
-      if (statusDiff !== 0) return statusDiff;
       return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
     });
   }, [actions]);

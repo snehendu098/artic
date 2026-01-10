@@ -1,4 +1,4 @@
-import { formatUnits, type Address, erc20Abi } from "viem";
+import { formatUnits, type Address, erc20Abi, getAddress } from "viem";
 import { getPublicClient } from "./client";
 import { getNativeToken } from "./config";
 import { getTokenPrices } from "./prices";
@@ -14,19 +14,33 @@ async function getERC20Balances(
 ): Promise<{ address: Address; symbol: string; name: string; decimals: number; balance: bigint }[]> {
   const publicClient = getPublicClient();
   const tokens = getTokensByChain(chainId);
+  const checksummedAccount = getAddress(account);
+
+  console.log(`[getERC20Balances] Fetching for account: ${checksummedAccount}, chainId: ${chainId}`);
+  console.log(`[getERC20Balances] Tokens to check:`, tokens.map(t => t.symbol));
 
   if (tokens.length === 0) return [];
 
   const balanceCalls = tokens.map((token) => ({
-    address: token.address,
+    address: getAddress(token.address),
     abi: erc20Abi,
     functionName: "balanceOf",
-    args: [account],
+    args: [checksummedAccount],
   }));
 
   const results = await publicClient.multicall({ contracts: balanceCalls });
 
-  return tokens
+  // Log all results including failures and zero balances
+  tokens.forEach((token, i) => {
+    const result = results[i];
+    if (result.status === "success") {
+      console.log(`[getERC20Balances] ${token.symbol} (${token.address}): ${result.result?.toString() ?? "0"}`);
+    } else {
+      console.log(`[getERC20Balances] ${token.symbol} (${token.address}): FAILED -`, result.error);
+    }
+  });
+
+  const balances = tokens
     .map((token, i) => ({
       address: token.address,
       symbol: token.symbol,
@@ -35,6 +49,10 @@ async function getERC20Balances(
       balance: (results[i].status === "success" ? results[i].result : BigInt(0)) as bigint,
     }))
     .filter((t) => t.balance > BigInt(0));
+
+  console.log(`[getERC20Balances] Tokens with balance > 0:`, balances.map(t => `${t.symbol}: ${t.balance.toString()}`));
+
+  return balances;
 }
 
 /**
@@ -47,11 +65,12 @@ export async function getWalletAssets(
   const publicClient = getPublicClient();
   const nativeToken = getNativeToken();
   const assets: AssetResult[] = [];
+  const checksummedAccount = getAddress(account);
 
   // Fetch native + ERC20 balances in parallel
   const [nativeBalance, erc20Balances] = await Promise.all([
-    publicClient.getBalance({ address: account }),
-    getERC20Balances(account, chainId),
+    publicClient.getBalance({ address: checksummedAccount }),
+    getERC20Balances(checksummedAccount, chainId),
   ]);
 
   // Collect symbols for batch price fetch
@@ -93,7 +112,7 @@ export async function getWalletAssets(
     return sum + amount * a.priceUSD;
   }, 0);
 
-  return { address: account, chainId, assets, totalUSD };
+  return { address: checksummedAccount, chainId, assets, totalUSD };
 }
 
 /**
@@ -106,11 +125,12 @@ export async function getRawWalletBalances(
   const publicClient = getPublicClient();
   const nativeToken = getNativeToken();
   const assets: RawAsset[] = [];
+  const checksummedAccount = getAddress(account);
 
   // Fetch native + ERC20 balances in parallel
   const [nativeBalance, erc20Balances] = await Promise.all([
-    publicClient.getBalance({ address: account }),
-    getERC20Balances(account, chainId),
+    publicClient.getBalance({ address: checksummedAccount }),
+    getERC20Balances(checksummedAccount, chainId),
   ]);
 
   const nativeAmount = parseFloat(formatUnits(nativeBalance, nativeToken.decimals));
@@ -137,7 +157,7 @@ export async function getRawWalletBalances(
   }
 
   return {
-    address: account,
+    address: checksummedAccount,
     nativeAmount,
     assets,
     assetCount: assets.length,

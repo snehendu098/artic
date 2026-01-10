@@ -4,7 +4,6 @@ export const getProtocolLogoPath = (protocol: string): string => {
     meth: "meth.png",
     okx: "okx.png",
     "pyth network": "pyth.png",
-    "1inch": "1inch.png",
     openocean: "openocean.jpeg",
     "merchant moe": "merchantmoe.png",
     "agni finance": "agni.jpg",

@@ -2,7 +2,56 @@ import { tool } from "langchain";
 import { ToolDependencies } from "../../../types";
 import z from "zod";
 import { getToolMetadata } from "../../../helpers/getToolMetadata";
-import { Address } from "viem";
+import { Address, formatUnits } from "viem";
+
+export const createOpenoceanGetTokens = (deps: ToolDependencies) => {
+  const meta = getToolMetadata("openocean_get_tokens");
+  return tool(
+    async () => {
+      const { mntAgentKit, eventLogger } = deps;
+
+      await eventLogger.emit({
+        type: "tool_call",
+        data: {
+          tool: "openocean_get_tokens",
+          args: {},
+        },
+      });
+
+      try {
+        const tokens = await mntAgentKit.getOpenOceanTokens();
+
+        await eventLogger.emit({
+          type: "tool_result",
+          data: {
+            tool: "openocean_get_tokens",
+            result: `Fetched ${tokens.length} tokens from OpenOcean`,
+          },
+        });
+
+        return JSON.stringify(tokens);
+      } catch (error) {
+        const errorMsg =
+          error instanceof Error ? error.message : "Unknown error";
+
+        await eventLogger.emit({
+          type: "error",
+          data: {
+            tool: "openocean_get_tokens",
+            error: `Failed to get OpenOcean tokens: ${errorMsg}`,
+          },
+        });
+
+        throw error;
+      }
+    },
+    {
+      name: meta.name,
+      description: meta.longDesc,
+      schema: z.object({}),
+    },
+  );
+};
 
 export const createOpenoceanGetQuote = (deps: ToolDependencies) => {
   const meta = getToolMetadata("openocean_get_quote");
@@ -25,6 +74,15 @@ export const createOpenoceanGetQuote = (deps: ToolDependencies) => {
           amount,
         );
 
+        const inAmountFormatted = formatUnits(
+          BigInt(quote.inAmount),
+          quote.inToken.decimals,
+        );
+        const outAmountFormatted = formatUnits(
+          BigInt(quote.outAmount),
+          quote.outToken.decimals,
+        );
+
         await eventLogger.emit({
           type: "tool_result",
           data: {
@@ -33,7 +91,12 @@ export const createOpenoceanGetQuote = (deps: ToolDependencies) => {
           },
         });
 
-        return quote;
+        return JSON.stringify({
+          inToken: quote.inToken,
+          outToken: quote.outToken,
+          inAmount: inAmountFormatted,
+          outAmount: outAmountFormatted,
+        });
       } catch (error) {
         const errorMsg =
           error instanceof Error ? error.message : "Unknown error";
@@ -53,8 +116,12 @@ export const createOpenoceanGetQuote = (deps: ToolDependencies) => {
       name: meta.name,
       description: meta.longDesc,
       schema: z.object({
-        fromToken: z.string().describe("Address of the token to swap from"),
-        toToken: z.string().describe("Address of the token to swap to"),
+        fromToken: z
+          .string()
+          .describe("Address of the token to swap from. Starts with 0x"),
+        toToken: z
+          .string()
+          .describe("Address of the token to swap to. Starts with 0x"),
         amount: z
           .string()
           .describe(
@@ -80,7 +147,14 @@ export const createOpenoceanSwap = (deps: ToolDependencies) => {
       });
 
       try {
-        const txHash = await mntAgentKit.swapOnOpenOcean(
+        // Get tokens to find decimals for output formatting
+        const tokens = await mntAgentKit.getOpenOceanTokens();
+
+        const outTokenInfo = tokens.find(
+          (t) => t.address.toLowerCase() === toToken.toLowerCase(),
+        );
+
+        const swapResult = await mntAgentKit.swapOnOpenOcean(
           fromToken as Address,
           toToken as Address,
           amount,
@@ -88,21 +162,31 @@ export const createOpenoceanSwap = (deps: ToolDependencies) => {
         );
 
         const receipt = await mntAgentKit.client.waitForTransactionReceipt({
-          hash: txHash.txHash as Address,
+          hash: swapResult.txHash as Address,
         });
+
+        const outAmountFormatted = outTokenInfo
+          ? formatUnits(BigInt(swapResult.outAmount), outTokenInfo.decimals)
+          : swapResult.outAmount;
 
         await eventLogger.emit({
           type: "tool_result",
           data: {
             tool: "openocean_swap",
-            result: `Swapped ${amount} tokens from ${fromToken} to ${toToken} via OpenOcean. TxHash: ${txHash}`,
+            result: `Swapped ${amount} tokens from ${fromToken} to ${toToken} via OpenOcean. TxHash: ${swapResult.txHash}`,
             txHash: receipt.transactionHash,
             blockNumber: receipt.blockNumber.toString(),
           },
         });
 
-        return receipt;
+        return JSON.stringify({
+          txHash: swapResult.txHash,
+          outAmount: outAmountFormatted,
+          outTokenSymbol: outTokenInfo?.symbol,
+        });
       } catch (error) {
+        console.log(error);
+
         const errorMsg =
           error instanceof Error ? error.message : "Unknown error";
 

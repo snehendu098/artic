@@ -29,7 +29,7 @@ const StrategyActionsCard = ({
                 <Activity className="w-3 h-3 text-primary" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-white/90">{action.description}</p>
+                <p className="text-xs text-white/90 break-words">{action.description}</p>
                 <p className="text-xs text-white/40 mt-1">
                   {formatDate(action.timestamp)}
                 </p>
