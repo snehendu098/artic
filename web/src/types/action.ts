@@ -12,4 +12,5 @@ export interface Action {
   status: "completed" | "pending" | "failed";
   strategyName?: string;
   delegationWalletName?: string;
+  txHash?: string;
 }

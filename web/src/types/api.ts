@@ -14,6 +14,7 @@ export interface DBAction {
   createdAt: string | null;
   strategyName: string | null;
   delegationWalletName: string;
+  txHash: string | null;
 }
 
 export interface DBStrategy {

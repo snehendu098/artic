@@ -12,6 +12,7 @@ import {
   IconCheck,
   IconX,
   IconCircleCheck,
+  IconExternalLink,
 } from "@tabler/icons-react";
 
 const typeIcons: Record<LiveEventType, React.ReactNode> = {
@@ -149,6 +150,17 @@ const LiveExecutionFeedCard = () => {
                     <p className="text-xs leading-relaxed text-white/90 line-clamp-2 break-all">
                       {getEventDescription(event)}
                     </p>
+                    {event.data.txHash && (
+                      <a
+                        href={`https://mantlescan.xyz/tx/${event.data.txHash}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 mt-1"
+                      >
+                        <span>{event.data.txHash.slice(0, 10)}...{event.data.txHash.slice(-8)}</span>
+                        <IconExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
                     <span className="text-xs text-white/40 mt-1 block">
                       {formatRelativeTime(event.timestamp)}
                     </span>

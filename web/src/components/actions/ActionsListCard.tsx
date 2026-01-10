@@ -10,6 +10,7 @@ import {
   IconArrowUp,
   IconBulb,
   IconChevronDown,
+  IconExternalLink,
 } from "@tabler/icons-react";
 import type { Action } from "@/types";
 
@@ -174,6 +175,21 @@ const ActionsListCard = () => {
                                 <p className="text-xs text-white/70 leading-relaxed break-all">
                                   {action.note}
                                 </p>
+                              </div>
+                            )}
+                            {action.txHash && (
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-xs text-white/40 shrink-0">Tx Hash</span>
+                                <a
+                                  href={`https://mantlescan.xyz/tx/${action.txHash}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={(e) => e.stopPropagation()}
+                                  className="text-xs text-primary hover:text-primary/80 flex items-center gap-1 truncate"
+                                >
+                                  <span className="truncate">{action.txHash.slice(0, 10)}...{action.txHash.slice(-8)}</span>
+                                  <IconExternalLink className="w-3 h-3 shrink-0" />
+                                </a>
                               </div>
                             )}
                           </div>

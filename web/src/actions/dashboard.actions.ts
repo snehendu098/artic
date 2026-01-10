@@ -25,6 +25,7 @@ function mapAction(dbAction: DBAction): Action {
     status: dbAction.status as Action["status"],
     strategyName: dbAction.strategyName ?? undefined,
     delegationWalletName: dbAction.delegationWalletName,
+    txHash: dbAction.txHash ?? undefined,
   };
 }
 
