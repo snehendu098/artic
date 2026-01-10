@@ -24,7 +24,9 @@
 	"migrations": [
 		{
 			"tag": "v1",
-			"new_classes": ["AgentExecutorDO"]
+			"new_classes": [
+				"AgentExecutorDO"
+			]
 		}
 	],
 	// "vars": {
@@ -51,5 +53,5 @@
 	// ],
 	"observability": {
 		"enabled": true,
-	},
 	}
+}
