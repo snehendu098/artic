@@ -10,6 +10,7 @@ export default function PrivyProviderMain({
 }) {
   return (
     <PrivyProvider
+      key={"hello-world"}
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID!}
       config={{
         embeddedWallets: {

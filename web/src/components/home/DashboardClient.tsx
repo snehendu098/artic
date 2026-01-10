@@ -9,7 +9,7 @@ import CombinedAssetCard from "@/components/home/cards/CombinedAssetCard";
 import SubscriptionsCard from "@/components/home/cards/SubscriptionsCard";
 import WalletsCard from "@/components/home/cards/WalletsCard";
 import SubscribersCard from "@/components/home/cards/SubscribersCard";
-import { DashboardDataProvider } from "@/contexts/DashboardDataContext";
+import { DashboardDataProvider, useDashboardData } from "@/contexts/DashboardDataContext";
 
 const DashboardContent = () => {
   return (
@@ -27,6 +27,18 @@ const DashboardContent = () => {
       <div className="col-span-2 space-y-4">
         <WalletsCard />
         <StrategiesCard />
+      </div>
+    </div>
+  );
+};
+
+const DashboardLayout = () => {
+  const { refetchGroup } = useDashboardData();
+  return (
+    <div className="w-full">
+      <Header url="/app/dashboard" showActions={true} onWalletCreated={refetchGroup.wallets} />
+      <div className="mt-6">
+        <DashboardContent />
       </div>
     </div>
   );
@@ -59,14 +71,9 @@ const DashboardClient = () => {
   }
 
   return (
-    <div className="w-full">
-      <Header url="/app/dashboard" showActions={true} />
-      <div className="mt-6">
-        <DashboardDataProvider walletAddress={walletAddress} chainId={chainId}>
-          <DashboardContent />
-        </DashboardDataProvider>
-      </div>
-    </div>
+    <DashboardDataProvider walletAddress={walletAddress} chainId={chainId}>
+      <DashboardLayout />
+    </DashboardDataProvider>
   );
 };
 

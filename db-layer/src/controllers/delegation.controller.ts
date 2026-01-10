@@ -23,7 +23,7 @@ export const getDelegationsHandler = async (c: Context<Env>) => {
       CacheKeys.delegations(wallet),
       TTL.DELEGATIONS,
       async () => {
-        const database = db(c.env.DATABASE_URL);
+        const database = db(c.env.HYPERDRIVE.connectionString);
         return getDelegationsByWallet(database, wallet);
       }
     );
@@ -76,7 +76,7 @@ export const revealPrivateKeyHandler = async (c: Context<Env>) => {
       return c.json({ success: false, message: "Signature verification failed", data: null }, 401);
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
 
     // Get user by wallet
     const user = await getUserByWallet(database, body.wallet);

@@ -80,6 +80,7 @@ IMPORTANT NOTES:
 - Strategies will be in plaintext
 - Be extremely concise but accurate in your final response
 - If the strategy doesn't make sense or the strategy is not something that can be executed, just simply ignore it and return a blank response
+- When you are swapping or getting quotes, if one tool is giving you error responses then make sure that you use other tools
 
 STRATEGY FORMAT:
 In the strategy the user will state what the user's intent is, from the available tools, you'll have to understand the users intent properly and execute the strategy according to the order that user has mentioned
@@ -188,6 +189,7 @@ Analyse the strategy of the user and return the appropriate tools as a **JSON ar
 Rules:
 - Only return a list of tools names
 - Only return tools from the available list
+- If tools for getting swap quotes, or swapping is required don't return tool from one protocol only, return tools from different protocols
 
 Input:
 - Your will be given a list of tools and a strategy

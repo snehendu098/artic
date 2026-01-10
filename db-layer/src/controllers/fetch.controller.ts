@@ -34,7 +34,7 @@ export const fetchDelegationWallets = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const delegations = await getDelegationsByWallet(database, wallet);
 
     // Convert private keys to public addresses
@@ -91,7 +91,7 @@ export const fetchStrategies = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const strategies = await getStrategiesByCreator(database, creatorWallet);
 
     return c.json(
@@ -133,7 +133,7 @@ export const fetchStrategiesForUser = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const strategies = await getStrategiesForUser(database, userWallet);
 
     return c.json(
@@ -176,7 +176,7 @@ export const fetchStrategyDetailsById = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const strategyDetails = await getStrategyDetailsById(
       database,
       strategyId,

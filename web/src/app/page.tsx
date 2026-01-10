@@ -4,6 +4,10 @@ import { Button } from "@/components/ui/button";
 import { FaGithub, FaXTwitter } from "react-icons/fa6";
 import { useState } from "react";
 import LetterGlitch from "@/components/LetterGlitch";
+import { LaserFlow } from "@/components/LaserFlow";
+import { HyperText } from "@/components/ui/hyper-text";
+import { TypingAnimation } from "@/components/ui/typing-animation";
+import { TextAnimate } from "@/components/ui/text-animate";
 import { IconChevronDown } from "@tabler/icons-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Marquee } from "@/components/ui/marquee";
@@ -44,54 +48,168 @@ export default function Home() {
 
   return (
     <div className="w-full relative h-full flex flex-col items-center">
-      <div className="w-full flex max-w-5xl flex-col">
+      <div className="w-full flex max-w-5xl flex-col z-10">
         {/* Navbar */}
         <div className="w-full flex items-center justify-between py-10">
-          <div className="flex items-center space-x-2">
+          <motion.div
+            className="flex items-center space-x-2"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <Image src={"/logo.png"} height={30} width={30} alt="logo" />
-          </div>
+          </motion.div>
 
-          <div>
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+          >
             <Button
               asChild
               className="bg-transparent hover:bg-neutral-900 cursor-pointer text-primary border border-primary"
             >
               <Link href={"/app/dashboard"}>Launch App</Link>
             </Button>
-          </div>
+          </motion.div>
         </div>
         {/* Hero */}
         <div className="flex mt-10 items-center justify-center space-x-20">
           <div className="text-lg">
-            <p className="text-white/50 lowercase">// Welcome to</p>
-            <div className="text-8xl font-semibold text-white ">
-              <p className="text-white">Artic</p>
-              <p className="text-muted-foreground">Protocol</p>
+            <TypingAnimation
+              className="text-white/50 lowercase"
+              duration={50}
+              delay={0}
+              showCursor={true}
+              blinkCursor={true}
+            >
+              // Welcome to
+            </TypingAnimation>
+            <div className="text-8xl font-semibold">
+              <HyperText
+                as="p"
+                className="text-white text-8xl py-0"
+                duration={600}
+                delay={200}
+              >
+                Artic
+              </HyperText>
+              <HyperText
+                as="p"
+                className="text-muted-foreground text-8xl py-0"
+                duration={600}
+                delay={500}
+              >
+                Protocol
+              </HyperText>
             </div>
             <div className="flex items-center w-full mt-6 space-x-2">
-              <div className="border p-2 bg-neutral-900">
+              <motion.div
+                className="border p-2 bg-neutral-900"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: 0.6 }}
+                whileHover={{ scale: 1.1 }}
+              >
                 <FaXTwitter className="text-2xl aspect-square text-muted-foreground" />
-              </div>
+              </motion.div>
 
-              <div className="border p-2 bg-neutral-900">
+              <motion.div
+                className="border p-2 bg-neutral-900"
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.4, delay: 0.7 }}
+                whileHover={{ scale: 1.1 }}
+              >
                 <FaGithub className="text-2xl aspect-square text-muted-foreground" />
-              </div>
+              </motion.div>
             </div>
           </div>
 
-          <div className="text-muted-foreground">
-            Autonomous <span className="text-primary">yield farming </span>
-            strategies powered by{" "}
-            <span className="text-primary">AI agents </span>on Mantle
-            blockchain. Create strategies in plain English, execute them
-            automatically on delegated wallets, or{" "}
-            <span className="text-primary">monetize </span>your expertise by
-            selling strategies in the marketplace
+          <div className="text-muted-foreground max-w-md">
+            <TextAnimate
+              as="span"
+              animation="blurIn"
+              by="word"
+              delay={0.6}
+              duration={0.4}
+              startOnView={false}
+            >
+              Autonomous
+            </TextAnimate>{" "}
+            <TextAnimate
+              as="span"
+              className="text-primary"
+              animation="blurIn"
+              by="word"
+              delay={0.7}
+              duration={0.4}
+              startOnView={false}
+            >
+              yield farming
+            </TextAnimate>{" "}
+            <TextAnimate
+              as="span"
+              animation="blurIn"
+              by="word"
+              delay={0.9}
+              duration={0.4}
+              startOnView={false}
+            >
+              strategies powered by
+            </TextAnimate>{" "}
+            <TextAnimate
+              as="span"
+              className="text-primary"
+              animation="blurIn"
+              by="word"
+              delay={1.1}
+              duration={0.4}
+              startOnView={false}
+            >
+              AI agents
+            </TextAnimate>{" "}
+            <TextAnimate
+              as="span"
+              animation="blurIn"
+              by="word"
+              delay={1.3}
+              duration={0.6}
+              startOnView={false}
+            >
+              on Mantle blockchain. Create strategies in plain English, execute them automatically on delegated wallets, or
+            </TextAnimate>{" "}
+            <TextAnimate
+              as="span"
+              className="text-primary"
+              animation="blurIn"
+              by="word"
+              delay={1.9}
+              duration={0.3}
+              startOnView={false}
+            >
+              monetize
+            </TextAnimate>{" "}
+            <TextAnimate
+              as="span"
+              animation="blurIn"
+              by="word"
+              delay={2.0}
+              duration={0.5}
+              startOnView={false}
+            >
+              your expertise by selling strategies in the marketplace
+            </TextAnimate>
           </div>
         </div>
 
         {/* Protocol Marquee */}
-        <div className="w-full my-20 relative">
+        <motion.div
+          className="w-full my-20 relative"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+        >
           <div className="absolute inset-0 bg-linear-to-r from-background via-transparent to-background z-10 pointer-events-none" />
           <Marquee>
             {protocols.map((protocol) => (
@@ -111,20 +229,30 @@ export default function Home() {
               </div>
             ))}
           </Marquee>
-        </div>
+        </motion.div>
 
         {/* Features */}
         <div className="my-20">
           <div className="flex gap-10">
             {/* Left: Features List */}
             <div className="flex-1 space-y-4">
-              <p className="text-5xl font-semibold text-white mb-10">
+              <motion.p
+                className="text-5xl font-semibold text-white mb-10"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5 }}
+              >
                 Features
-              </p>
+              </motion.p>
               {features.map((feature, index) => (
-                <div
+                <motion.div
                   key={index}
                   className="border border-neutral-700 bg-neutral-900 hover:border-primary/50 transition-colors"
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
                   <button
                     onClick={() =>
@@ -162,7 +290,7 @@ export default function Home() {
                       </motion.div>
                     )}
                   </AnimatePresence>
-                </div>
+                </motion.div>
               ))}
             </div>
 

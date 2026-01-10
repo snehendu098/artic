@@ -43,7 +43,7 @@ export const createActionHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const action = await createWalletAction(database, body);
 
     // Get user wallet for cache invalidation
@@ -101,7 +101,7 @@ export const getActionsHandler = async (c: Context<Env>) => {
       CacheKeys.actions(wallet, limit),
       TTL.ACTIONS,
       async () => {
-        const database = db(c.env.DATABASE_URL);
+        const database = db(c.env.HYPERDRIVE.connectionString);
         return getActionsByWallet(database, wallet, limit);
       }
     );
@@ -143,7 +143,7 @@ export const createBatchActionsHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const results = await createWalletActions(database, actions);
 
     // Get unique delegation wallet IDs and invalidate caches

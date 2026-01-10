@@ -11,7 +11,13 @@
 		}
 	],
 	"compatibility_flags": [
-	  "nodejs_compat"
+		"nodejs_compat"
+	],
+	"hyperdrive": [
+		{
+			"binding": "HYPERDRIVE",
+			"id": "8dfd68d8b4004ee3b44d2c225320fb11",
+		}
 	],
 	// "vars": {
 	//   "MY_VAR": "my-variable"
@@ -38,8 +44,7 @@
 	// "ai": {
 	//   "binding": "AI"
 	// },
-	// "observability": {
-	//   "enabled": true,
-	//   "head_sampling_rate": 1
-	// }
+	"observability": {
+	  "enabled": true,
+	}
 }

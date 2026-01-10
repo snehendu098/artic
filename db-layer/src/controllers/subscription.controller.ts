@@ -34,7 +34,7 @@ export const createSubscriptionHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const user = await getUserByWallet(database, body.wallet);
 
     if (!user) {
@@ -108,7 +108,7 @@ export const getSubscriptionsHandler = async (c: Context<Env>) => {
       CacheKeys.subscriptions(wallet),
       TTL.SUBSCRIPTIONS,
       async () => {
-        const database = db(c.env.DATABASE_URL);
+        const database = db(c.env.HYPERDRIVE.connectionString);
         return getSubscriptionsByWallet(database, wallet);
       }
     );
@@ -148,7 +148,7 @@ export const pauseSubscriptionHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const subscription = await pauseSubscription(database, id);
 
     if (!subscription) {
@@ -200,7 +200,7 @@ export const activateSubscriptionHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const subscription = await activateSubscription(database, id);
 
     if (!subscription) {
@@ -257,7 +257,7 @@ export const getSubscribersHandler = async (c: Context<Env>) => {
       CacheKeys.subscribers(wallet),
       TTL.SUBSCRIBERS,
       async () => {
-        const database = db(c.env.DATABASE_URL);
+        const database = db(c.env.HYPERDRIVE.connectionString);
         const { getStrategiesByCreator } = await import("../db/actions");
         const strategies = await getStrategiesByCreator(database, wallet);
 
@@ -302,7 +302,7 @@ export const getSubscribersHandler = async (c: Context<Env>) => {
 
 export const getActiveSubscriptionsForBotHandler = async (c: Context<Env>) => {
   try {
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const subscriptions = await getActiveSubscriptionsForBot(
       database,
       c.env.ENCRYPTION_KEY,

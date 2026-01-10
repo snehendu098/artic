@@ -30,6 +30,8 @@ export async function fetchActiveSubscriptions(): Promise<
     },
   });
 
+  console.log(res.body);
+
   if (!res.ok) {
     throw new Error(`Failed to fetch subscriptions: ${res.status}`);
   }

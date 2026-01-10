@@ -3,8 +3,15 @@ import { Env } from "./types";
 import { requireApiKey } from "./middleware/auth.middleware";
 
 // Controllers
-import { createDelegationWallet, getUser, upsertUserHandler } from "./controllers/user.controller";
-import { getDelegationsHandler, revealPrivateKeyHandler } from "./controllers/delegation.controller";
+import {
+  createDelegationWallet,
+  getUser,
+  upsertUserHandler,
+} from "./controllers/user.controller";
+import {
+  getDelegationsHandler,
+  revealPrivateKeyHandler,
+} from "./controllers/delegation.controller";
 import {
   createStrategyHandler,
   getMyStrategies,
@@ -23,11 +30,23 @@ import {
   getSubscribersHandler,
   getActiveSubscriptionsForBotHandler,
 } from "./controllers/subscription.controller";
-import { createPurchaseHandler, getPurchasesHandler } from "./controllers/purchase.controller";
-import { getEarningsHandler, claimEarningHandler } from "./controllers/earnings.controller";
-import { createActionHandler, getActionsHandler, createBatchActionsHandler } from "./controllers/action.controller";
+import {
+  createPurchaseHandler,
+  getPurchasesHandler,
+} from "./controllers/purchase.controller";
+import {
+  getEarningsHandler,
+  claimEarningHandler,
+} from "./controllers/earnings.controller";
+import {
+  createActionHandler,
+  getActionsHandler,
+  createBatchActionsHandler,
+} from "./controllers/action.controller";
+import { cors } from "hono/cors";
 
 const app = new Hono<Env>();
+app.use(cors());
 
 app.get("/", (c) => c.text("Artic Protocol API"));
 
@@ -91,6 +110,10 @@ app.patch("/earnings/:id/claim", claimEarningHandler);
 // ============================================
 // BOT ROUTES (protected)
 // ============================================
-app.get("/bot/active-subscriptions", requireApiKey, getActiveSubscriptionsForBotHandler);
+app.get(
+  "/bot/active-subscriptions",
+  requireApiKey,
+  getActiveSubscriptionsForBotHandler,
+);
 
 export default app;

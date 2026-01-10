@@ -100,7 +100,7 @@ export const updateStrategyStateHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
 
     const result = await database.transaction(async (tx) => {
       await validateStrategyExists(tx, body.strategyId);

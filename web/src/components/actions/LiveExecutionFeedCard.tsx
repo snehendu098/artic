@@ -95,9 +95,7 @@ const LiveExecutionFeedCard = () => {
 
   const activeSubscriptionIds = useMemo(() => {
     if (!subscriptions) return [];
-    return subscriptions
-      .filter((s) => s.isActive)
-      .map((s) => s.id);
+    return subscriptions.filter((s) => s.isActive).map((s) => s.id);
   }, [subscriptions]);
 
   const { events, isAnyRunning } = useLiveEvents(activeSubscriptionIds);
@@ -128,7 +126,6 @@ const LiveExecutionFeedCard = () => {
             {events.map((event) => (
               <motion.div
                 key={event.id}
-                variants={eventVariants}
                 initial="initial"
                 animate={event.isExiting ? "exit" : "animate"}
                 exit="exit"

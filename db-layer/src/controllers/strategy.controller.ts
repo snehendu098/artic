@@ -74,7 +74,7 @@ export const createStrategyHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
 
     // Get user
     const user = await getUserByWallet(database, body.wallet);
@@ -148,7 +148,7 @@ export const getMyStrategies = async (c: Context<Env>) => {
       CacheKeys.myStrategies(wallet),
       TTL.MY_STRATEGIES,
       async () => {
-        const database = db(c.env.DATABASE_URL);
+        const database = db(c.env.HYPERDRIVE.connectionString);
         return getStrategiesByCreator(database, wallet);
       }
     );
@@ -180,7 +180,7 @@ export const getMarketplaceStrategies = async (c: Context<Env>) => {
       CacheKeys.marketplace(),
       TTL.MARKETPLACE,
       async () => {
-        const database = db(c.env.DATABASE_URL);
+        const database = db(c.env.HYPERDRIVE.connectionString);
         return getPublicStrategies(database);
       }
     );
@@ -222,7 +222,7 @@ export const getStrategyDetailsHandler = async (c: Context<Env>) => {
     }
 
     // No caching - response is user-specific (isCreator, isOwned, isPurchased, subscription)
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const details = await getStrategyDetails(database, id, userWallet);
 
     if (!details) {
@@ -274,7 +274,7 @@ export const updateStrategyHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const strategy = await updateStrategy(database, id, body);
 
     if (!strategy) {
@@ -337,7 +337,7 @@ export const activateStrategyHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
 
     const user = await getUserByWallet(database, body.wallet);
     if (!user) {
@@ -397,7 +397,7 @@ export const publishStrategyHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
 
     // Verify user exists (authorization check could be added here)
     const user = await getUserByWallet(database, body.wallet);
@@ -463,7 +463,7 @@ export const editStrategyHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
 
     const user = await getUserByWallet(database, body.wallet);
     if (!user) {

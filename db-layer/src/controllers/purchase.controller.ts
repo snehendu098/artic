@@ -33,7 +33,7 @@ export const createPurchaseHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const user = await upsertUser(database, body.wallet);
 
     const purchase = await createPurchase(database, {
@@ -98,7 +98,7 @@ export const getPurchasesHandler = async (c: Context<Env>) => {
       CacheKeys.purchases(wallet),
       TTL.PURCHASES,
       async () => {
-        const database = db(c.env.DATABASE_URL);
+        const database = db(c.env.HYPERDRIVE.connectionString);
         return getPurchasesByWallet(database, wallet);
       }
     );

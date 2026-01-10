@@ -80,7 +80,7 @@ export const createDelegationWallet = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const privateKey = generatePrivateKey();
     const account = privateKeyToAccount(privateKey);
     const encryptedPrivateKey = await encrypt(privateKey, c.env.ENCRYPTION_KEY);
@@ -156,7 +156,7 @@ export const getUser = async (c: Context<Env>) => {
       CacheKeys.user(wallet),
       TTL.USER,
       async () => {
-        const database = db(c.env.DATABASE_URL);
+        const database = db(c.env.HYPERDRIVE.connectionString);
         return getUserByWallet(database, wallet);
       }
     );
@@ -207,7 +207,7 @@ export const upsertUserHandler = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const user = await upsertUser(database, body.wallet, body.username);
 
     // Invalidate cache

@@ -13,6 +13,20 @@
 			"remote": true
 		}
 	],
+	"durable_objects": {
+		"bindings": [
+			{
+				"name": "AGENT_EXECUTOR",
+				"class_name": "AgentExecutorDO"
+			}
+		]
+	},
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_classes": ["AgentExecutorDO"]
+		}
+	],
 	// "vars": {
 	//   "MY_VAR": "my-variable"
 	// },
@@ -35,8 +49,7 @@
 	//     "database_id": ""
 	//   }
 	// ],
-	// "observability": {
-	//   "enabled": true,
-	//   "head_sampling_rate": 1
-	// }
-}
+	"observability": {
+		"enabled": true,
+	},
+	}

@@ -1,10 +1,10 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { Agent } from "./agent";
-import { EventLogger, EventsState } from "./helpers/EventLogger";
-import { formatActions, RecentAction } from "./helpers/formatActions";
-import { KVNamespace } from "@cloudflare/workers-types";
+import { EventsState } from "./helpers/EventLogger";
+import { RecentAction } from "./helpers/formatActions";
+import { KVNamespace, DurableObjectNamespace } from "@cloudflare/workers-types";
 import { buildProtocolsList } from "./helpers/listProtocols";
+import { AgentExecutorDO, ExecuteRequest } from "./durable-objects/AgentExecutorDO";
 
 interface Env {
   EVENTS: KVNamespace;
@@ -12,6 +12,7 @@ interface Env {
   DB_LAYER_URL: string;
   GATEWAY_NAME: string;
   ACCOUNT_ID: string;
+  AGENT_EXECUTOR: DurableObjectNamespace<AgentExecutorDO>;
 }
 
 interface ExecutionMetadata {
@@ -30,16 +31,7 @@ app.get("/", (c) => {
 });
 
 app.post("/send", async (c) => {
-  const {
-    privateKey,
-    strategy,
-    subscriptionId,
-    delegationWalletId,
-    recentActions,
-    strategyId,
-    strategyName,
-    walletAddress,
-  } = (await c.req.json()) as {
+  const body = (await c.req.json()) as {
     privateKey: string;
     strategy: string;
     subscriptionId: string;
@@ -49,6 +41,8 @@ app.post("/send", async (c) => {
     strategyName?: string;
     walletAddress?: string;
   };
+
+  const { subscriptionId, strategyId, strategyName, walletAddress } = body;
 
   // Check if subscription is already running
   const existing = (await c.env.EVENTS.get(
@@ -84,46 +78,12 @@ app.post("/send", async (c) => {
     );
   }
 
-  // Fire and forget - execute in background
-  c.executionCtx.waitUntil(
-    (async () => {
-      const eventLogger = new EventLogger(
-        c.env.EVENTS,
-        subscriptionId,
-        delegationWalletId,
-        c.env.DB_LAYER_URL,
-      );
+  // Use Durable Object for long-running execution (no IoContext timeout)
+  const id = c.env.AGENT_EXECUTOR.idFromName(subscriptionId);
+  const stub = c.env.AGENT_EXECUTOR.get(id);
+  const result = await stub.execute(body as ExecuteRequest);
 
-      try {
-        const agent = new Agent(
-          privateKey as `0x${string}`,
-          c.env.GROQ_API_KEY,
-          eventLogger,
-          // c.env.ACCOUNT_ID,
-          // c.env.GATEWAY_NAME,
-        );
-        await agent.execute(strategy, formatActions(recentActions));
-        await eventLogger.setStatus("completed");
-      } catch (e) {
-        const errorMessage =
-          e instanceof Error ? e.message : "Unknown error occurred";
-        await eventLogger.emit({
-          type: "error",
-          data: { error: errorMessage, note: "Strategy execution failed" },
-        });
-        await eventLogger.setStatus("error");
-      }
-
-      await eventLogger.flush();
-
-      // Clear wallet execution tracking
-      if (walletAddress) {
-        await c.env.EVENTS.delete(`execution:${walletAddress}`);
-      }
-    })(),
-  );
-
-  return c.json({ success: true, message: "Execution started" });
+  return c.json(result);
 });
 
 // Batch endpoint must come before :subscriptionId to avoid matching "batch" as param
@@ -215,3 +175,4 @@ app.get("/protocols/list", async (c) => {
 });
 
 export default app;
+export { AgentExecutorDO } from "./durable-objects/AgentExecutorDO";

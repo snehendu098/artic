@@ -98,10 +98,7 @@ export class EventLogger {
   async flush() {
     const data = await this.kv.get(this.key, "json") as EventsState | null;
 
-    console.log(`[${this.subscriptionId}] Flush called - events: ${data?.events?.length ?? 0}, delegationWalletId: ${this.delegationWalletId}`);
-
     if (!data?.events?.length) {
-      console.log(`[${this.subscriptionId}] No events to flush`);
       await this.kv.delete(this.key);
       return;
     }
@@ -111,29 +108,20 @@ export class EventLogger {
       (e) => e.type === "tool_result" || e.type === "error"
     );
 
-    if (!persistableEvents.length) {
-      console.log(`[${this.subscriptionId}] No persistable events (tool_result/error)`);
-      await this.kv.delete(this.key);
-      return;
-    }
+    if (persistableEvents.length) {
+      const actions = persistableEvents.map((e) => ({
+        subscriptionId: this.subscriptionId,
+        delegationWalletId: this.delegationWalletId,
+        actionType: this.mapEventTypeToActionType(e.type),
+        description: this.getDescription(e),
+        note: e.data.note || e.data.tools?.join(", ") || "",
+        txHash: e.data.txHash,
+        blockNumber: e.data.blockNumber,
+        status: this.mapEventTypeToStatus(e.type),
+        createdAt: new Date(e.timestamp).toISOString(),
+      }));
 
-    const actions = persistableEvents.map((e) => ({
-      subscriptionId: this.subscriptionId,
-      delegationWalletId: this.delegationWalletId,
-      actionType: this.mapEventTypeToActionType(e.type),
-      description: this.getDescription(e),
-      note: e.data.note || e.data.tools?.join(", ") || "",
-      txHash: e.data.txHash,
-      blockNumber: e.data.blockNumber,
-      status: this.mapEventTypeToStatus(e.type),
-      createdAt: new Date(e.timestamp).toISOString(),
-    }));
-
-    console.log(`[${this.subscriptionId}] Actions to save: ${actions.length}`);
-
-    if (actions.length) {
       try {
-        console.log(`[${this.subscriptionId}] Posting to /actions/batch:`, JSON.stringify(actions));
         await fetch(`${this.dbLayerUrl}/actions/batch`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -144,7 +132,6 @@ export class EventLogger {
       }
     }
 
-    // Clear KV
     await this.kv.delete(this.key);
   }
 }

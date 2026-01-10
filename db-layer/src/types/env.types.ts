@@ -1,8 +1,9 @@
 export type Env = {
   Bindings: {
     ARTIC: KVNamespace;
-    DATABASE_URL: string;
     BOT_API_KEY: string;
     ENCRYPTION_KEY: string;
+    HYPERDRIVE: Hyperdrive;
+    CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE: string;
   };
 };

@@ -5,7 +5,7 @@ import { getActiveSubscriptionsForBot } from "../db/actions/subscription.actions
 
 export const fetchActiveSubscriptionsHandler = async (c: Context<Env>) => {
   try {
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
 
     const activeSubscriptions = await getActiveSubscriptionsForBot(
       database,

@@ -16,6 +16,7 @@ interface HeaderProps {
   number?: number;
   indexEnabled?: boolean;
   showActions?: boolean;
+  onWalletCreated?: () => void;
 }
 
 const Header = ({
@@ -25,6 +26,7 @@ const Header = ({
   number,
   indexEnabled = true,
   showActions = false,
+  onWalletCreated,
 }: HeaderProps) => {
   const linkConfig = getLinkByUrl(url);
   const linkIndex = getLinkIndexByUrl(url);
@@ -64,7 +66,7 @@ const Header = ({
             </motion.button>
           </Link>
 
-          <CreateWalletDialog mode="text" />
+          <CreateWalletDialog mode="text" onSuccess={onWalletCreated} />
         </div>
       )}
     </div>

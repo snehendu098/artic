@@ -22,7 +22,7 @@ export const fetchRecentWalletActions = async (c: Context<Env>) => {
       );
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const actions = await getRecentWalletActions(database, userWallet, 3);
 
     return c.json(

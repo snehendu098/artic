@@ -27,7 +27,7 @@ export const getEarningsHandler = async (c: Context<Env>) => {
       CacheKeys.earnings(wallet),
       TTL.EARNINGS,
       async () => {
-        const database = db(c.env.DATABASE_URL);
+        const database = db(c.env.HYPERDRIVE.connectionString);
         const earnings = await getEarningsByWallet(database, wallet);
         const summary = await getEarningsSummary(database, wallet);
         return { earnings, summary };
@@ -73,7 +73,7 @@ export const claimEarningHandler = async (c: Context<Env>) => {
       }, 400);
     }
 
-    const database = db(c.env.DATABASE_URL);
+    const database = db(c.env.HYPERDRIVE.connectionString);
     const earning = await markEarningClaimed(database, id, body.claimTxHash);
 
     if (!earning) {
