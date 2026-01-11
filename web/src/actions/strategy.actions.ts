@@ -253,3 +253,35 @@ export async function publishStrategy(
     return { success: false, message: "Failed to publish strategy" };
   }
 }
+
+export async function pauseSubscription(
+  subscriptionId: string,
+): Promise<ActionResult> {
+  try {
+    const res = await fetch(`${API_URL}/subscriptions/${subscriptionId}/pause`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+    });
+    const json = await res.json();
+    return { success: json.success, message: json.message };
+  } catch (error) {
+    console.error("Failed to pause subscription:", error);
+    return { success: false, message: "Failed to pause subscription" };
+  }
+}
+
+export async function activateSubscriptionAction(
+  subscriptionId: string,
+): Promise<ActionResult> {
+  try {
+    const res = await fetch(`${API_URL}/subscriptions/${subscriptionId}/activate`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+    });
+    const json = await res.json();
+    return { success: json.success, message: json.message };
+  } catch (error) {
+    console.error("Failed to activate subscription:", error);
+    return { success: false, message: "Failed to activate subscription" };
+  }
+}

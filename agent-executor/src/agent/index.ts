@@ -25,7 +25,8 @@ import { EventLogger } from "../helpers/EventLogger";
 import { ChatGroq } from "@langchain/groq";
 import { MNTAgentKit } from "mantle-agent-kit-sdk";
 import { MAINNET_TOKENS, TokenConfig } from "../constants";
-import { createOpenoceanGetTokens } from "../tools";
+import { MemorySaver } from "@langchain/langgraph";
+import { uuidv4 } from "zod";
 
 export class Agent {
   public account: PrivateKeyAccount;
@@ -61,6 +62,8 @@ export class Agent {
       const requiredTools = ["openocean_get_tokens"];
       const mergedToolNames = [...new Set([...toolNames, ...requiredTools])];
       const tools = filterToolsByNames(allTools, mergedToolNames);
+
+      const checkpointer = new MemorySaver();
 
       const tokenData = MAINNET_TOKENS.map(
         (item: TokenConfig) => `
@@ -129,11 +132,19 @@ CURRENT TIME: ${new Date().toLocaleDateString()}
       const mainAgent = createAgent({
         model: this.model,
         tools,
+        checkpointer,
       });
 
-      const result = await mainAgent.invoke({
-        messages: [new SystemMessage(systemPrompt), new HumanMessage(prompt)],
-      });
+      const result = await mainAgent.invoke(
+        {
+          messages: [new SystemMessage(systemPrompt), new HumanMessage(prompt)],
+        },
+        {
+          configurable: {
+            thread_id: uuidv4(),
+          },
+        },
+      );
 
       console.log(result.messages.map((item) => item).join("\n\n"));
 

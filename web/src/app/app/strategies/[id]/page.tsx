@@ -11,7 +11,7 @@ import StrategyActionsPanel from "@/components/strategies/card/StrategyActionsPa
 import StrategySubscribersCard from "@/components/strategies/card/StrategySubscribersCard";
 import StrategyWalletCard from "@/components/strategies/card/StrategyWalletCard";
 import StrategyActionsCard from "@/components/strategies/card/StrategyActionsCard";
-import { getStrategyDetails, activateStrategy, publishStrategy, type StrategyDetailsResponse } from "@/actions/strategy.actions";
+import { getStrategyDetails, activateStrategy, publishStrategy, pauseSubscription, activateSubscriptionAction, type StrategyDetailsResponse } from "@/actions/strategy.actions";
 import { getWalletAssets } from "@/lib/blockchain/assets";
 import { useWallets } from "@/hooks/useWallets";
 import { useMarketplace } from "@/hooks/useMarketplace";
@@ -147,14 +147,18 @@ const StrategyDetailPage = ({
 
   const userStatus = getUserStatus();
 
-  const handleToggleStatus = () => {
-    // Toggle subscription active state
-    if (subscriptionActive) {
-      setSubscriptionActive(false);
-    } else {
-      setSubscriptionActive(true);
+  const handleToggleStatus = async () => {
+    if (!data?.subscription) return;
+
+    const result = subscriptionActive
+      ? await pauseSubscription(data.subscription.id)
+      : await activateSubscriptionAction(data.subscription.id);
+
+    if (result.success) {
+      setSubscriptionActive(!subscriptionActive);
+      const updated = await getStrategyDetails(id, walletAddress);
+      if (updated) setData(updated);
     }
-    // TODO: Call API to update subscription status
   };
 
   const handleActivate = async (delegationWalletId: string) => {
