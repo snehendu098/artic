@@ -6,6 +6,7 @@ import type { ProgressiveWallet } from "@/types";
 import SplitPanelLayout from "@/components/layouts/split-panel-layout";
 import WalletRow from "@/components/wallets/WalletRow";
 import AssetDistributionPanel from "@/components/wallets/AssetDistributionPanel";
+import CreateWalletDialog from "@/components/dialog/CreateWalletDialog";
 import { useProgressiveWallets } from "@/hooks";
 
 const WalletsPage = () => {
@@ -13,7 +14,7 @@ const WalletsPage = () => {
   const [selectedWallet, setSelectedWallet] = useState<ProgressiveWallet | null>(null);
 
   const walletAddress = user?.wallet?.address;
-  const { wallets, phase } = useProgressiveWallets(authenticated ? walletAddress : undefined);
+  const { wallets, phase, refetch } = useProgressiveWallets(authenticated ? walletAddress : undefined);
 
   const isLoading = phase === "idle" || phase === "wallets";
 
@@ -64,6 +65,7 @@ const WalletsPage = () => {
       title="Wallets"
       subtitle="// wallet management"
       isPanelOpen={!!currentWallet}
+      headerAction={<CreateWalletDialog mode="text" onSuccess={refetch} />}
       sidePanel={
         currentWallet && (
           <AssetDistributionPanel

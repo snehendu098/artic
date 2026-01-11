@@ -103,7 +103,6 @@ export const createStrategyHandler = async (c: Context<Env>) => {
     // Invalidate caches
     await cacheDelete(c.env.ARTIC, [
       CacheKeys.myStrategies(body.wallet),
-      CacheKeys.marketplace(),
       CacheKeys.subscriptions(body.wallet),
       CacheKeys.botActive(),
     ]);
@@ -175,15 +174,8 @@ export const getMyStrategies = async (c: Context<Env>) => {
 
 export const getMarketplaceStrategies = async (c: Context<Env>) => {
   try {
-    const strategies = await cached(
-      c.env.ARTIC,
-      CacheKeys.marketplace(),
-      TTL.MARKETPLACE,
-      async () => {
-        const database = db(c.env.HYPERDRIVE.connectionString);
-        return getPublicStrategies(database);
-      }
-    );
+    const database = db(c.env.HYPERDRIVE.connectionString);
+    const strategies = await getPublicStrategies(database);
 
     return c.json(
       {
@@ -287,9 +279,6 @@ export const updateStrategyHandler = async (c: Context<Env>) => {
         404,
       );
     }
-
-    // Invalidate caches
-    await cacheDelete(c.env.ARTIC, [CacheKeys.marketplace()]);
 
     return c.json(
       {
@@ -417,9 +406,6 @@ export const publishStrategyHandler = async (c: Context<Env>) => {
       );
     }
 
-    // Invalidate caches
-    await cacheDelete(c.env.ARTIC, [CacheKeys.marketplace()]);
-
     return c.json(
       { success: true, message: "Strategy published", data: strategy },
       200,
@@ -481,10 +467,7 @@ export const editStrategyHandler = async (c: Context<Env>) => {
     });
 
     // Invalidate caches
-    await cacheDelete(c.env.ARTIC, [
-      CacheKeys.marketplace(),
-      CacheKeys.myStrategies(body.wallet),
-    ]);
+    await cacheDelete(c.env.ARTIC, [CacheKeys.myStrategies(body.wallet)]);
 
     return c.json(
       { success: true, message: "Strategy updated", data: strategy },

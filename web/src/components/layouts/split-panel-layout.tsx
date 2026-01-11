@@ -13,6 +13,7 @@ interface SplitPanelLayoutProps {
   sidePanel?: ReactNode;
   isPanelOpen: boolean;
   showHeader?: boolean;
+  headerAction?: ReactNode;
 }
 
 const SplitPanelLayout = ({
@@ -23,6 +24,7 @@ const SplitPanelLayout = ({
   sidePanel,
   isPanelOpen,
   showHeader = true,
+  headerAction,
 }: SplitPanelLayoutProps) => {
   return (
     <div className="w-full h-full relative">
@@ -35,16 +37,19 @@ const SplitPanelLayout = ({
           className="w-[60%] shrink-0"
         >
           {showHeader && backUrl && (
-            <div className="flex items-center gap-3">
-              <Link href={backUrl}>
-                <button className="p-1.5 bg-neutral-700 border border-neutral-600 hover:border-primary/50 transition-all duration-200 group">
-                  <ArrowLeft className="w-4 h-4 group-hover:text-primary transition-colors" />
-                </button>
-              </Link>
-              <div>
-                <p className="text-xs text-white/50">{subtitle}</p>
-                <p className="uppercase">{title}</p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Link href={backUrl}>
+                  <button className="p-1.5 bg-neutral-700 border border-neutral-600 hover:border-primary/50 transition-all duration-200 group">
+                    <ArrowLeft className="w-4 h-4 group-hover:text-primary transition-colors" />
+                  </button>
+                </Link>
+                <div>
+                  <p className="text-xs text-white/50">{subtitle}</p>
+                  <p className="uppercase">{title}</p>
+                </div>
               </div>
+              {headerAction}
             </div>
           )}
 

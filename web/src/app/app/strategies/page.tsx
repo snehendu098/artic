@@ -148,7 +148,7 @@ const StrategiesPage = () => {
                             </span>
                           </div>
                           <p className="text-xs text-white/40 mt-0.5">
-                            {purchase.priceMnt} MNT
+                            {parseFloat(purchase.priceMnt)} MNT
                           </p>
                         </div>
                       </div>
