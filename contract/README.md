@@ -1,3 +1,7 @@
+## Deployed Contract
+
+Live on Mantle Mainnet: [0x18452c228e66BEaD6990Be6E2387cEE3dE441dCA](https://mantlescan.xyz/address/0x18452c228e66BEaD6990Be6E2387cEE3dE441dCA)
+
 ## Getting Started
 
 Create a project using this example:
