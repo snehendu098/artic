@@ -25,7 +25,7 @@ export function FooterSection() {
             <Twitter className="w-full h-full" />
           </a>
           <a
-            href="https://github.com"
+            href="https://github.com/snehendu098/artic"
             target="_blank"
             rel="noopener noreferrer"
             aria-label="GitHub"

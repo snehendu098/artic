@@ -113,15 +113,17 @@ export default function Home() {
                 <FaXTwitter className="text-2xl aspect-square text-muted-foreground" />
               </motion.div>
 
-              <motion.div
-                className="border p-2 bg-neutral-900"
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: 0.7 }}
-                whileHover={{ scale: 1.1 }}
-              >
-                <FaGithub className="text-2xl aspect-square text-muted-foreground" />
-              </motion.div>
+              <Link href="https://github.com/snehendu098/artic" target="_blank">
+                <motion.div
+                  className="border p-2 bg-neutral-900"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, delay: 0.7 }}
+                  whileHover={{ scale: 1.1 }}
+                >
+                  <FaGithub className="text-2xl aspect-square text-muted-foreground" />
+                </motion.div>
+              </Link>
             </div>
           </div>
 
